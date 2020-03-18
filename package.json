@@ -9,6 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@trig-app/constants": "^0.1.4",
+    "@trig-app/core-components": "^0.1.52",
+    "@trig-app/themes": "^0.1.3",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "webpack": "^4.42.0",

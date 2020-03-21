@@ -1,7 +1,8 @@
 import React from "react";
+import ReactDOM from "react-dom";
 
 const Page = () => {
   return <div>My test site</div>;
 };
 
-export default Page;
+ReactDOM.render(<Page />, document.getElementById("app"));

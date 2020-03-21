@@ -1,25 +1,24 @@
-// Webpack uses this to work with directories
-const path = require("path");
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-// This is main configuration object.
-// Here you write different options and tell Webpack what to do
 module.exports = {
-  entry: "./src/index.js",
+  entry: './src/index.js',
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader"
-        }
-      }
-    ]
+          loader: 'babel-loader',
+        },
+      },
+    ],
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "bundle.js"
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
   },
-  devtool: "eval-source-map",
-  mode: "development"
+  plugins: [new HtmlWebpackPlugin({ template: 'index.html' })],
+  devtool: 'eval-source-map',
+  mode: 'development',
 };

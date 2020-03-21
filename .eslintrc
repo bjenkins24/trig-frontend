@@ -1,0 +1,15 @@
+{
+  "extends": ["@trig-app"],
+  "rules": {
+    "react/forbid-prop-types": 0
+  },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**", "**/src/test/**"],
+      "rules": {
+        "no-console": 0,
+        "react/prop-types": 0
+      }
+    }
+  ]
+}

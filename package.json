@@ -1,20 +1,69 @@
 {
   "name": "trig-frontend",
+  "private": true,
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
+    "test": "is-ci \"test:coverage\" \"test:watch\"",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch --runInBand",
+    "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --watch",
+    "coverage": "open-cli coverage/lcov-report/index.html",
+    "t:oc": "npm run test:coverage && npm run coverage"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "precise-commits",
+      "eslint --fix"
+    ]
   },
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "dependencies": {
     "@trig-app/constants": "^0.1.4",
     "@trig-app/core-components": "^0.1.52",
     "@trig-app/themes": "^0.1.3",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
+    "styled-components": "^4.4.1",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.1.1",
+    "@testing-library/react": "^10.0.1",
+    "@testing-library/user-event": "^10.0.0",
+    "@trig-app/eslint-config": "^1.0.4",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^25.1.0",
+    "babel-plugin-styled-components": "^1.10.7",
+    "bufferutil": "^4.0.1",
+    "canvas": "^2.6.1",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jest": "^23.8.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^2.5.1",
+    "husky": "^4.2.3",
+    "is-ci": "^2.0.0",
+    "jest": "^25.1.0",
+    "lint-staged": "^10.0.8",
+    "open-cli": "^6.0.0",
+    "precise-commits": "^1.0.2",
+    "prettier": "^1.19.1",
+    "prop-types": "^15.7.2",
+    "typescript": "^3.8.3",
+    "utf-8-validate": "^5.0.2"
   }
 }

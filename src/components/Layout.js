@@ -18,18 +18,12 @@ const Header = styled.div`
 `;
 
 const Container = styled.div`
-  &:first-child {
-    width: 90000px;
-  }
   @media ${device.bigDesktopUp} {
     margin: 0;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    &:first-child {
-      margin: 0;
-    }
   }
 `;
 

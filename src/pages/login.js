@@ -29,7 +29,11 @@ const ForgotPassword = styled(Body1)`
   margin-top: -1.6rem;
 `;
 
-const Lock = styled(Icon).attrs({ type: 'lock', size: 1.6 })`
+const Lock = styled(Icon).attrs({
+  type: 'lock',
+  size: 1.6,
+  svgProps: { style: { transition: 'none' } },
+})`
   display: inline-block;
   margin-right: 0.4rem;
   transform: translateY(0.1rem);
@@ -67,14 +71,12 @@ const Login = () => {
                     <StringFieldForm
                       type="email"
                       name="email"
-                      label="Email"
-                      labelProps={{ color: 'pc' }}
+                      placeholder="Email"
                     />
                     <StringFieldForm
                       type="password"
                       name="password"
-                      label="Password"
-                      labelProps={{ color: 'pc' }}
+                      placeholder="Password"
                     />
                     <ForgotPassword forwardedAs={Link} to="/forgot-password">
                       <Lock /> Forgot your password?

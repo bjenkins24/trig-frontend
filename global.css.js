@@ -64,12 +64,16 @@ export default createGlobalStyle`
         -moz-osx-font-smoothing: grayscale;
     }  
 
+    form {
+        margin-block-end: 0;
+    }
+
     a {
         text-decoration: none;
         transition: all 0.2s;
-        color: inherit;
+        color: ${({ theme }) => theme.s} !important;
         &:hover {
-           color: ${({ theme }) => theme.ss[200]};
+           color: ${({ theme }) => theme.ss[200]} !important;
         }
     }
 `;

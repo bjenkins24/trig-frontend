@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Logo } from '@trig-app/core-components';
+import { device } from '@trig-app/constants';
 
 const GlobalStyles = createGlobalStyle`
     body {
@@ -17,10 +18,19 @@ const Header = styled.div`
 `;
 
 const Container = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  &:first-child {
+    width: 90000px;
+  }
+  @media ${device.bigDesktopUp} {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    &:first-child {
+      margin: 0;
+    }
+  }
 `;
 
 const Layout = ({ children }) => {

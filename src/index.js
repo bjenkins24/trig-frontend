@@ -4,8 +4,10 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import theme from '@trig-app/themes';
-import Login from './pages/login';
-import Register from './pages/register';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import GlobalStyle from '../global.css';
 
 const App = hot(() => {
@@ -16,6 +18,12 @@ const App = hot(() => {
         <Switch>
           <Route path="/register">
             <Register />
+          </Route>
+          <Route path="/reset-password">
+            <ResetPassword />
+          </Route>
+          <Route path="/forgot-password">
+            <ForgotPassword />
           </Route>
           <Route path={['/', '/login']}>
             <Login />

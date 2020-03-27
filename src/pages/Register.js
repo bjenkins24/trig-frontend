@@ -30,7 +30,7 @@ const Or = styled.p`
 
 const Register = () => {
   return (
-    <Layout>
+    <Layout title="Create Account">
       <AuthBox>
         <Heading1 color="pc">Create a free account</Heading1>
         <SignIn>

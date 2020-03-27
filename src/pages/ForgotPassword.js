@@ -56,7 +56,7 @@ const Login = () => {
   const [emailAddress, setEmailAddress] = useState('');
 
   return (
-    <Layout>
+    <Layout title="Forgot Password">
       <AuthBox>
         <Container>
           {!wasEmailSent ? (

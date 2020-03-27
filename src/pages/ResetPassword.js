@@ -28,7 +28,7 @@ const FormContainer = styled.div`
 
 const Login = () => {
   return (
-    <Layout>
+    <Layout title="Reset Password">
       <AuthBox>
         <Container>
           <Heading1 color="pc">Reset your password</Heading1>

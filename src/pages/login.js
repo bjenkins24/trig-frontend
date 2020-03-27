@@ -45,7 +45,7 @@ const Or = styled.p`
 
 const Login = () => {
   return (
-    <Layout>
+    <Layout title="Login">
       <AuthBox>
         <Heading1 color="pc">Sign in</Heading1>
         <CreateAccount>

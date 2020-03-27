@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
+import { Helmet } from 'react-helmet';
 import { Logo } from '@trig-app/core-components';
 import { device } from '@trig-app/constants';
 
@@ -27,10 +28,13 @@ const Container = styled.div`
   }
 `;
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title }) => {
   return (
     <>
       <GlobalStyles />
+      <Helmet>
+        <title>{title} | Trig</title>
+      </Helmet>
       <Header>
         <a href="https://trytrig.com">
           <Logo />
@@ -43,6 +47,7 @@ const Layout = ({ children }) => {
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
 };
 
 export default Layout;

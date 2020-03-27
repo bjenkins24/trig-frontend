@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { object, string } from 'yup';
 import {
@@ -23,12 +23,10 @@ const Description = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
 
 const FormContainer = styled.div`
   text-align: left;
-  margin: 0 auto 4rem;
+  margin: 0 auto;
 `;
 
 const Login = () => {
-  const [isPasswordShowing, setIsPasswordShowing] = useState(false);
-
   return (
     <Layout>
       <AuthBox>
@@ -37,9 +35,6 @@ const Login = () => {
           <Description>
             Enter your new password below and you&apos;re good to go.
           </Description>
-          <Button onClick={() => setIsPasswordShowing(!isPasswordShowing)}>
-            {isPasswordShowing ? 'Hide Password' : 'Show Password'}
-          </Button>
           <FormContainer>
             <Form
               initialValues={{ password: '', confirmPassword: '' }}
@@ -51,6 +46,16 @@ const Login = () => {
                   8,
                   'Your password must be at least 8 characters.'
                 ),
+                confirmPassword: string().test(
+                  'match',
+                  'The passwords do not match.',
+                  /* eslint-disable */
+                  function(value) {
+                    const { password } = this.parent;
+                    return password === value;
+                  }
+                  /* eslint-enable */
+                ),
               })}
             >
               {({ handleSubmit }) => {
@@ -58,12 +63,12 @@ const Login = () => {
                   <form onSubmit={handleSubmit}>
                     <Fieldset width="100%">
                       <StringFieldForm
-                        type={isPasswordShowing ? 'text' : 'password'}
+                        type="password"
                         name="password"
                         placeholder="New Password"
                       />
                       <StringFieldForm
-                        type={isPasswordShowing ? 'text' : 'password'}
+                        type="password"
                         name="confirmPassword"
                         placeholder="Confirm New Password"
                       />

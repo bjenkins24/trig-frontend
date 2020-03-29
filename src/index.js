@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
+import { ToastContainer } from '@trig-app/core-components';
 import theme from '@trig-app/themes';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -14,6 +15,7 @@ const App = hot(() => {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
+      <ToastContainer />
       <Router>
         <Switch>
           <Route path="/register">

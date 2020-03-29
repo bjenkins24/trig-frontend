@@ -10,9 +10,11 @@ import {
   StringFieldForm,
   Button,
   Icon,
+  toast,
 } from '@trig-app/core-components';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
+import { login } from '../utils/authClient';
 
 const CreateAccount = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
   margin-bottom: 4rem;
@@ -25,8 +27,9 @@ const FormContainer = styled.div`
 `;
 
 const ForgotPassword = styled(Body1)`
-  text-align: right;
-  margin-top: -1.6rem;
+  text-align: center;
+  display: block;
+  margin-top: 2.4rem;
 `;
 
 const Lock = styled(Icon).attrs({
@@ -54,17 +57,27 @@ const Login = () => {
         <FormContainer>
           <Form
             initialValues={{ email: '', password: '' }}
-            onSubmit={({ values }) => console.log(values)}
+            onSubmit={async ({ email, password }) => {
+              const result = await login({ email, password });
+              if (result?.error === 'invalid_grant') {
+                toast({
+                  type: 'error',
+                  message:
+                    'The email or password you entered was incorrect. Please try again.',
+                });
+              }
+            }}
             validationSchema={object().shape({
               email: string()
                 .required('An email is required')
                 .email('Please use a valid email'),
-              password: string()
-                .required('Please enter a valid password.')
-                .min(8, 'Your password must be at least 8 characters.'),
+              password: string().min(
+                8,
+                'Your password must be at least 8 characters.'
+              ),
             })}
           >
-            {({ handleSubmit }) => {
+            {({ handleSubmit, submitting }) => {
               return (
                 <form onSubmit={handleSubmit}>
                   <Fieldset width="100%">
@@ -78,10 +91,13 @@ const Login = () => {
                       name="password"
                       placeholder="Password"
                     />
-                    <ForgotPassword forwardedAs={Link} to="/forgot-password">
-                      <Lock /> Forgot your password?
-                    </ForgotPassword>
-                    <Button type="submit" size="lg" width="100%">
+
+                    <Button
+                      type="submit"
+                      size="lg"
+                      width="100%"
+                      loading={submitting}
+                    >
                       Sign In
                     </Button>
                   </Fieldset>
@@ -104,6 +120,9 @@ const Login = () => {
           >
             Sign in with Google
           </Button>
+          <ForgotPassword forwardedAs={Link} to="/forgot-password">
+            <Lock /> Forgot your password?
+          </ForgotPassword>
         </FormContainer>
       </AuthBox>
     </Layout>

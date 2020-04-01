@@ -39,6 +39,7 @@
     "react-dom": "^16.13.0",
     "react-helmet": "^5.2.1",
     "react-hot-loader": "^4.12.20",
+    "react-query": "^1.2.0",
     "react-router-dom": "^5.1.2",
     "styled-components": "^4.4.1",
     "webpack": "^4.42.0",

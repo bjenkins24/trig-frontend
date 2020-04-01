@@ -8,7 +8,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
   },
-  devtool: 'eval-source-map',
+  devtool: 'inline-source-map',
   resolve: {
     alias: {
       'react-dom': '@hot-loader/react-dom',

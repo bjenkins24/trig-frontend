@@ -6,7 +6,10 @@ const logout = () => {
 
 const client = async (endpoint, { body, ...customConfig } = {}) => {
   const token = window.localStorage.getItem(localStorageKey);
-  const headers = { 'content-type': 'application/json' };
+  const headers = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }

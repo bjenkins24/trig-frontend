@@ -2,7 +2,7 @@ import { client, localStorageKey } from './apiClient';
 
 const handleUserResponse = data => {
   if (data?.error) return data;
-  const token = data.data.access_token;
+  const token = data.data.auth_token.access_token;
   return window.localStorage.setItem(localStorageKey, token);
 };
 

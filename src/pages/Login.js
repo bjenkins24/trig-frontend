@@ -14,7 +14,7 @@ import {
 } from '@trig-app/core-components';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
-import { login } from '../utils/authClient';
+import { useAuth } from '../context/authContext';
 
 const CreateAccount = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
   margin-bottom: 4rem;
@@ -47,6 +47,8 @@ const Or = styled.p`
 `;
 
 const Login = () => {
+  const { login } = useAuth();
+
   return (
     <Layout title="Login">
       <AuthBox>

@@ -27,12 +27,18 @@ const AuthProvider = props => {
 
   const login = useCallback(async params => {
     const result = await authClient.login(params);
-    setUser(result);
+    if (!result?.error) {
+      setUser(result);
+    }
+    return result;
   }, []);
 
   const register = useCallback(async params => {
     const result = await authClient.register(params);
-    setUser(result);
+    if (!result?.error) {
+      setUser(result);
+    }
+    return result;
   }, []);
 
   const logout = useCallback(() => {

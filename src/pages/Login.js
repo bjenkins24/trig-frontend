@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { object, string } from 'yup';
 import {
   Heading1,
@@ -48,6 +48,7 @@ const Or = styled.p`
 
 const Login = () => {
   const { login } = useAuth();
+  const history = useHistory();
 
   return (
     <Layout title="Login">
@@ -62,21 +63,19 @@ const Login = () => {
             onSubmit={async ({ email, password }) => {
               const result = await login({ email, password });
               if (result?.error === 'invalid_grant') {
-                toast({
+                return toast({
                   type: 'error',
                   message:
                     'The email or password you entered was incorrect. Please try again.',
                 });
               }
+              return history.push('/');
             }}
             validationSchema={object().shape({
               email: string()
-                .required('An email is required')
-                .email('Please use a valid email'),
-              password: string().min(
-                8,
-                'Your password must be at least 8 characters.'
-              ),
+                .required('An email is required.')
+                .email('Please use a valid email.'),
+              password: string().required('You must enter your password.'),
             })}
           >
             {({ handleSubmit, submitting }) => {

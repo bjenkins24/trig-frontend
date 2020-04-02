@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { object, string, bool } from 'yup';
 import {
   Heading1,
@@ -32,6 +32,7 @@ const Or = styled.p`
 
 const Register = () => {
   const { register } = useAuth();
+  const history = useHistory();
 
   return (
     <Layout title="Create Account">
@@ -46,12 +47,13 @@ const Register = () => {
             onSubmit={async ({ email, password, terms }) => {
               const result = await register({ email, password, terms });
               if (result?.error === 'user_exists') {
-                toast({
+                return toast({
                   type: 'error',
                   message:
                     'The email you tried to register already has an account associated with it. Please try logging in instead.',
                 });
               }
+              return history.push('/');
             }}
             validationSchema={object().shape({
               email: string()

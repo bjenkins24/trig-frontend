@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
-import { Helmet } from 'react-helmet';
 import { Logo } from '@trig-app/core-components';
 import { device } from '@trig-app/constants';
+import Head from './Head';
 
 const GlobalStyles = createGlobalStyle`
     body {
@@ -32,9 +32,7 @@ const Layout = ({ children, title }) => {
   return (
     <>
       <GlobalStyles />
-      <Helmet>
-        <title>{title} | Trig</title>
-      </Helmet>
+      <Head title={title} />
       <Header>
         <a href="https://trytrig.com">
           <Logo />

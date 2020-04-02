@@ -15,32 +15,7 @@ module.exports = {
     },
   },
   devServer: {
-    watchOptions: { aggregateTimeout: 300, poll: 1000 },
-    publicPath: '/',
-    inline: true,
     hot: true,
-    clientLogLevel: 'none',
-    overlay: true,
-    stats: {
-      colors: true,
-      hash: false,
-      version: false,
-      timings: true,
-      assets: false,
-      chunks: false,
-      modules: false,
-      reasons: false,
-      children: false,
-      source: false,
-      errors: true,
-      errorDetails: true,
-      warnings: true,
-      publicPath: false,
-    },
-    // Make all 404's fallback to index.html - so react router works
-    historyApiFallback: {
-      index: '/',
-    },
   },
   mode: 'development',
   module: {

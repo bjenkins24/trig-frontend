@@ -3,7 +3,8 @@ import { client, localStorageKey } from './apiClient';
 const handleUserResponse = data => {
   if (data?.error) return data;
   const token = data.data.auth_token.access_token;
-  return window.localStorage.setItem(localStorageKey, token);
+  window.localStorage.setItem(localStorageKey, token);
+  return data.data.user;
 };
 
 const getToken = () => {
@@ -24,8 +25,8 @@ const login = async ({ email, password }) => {
   return handleUserResponse(result);
 };
 
-const register = async ({ email, password }) => {
-  const result = await client('register', { body: { email, password } });
+const register = async ({ email, password, terms }) => {
+  const result = await client('register', { body: { email, password, terms } });
   return handleUserResponse(result);
 };
 

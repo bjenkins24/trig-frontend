@@ -10,7 +10,9 @@ import {
   StringFieldForm,
   Button,
   CheckboxForm,
+  toast,
 } from '@trig-app/core-components';
+import { useAuth } from '../context/authContext';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
 
@@ -29,6 +31,8 @@ const Or = styled.p`
 `;
 
 const Register = () => {
+  const { register } = useAuth();
+
   return (
     <Layout title="Create Account">
       <AuthBox>
@@ -39,7 +43,16 @@ const Register = () => {
         <FormContainer>
           <Form
             initialValues={{ email: '', password: '', terms: false }}
-            onSubmit={values => console.log(values)}
+            onSubmit={async ({ email, password, terms }) => {
+              const result = await register({ email, password, terms });
+              if (result?.error === 'user_exists') {
+                toast({
+                  type: 'error',
+                  message:
+                    'The email you tried to register already has an account associated with it. Please try logging in instead.',
+                });
+              }
+            }}
             validationSchema={object().shape({
               email: string()
                 .required('An email is required')
@@ -54,7 +67,7 @@ const Register = () => {
               ),
             })}
           >
-            {({ handleSubmit }) => {
+            {({ handleSubmit, submitting }) => {
               return (
                 <form onSubmit={handleSubmit}>
                   <Fieldset width="100%">
@@ -74,7 +87,12 @@ const Register = () => {
                       labelProps={{ color: 'pc' }}
                       label="I agree to the Terms of Service and Privacy Policy"
                     />
-                    <Button type="submit" size="lg" width="100%">
+                    <Button
+                      type="submit"
+                      size="lg"
+                      width="100%"
+                      loading={submitting}
+                    >
                       Sign up
                     </Button>
                   </Fieldset>

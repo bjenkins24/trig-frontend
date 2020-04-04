@@ -30,9 +30,15 @@ const register = async ({ email, password, terms }) => {
   return handleUserResponse(result);
 };
 
+const forgotPassword = async ({ email }) => {
+  const result = await client('forgot-password', { body: { email } });
+  if (result?.error) return result.error;
+  return result.data;
+};
+
 const isLoggedIn = () => {
   return Boolean(getToken());
 };
 
-export { login, register, getToken, getUser, isLoggedIn };
+export { login, register, forgotPassword, getToken, getUser, isLoggedIn };
 export { logout } from './apiClient';

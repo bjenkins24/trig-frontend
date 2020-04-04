@@ -16,6 +16,8 @@ module.exports = {
   },
   devServer: {
     hot: true,
+    historyApiFallback: true,
+    contentBase: './',
   },
   mode: 'development',
   module: {

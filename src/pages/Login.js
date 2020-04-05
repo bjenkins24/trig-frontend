@@ -99,7 +99,7 @@ const Login = () => {
                       width="100%"
                       loading={submitting}
                     >
-                      Sign In
+                      {!submitting ? 'Sign In' : 'Signing In'}
                     </Button>
                   </Fieldset>
                 </form>

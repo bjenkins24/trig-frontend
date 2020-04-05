@@ -11,7 +11,7 @@ const UnauthenticatedApp = () => {
       <Route path="/register">
         <Register />
       </Route>
-      <Route path="/reset-password">
+      <Route path="/reset-password/:token/:emailHash">
         <ResetPassword />
       </Route>
       <Route path="/forgot-password">

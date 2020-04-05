@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useParams, useHistory } from 'react-router-dom';
 import { object, string } from 'yup';
 import {
   Heading1,
@@ -8,9 +9,13 @@ import {
   Fieldset,
   StringFieldForm,
   Button,
+  toast,
 } from '@trig-app/core-components';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
+import { useAuth } from '../context/authContext';
+import { validateResetUrl } from '../utils/authClient';
+import useSafeSetState from '../utils/useSafeSetState';
 
 const Container = styled.div`
   width: 45rem;
@@ -26,7 +31,40 @@ const FormContainer = styled.div`
   margin: 0 auto;
 `;
 
-const Login = () => {
+const ResetPassword = () => {
+  const [isValidatingToken, setIsValidatingToken] = useState(true);
+  const [isValidToken, setIsValidToken] = useState(false);
+  const { token, emailHash } = useParams();
+  const { resetPassword } = useAuth();
+  const history = useHistory();
+  const safeSetIsValidatingToken = useSafeSetState(setIsValidatingToken);
+  const safeSetIsValidToken = useSafeSetState(setIsValidToken);
+
+  useEffect(() => {
+    const validateToken = async () => {
+      const result = await validateResetUrl({ token, emailHash });
+      if (result === 'valid') {
+        safeSetIsValidToken(true);
+      }
+      safeSetIsValidatingToken(false);
+    };
+    validateToken();
+  }, []);
+
+  if (isValidatingToken) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isValidToken) {
+    toast({
+      type: 'error',
+      message:
+        'The reset password link has expired. If you still need to reset your password, click forgot your password.',
+    });
+    history.push('/');
+    return false;
+  }
+
   return (
     <Layout title="Reset Password">
       <AuthBox>
@@ -37,16 +75,28 @@ const Login = () => {
           </Description>
           <FormContainer>
             <Form
-              initialValues={{ password: '', confirmPassword: '' }}
-              onSubmit={values => {
-                console.log(values);
+              initialValues={{ password: '', passwordConfirmation: '' }}
+              onSubmit={async ({ password, passwordConfirmation }) => {
+                const result = await resetPassword({
+                  password,
+                  passwordConfirmation,
+                  token,
+                  emailHash,
+                });
+                if (result?.error) {
+                  return toast({
+                    type: 'error',
+                    message: 'An unknown error occurred. Please try again.',
+                  });
+                }
+                return history.push('/');
               }}
               validationSchema={object().shape({
                 password: string().min(
                   8,
                   'Your password must be at least 8 characters.'
                 ),
-                confirmPassword: string().test(
+                passwordConfirmation: string().test(
                   'match',
                   'The passwords do not match.',
                   /* eslint-disable */
@@ -58,7 +108,7 @@ const Login = () => {
                 ),
               })}
             >
-              {({ handleSubmit }) => {
+              {({ handleSubmit, submitting }) => {
                 return (
                   <form onSubmit={handleSubmit}>
                     <Fieldset width="100%">
@@ -69,11 +119,16 @@ const Login = () => {
                       />
                       <StringFieldForm
                         type="password"
-                        name="confirmPassword"
+                        name="passwordConfirmation"
                         placeholder="Confirm New Password"
                       />
-                      <Button type="submit" size="lg" width="100%">
-                        Reset password
+                      <Button
+                        type="submit"
+                        size="lg"
+                        width="100%"
+                        loading={submitting}
+                      >
+                        {!submitting ? 'Reset password' : 'Resetting password'}
                       </Button>
                     </Fieldset>
                   </form>
@@ -87,4 +142,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;

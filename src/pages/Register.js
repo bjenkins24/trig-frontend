@@ -95,7 +95,7 @@ const Register = () => {
                       width="100%"
                       loading={submitting}
                     >
-                      Sign up
+                      {!submitting ? 'Sign up' : 'Signing Up'}
                     </Button>
                   </Fieldset>
                 </form>

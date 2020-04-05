@@ -25,20 +25,26 @@ const AuthProvider = props => {
     fetchData();
   }, []);
 
-  const login = useCallback(async params => {
-    const result = await authClient.login(params);
+  const setUserFromResponse = result => {
     if (!result?.error) {
       setUser(result);
     }
     return result;
+  };
+
+  const login = useCallback(async params => {
+    const result = await authClient.login(params);
+    return setUserFromResponse(result);
   }, []);
 
   const register = useCallback(async params => {
     const result = await authClient.register(params);
-    if (!result?.error) {
-      setUser(result);
-    }
-    return result;
+    return setUserFromResponse(result);
+  }, []);
+
+  const resetPassword = useCallback(async params => {
+    const result = await authClient.resetPassword(params);
+    return setUserFromResponse(result);
   }, []);
 
   const logout = useCallback(() => {
@@ -46,12 +52,10 @@ const AuthProvider = props => {
     setUser(null);
   }, []);
 
-  const value = useMemo(() => ({ user, login, logout, register }), [
-    login,
-    logout,
-    register,
-    user,
-  ]);
+  const value = useMemo(
+    () => ({ user, login, logout, register, resetPassword }),
+    [login, logout, register, resetPassword, user]
+  );
 
   if (isLoading) {
     return <div>Loading...</div>;

@@ -104,7 +104,9 @@ const Login = () => {
                             width="100%"
                             loading={submitting}
                           >
-                            Send reset instructions
+                            {!submitting
+                              ? 'Send reset instructions'
+                              : 'Sending reset instructions'}
                           </Button>
                         </Fieldset>
                       </form>

@@ -36,9 +36,42 @@ const forgotPassword = async ({ email }) => {
   return result.data;
 };
 
+const resetPassword = async ({
+  password,
+  passwordConfirmation,
+  emailHash,
+  token,
+}) => {
+  const result = await client('reset-password', {
+    body: {
+      password,
+      password_confirmation: passwordConfirmation,
+      token,
+      email_hash: emailHash,
+    },
+  });
+  return handleUserResponse(result);
+};
+
+const validateResetUrl = async ({ token, emailHash }) => {
+  const result = await client('validate-reset-token', {
+    body: { token, emailHash },
+  });
+  return result?.data;
+};
+
 const isLoggedIn = () => {
   return Boolean(getToken());
 };
 
-export { login, register, forgotPassword, getToken, getUser, isLoggedIn };
+export {
+  login,
+  register,
+  forgotPassword,
+  resetPassword,
+  validateResetUrl,
+  getToken,
+  getUser,
+  isLoggedIn,
+};
 export { logout } from './apiClient';

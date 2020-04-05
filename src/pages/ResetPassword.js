@@ -12,6 +12,7 @@ import {
   toast,
 } from '@trig-app/core-components';
 import Layout from '../components/Layout';
+import FullPageSpinner from '../components/FullPageSpinner';
 import AuthBox from '../components/AuthBox';
 import { useAuth } from '../context/authContext';
 import { validateResetUrl } from '../utils/authClient';
@@ -52,7 +53,7 @@ const ResetPassword = () => {
   }, []);
 
   if (isValidatingToken) {
-    return <div>Loading...</div>;
+    return <FullPageSpinner />;
   }
 
   if (!isValidToken) {

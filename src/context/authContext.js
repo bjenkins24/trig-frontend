@@ -7,6 +7,7 @@ import React, {
   useLayoutEffect,
 } from 'react';
 import * as authClient from '../utils/authClient';
+import FullPageSpinner from '../components/FullPageSpinner';
 
 const AuthContext = createContext();
 AuthContext.displayName = 'AuthContext';
@@ -58,7 +59,7 @@ const AuthProvider = props => {
   );
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <FullPageSpinner />;
   }
 
   return <AuthContext.Provider value={value} {...props} />;

@@ -48,14 +48,19 @@ const AuthProvider = props => {
     return setUserFromResponse(result);
   }, []);
 
+  const googleSSO = useCallback(async params => {
+    const result = await authClient.googleSSO(params);
+    return setUserFromResponse(result);
+  }, []);
+
   const logout = useCallback(() => {
     authClient.logout();
     setUser(null);
   }, []);
 
   const value = useMemo(
-    () => ({ user, login, logout, register, resetPassword }),
-    [login, logout, register, resetPassword, user]
+    () => ({ user, login, logout, register, resetPassword, googleSSO }),
+    [login, logout, register, resetPassword, googleSSO, user]
   );
 
   if (isLoading) {

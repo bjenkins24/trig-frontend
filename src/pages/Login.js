@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link, useHistory } from 'react-router-dom';
 import { object, string } from 'yup';
@@ -15,6 +15,8 @@ import {
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
 import { useAuth } from '../context/authContext';
+import GoogleSSOButton from '../components/GoogleSSOButton';
+import FullPageSpinner from '../components/FullPageSpinner';
 
 const CreateAccount = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
   margin-bottom: 4rem;
@@ -47,8 +49,13 @@ const Or = styled.p`
 `;
 
 const Login = () => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { login } = useAuth();
   const history = useHistory();
+
+  if (isLoggingIn) {
+    return <FullPageSpinner />;
+  }
 
   return (
     <Layout title="Login">
@@ -109,18 +116,9 @@ const Login = () => {
           <Or>
             <Body1 color="pc">or</Body1>
           </Or>
-          <Button
-            size="lg"
-            width="100%"
-            variant="inverse-pc"
-            iconProps={{
-              type: 'google',
-              size: 2,
-              style: { marginRight: '1.6rem' },
-            }}
-          >
+          <GoogleSSOButton onSuccess={() => setIsLoggingIn(true)}>
             Sign in with Google
-          </Button>
+          </GoogleSSOButton>
           <ForgotPassword forwardedAs={Link} to="/forgot-password">
             <Lock /> Forgot your password?
           </ForgotPassword>

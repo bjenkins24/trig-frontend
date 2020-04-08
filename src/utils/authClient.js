@@ -2,7 +2,7 @@ import { client, localStorageKey } from './apiClient';
 
 const handleUserResponse = data => {
   if (data?.error) return data;
-  const token = data.data.auth_token.access_token;
+  const token = data.data.authToken.access_token;
   window.localStorage.setItem(localStorageKey, token);
   return data.data.user;
 };
@@ -55,9 +55,14 @@ const resetPassword = async ({
 
 const validateResetUrl = async ({ token, emailHash }) => {
   const result = await client('validate-reset-token', {
-    body: { token, emailHash },
+    body: { token, email_hash: emailHash },
   });
   return result?.data;
+};
+
+const googleSSO = async ({ idToken }) => {
+  const result = await client('google-sso', { body: { idToken } });
+  return handleUserResponse(result);
 };
 
 const isLoggedIn = () => {
@@ -72,6 +77,7 @@ export {
   validateResetUrl,
   getToken,
   getUser,
+  googleSSO,
   isLoggedIn,
 };
 export { logout } from './apiClient';

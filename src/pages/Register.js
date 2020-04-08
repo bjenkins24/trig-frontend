@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link, useHistory } from 'react-router-dom';
 import { object, string, bool } from 'yup';
@@ -15,6 +15,8 @@ import {
 import { useAuth } from '../context/authContext';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
+import GoogleSSOButton from '../components/GoogleSSOButton';
+import FullPageSpinner from '../components/FullPageSpinner';
 
 const SignIn = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
   margin-bottom: 4rem;
@@ -31,8 +33,13 @@ const Or = styled.p`
 `;
 
 const Register = () => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { register } = useAuth();
   const history = useHistory();
+
+  if (isLoggingIn) {
+    return <FullPageSpinner />;
+  }
 
   return (
     <Layout title="Create Account">
@@ -105,18 +112,9 @@ const Register = () => {
           <Or>
             <Body1 color="pc">or</Body1>
           </Or>
-          <Button
-            size="lg"
-            width="100%"
-            variant="inverse-pc"
-            iconProps={{
-              type: 'google',
-              size: 2,
-              style: { marginRight: '1.6rem' },
-            }}
-          >
+          <GoogleSSOButton onSuccess={() => setIsLoggingIn(true)}>
             Sign up with Google
-          </Button>
+          </GoogleSSOButton>
         </FormContainer>
       </AuthBox>
     </Layout>

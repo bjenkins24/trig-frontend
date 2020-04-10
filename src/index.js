@@ -1,37 +1,22 @@
+import './consoleOverrides';
 import { hot } from 'react-hot-loader/root';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
-import theme from '@trig-app/themes';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
+
+import { ToastContainer } from '@trig-app/core-components';
+import AppProviders from './context';
+import App from './App';
+
 import GlobalStyle from '../global.css';
 
-const App = hot(() => {
+const Entry = hot(() => {
   return (
-    <ThemeProvider theme={theme}>
+    <AppProviders>
       <GlobalStyle />
-      <Router>
-        <Switch>
-          <Route path="/register">
-            <Register />
-          </Route>
-          <Route path="/reset-password">
-            <ResetPassword />
-          </Route>
-          <Route path="/forgot-password">
-            <ForgotPassword />
-          </Route>
-          <Route path={['/', '/login']}>
-            <Login />
-          </Route>
-        </Switch>
-      </Router>
-    </ThemeProvider>
+      <ToastContainer />
+      <App />
+    </AppProviders>
   );
 });
 
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(<Entry />, document.getElementById('app'));

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { object, string } from 'yup';
 import {
   Heading1,
@@ -10,9 +10,13 @@ import {
   StringFieldForm,
   Button,
   Icon,
+  toast,
 } from '@trig-app/core-components';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
+import { useAuth } from '../context/authContext';
+import GoogleSSOButton from '../components/GoogleSSOButton';
+import FullPageSpinner from '../components/FullPageSpinner';
 
 const CreateAccount = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
   margin-bottom: 4rem;
@@ -25,8 +29,9 @@ const FormContainer = styled.div`
 `;
 
 const ForgotPassword = styled(Body1)`
-  text-align: right;
-  margin-top: -1.6rem;
+  text-align: center;
+  display: block;
+  margin-top: 2.4rem;
 `;
 
 const Lock = styled(Icon).attrs({
@@ -44,6 +49,14 @@ const Or = styled.p`
 `;
 
 const Login = () => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const { login } = useAuth();
+  const history = useHistory();
+
+  if (isLoggingIn) {
+    return <FullPageSpinner />;
+  }
+
   return (
     <Layout title="Login">
       <AuthBox>
@@ -54,17 +67,25 @@ const Login = () => {
         <FormContainer>
           <Form
             initialValues={{ email: '', password: '' }}
-            onSubmit={({ values }) => console.log(values)}
+            onSubmit={async ({ email, password }) => {
+              const result = await login({ email, password });
+              if (result?.error === 'invalid_grant') {
+                return toast({
+                  type: 'error',
+                  message:
+                    'The email or password you entered was incorrect. Please try again.',
+                });
+              }
+              return history.push('/');
+            }}
             validationSchema={object().shape({
               email: string()
-                .required('An email is required')
-                .email('Please use a valid email'),
-              password: string()
-                .required('Please enter a valid password.')
-                .min(8, 'Your password must be at least 8 characters.'),
+                .required('An email is required.')
+                .email('Please use a valid email.'),
+              password: string().required('You must enter your password.'),
             })}
           >
-            {({ handleSubmit }) => {
+            {({ handleSubmit, submitting }) => {
               return (
                 <form onSubmit={handleSubmit}>
                   <Fieldset width="100%">
@@ -78,11 +99,14 @@ const Login = () => {
                       name="password"
                       placeholder="Password"
                     />
-                    <ForgotPassword forwardedAs={Link} to="/forgot-password">
-                      <Lock /> Forgot your password?
-                    </ForgotPassword>
-                    <Button type="submit" size="lg" width="100%">
-                      Sign In
+
+                    <Button
+                      type="submit"
+                      size="lg"
+                      width="100%"
+                      loading={submitting}
+                    >
+                      {!submitting ? 'Sign In' : 'Signing In'}
                     </Button>
                   </Fieldset>
                 </form>
@@ -92,18 +116,12 @@ const Login = () => {
           <Or>
             <Body1 color="pc">or</Body1>
           </Or>
-          <Button
-            size="lg"
-            width="100%"
-            variant="inverse-pc"
-            iconProps={{
-              type: 'google',
-              size: 2,
-              style: { marginRight: '1.6rem' },
-            }}
-          >
+          <GoogleSSOButton onSuccess={() => setIsLoggingIn(true)}>
             Sign in with Google
-          </Button>
+          </GoogleSSOButton>
+          <ForgotPassword forwardedAs={Link} to="/forgot-password">
+            <Lock /> Forgot your password?
+          </ForgotPassword>
         </FormContainer>
       </AuthBox>
     </Layout>

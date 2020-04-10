@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { object, string, bool } from 'yup';
 import {
   Heading1,
@@ -10,9 +10,13 @@ import {
   StringFieldForm,
   Button,
   CheckboxForm,
+  toast,
 } from '@trig-app/core-components';
+import { useAuth } from '../context/authContext';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
+import GoogleSSOButton from '../components/GoogleSSOButton';
+import FullPageSpinner from '../components/FullPageSpinner';
 
 const SignIn = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
   margin-bottom: 4rem;
@@ -29,6 +33,14 @@ const Or = styled.p`
 `;
 
 const Register = () => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const { register } = useAuth();
+  const history = useHistory();
+
+  if (isLoggingIn) {
+    return <FullPageSpinner />;
+  }
+
   return (
     <Layout title="Create Account">
       <AuthBox>
@@ -39,7 +51,17 @@ const Register = () => {
         <FormContainer>
           <Form
             initialValues={{ email: '', password: '', terms: false }}
-            onSubmit={values => console.log(values)}
+            onSubmit={async ({ email, password, terms }) => {
+              const result = await register({ email, password, terms });
+              if (result?.error === 'user_exists') {
+                return toast({
+                  type: 'error',
+                  message:
+                    'The email you tried to register already has an account associated with it. Please try logging in instead.',
+                });
+              }
+              return history.push('/');
+            }}
             validationSchema={object().shape({
               email: string()
                 .required('An email is required')
@@ -54,7 +76,7 @@ const Register = () => {
               ),
             })}
           >
-            {({ handleSubmit }) => {
+            {({ handleSubmit, submitting }) => {
               return (
                 <form onSubmit={handleSubmit}>
                   <Fieldset width="100%">
@@ -74,8 +96,13 @@ const Register = () => {
                       labelProps={{ color: 'pc' }}
                       label="I agree to the Terms of Service and Privacy Policy"
                     />
-                    <Button type="submit" size="lg" width="100%">
-                      Sign up
+                    <Button
+                      type="submit"
+                      size="lg"
+                      width="100%"
+                      loading={submitting}
+                    >
+                      {!submitting ? 'Sign up' : 'Signing Up'}
                     </Button>
                   </Fieldset>
                 </form>
@@ -85,18 +112,9 @@ const Register = () => {
           <Or>
             <Body1 color="pc">or</Body1>
           </Or>
-          <Button
-            size="lg"
-            width="100%"
-            variant="inverse-pc"
-            iconProps={{
-              type: 'google',
-              size: 2,
-              style: { marginRight: '1.6rem' },
-            }}
-          >
+          <GoogleSSOButton onSuccess={() => setIsLoggingIn(true)}>
             Sign up with Google
-          </Button>
+          </GoogleSSOButton>
         </FormContainer>
       </AuthBox>
     </Layout>

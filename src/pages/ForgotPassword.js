@@ -11,9 +11,11 @@ import {
   Button,
   Icon,
   HorizontalGroup,
+  toast,
 } from '@trig-app/core-components';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
+import { forgotPassword } from '../utils/authClient';
 
 const Container = styled.div`
   width: 45rem;
@@ -69,9 +71,17 @@ const Login = () => {
               <FormContainer>
                 <Form
                   initialValues={{ email: '' }}
-                  onSubmit={values => {
-                    setEmailAddress(values.email);
-                    setWasEmailSent(true);
+                  onSubmit={async ({ email }) => {
+                    const result = await forgotPassword({ email });
+                    if (result === 'no_user_found') {
+                      return toast({
+                        type: 'error',
+                        message:
+                          'The email you entered is not a Trig user. Please check the email address and try again',
+                      });
+                    }
+                    setEmailAddress(email);
+                    return setWasEmailSent(true);
                   }}
                   validationSchema={object().shape({
                     email: string()
@@ -79,7 +89,7 @@ const Login = () => {
                       .email('Please use a valid email'),
                   })}
                 >
-                  {({ handleSubmit }) => {
+                  {({ handleSubmit, submitting }) => {
                     return (
                       <form onSubmit={handleSubmit}>
                         <Fieldset width="100%">
@@ -88,8 +98,15 @@ const Login = () => {
                             name="email"
                             placeholder="Email"
                           />
-                          <Button type="submit" size="lg" width="100%">
-                            Send reset instructions
+                          <Button
+                            type="submit"
+                            size="lg"
+                            width="100%"
+                            loading={submitting}
+                          >
+                            {!submitting
+                              ? 'Send reset instructions'
+                              : 'Sending reset instructions'}
                           </Button>
                         </Fieldset>
                       </form>

@@ -1,45 +1,24 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
+    publicPath: '/',
     filename: 'bundle.js',
   },
-  devtool: 'eval-source-map',
+  devtool: 'inline-source-map',
   resolve: {
     alias: {
       'react-dom': '@hot-loader/react-dom',
     },
   },
   devServer: {
-    watchOptions: { aggregateTimeout: 300, poll: 1000 },
-    publicPath: '/',
-    inline: true,
     hot: true,
-    clientLogLevel: 'none',
-    overlay: true,
-    stats: {
-      colors: true,
-      hash: false,
-      version: false,
-      timings: true,
-      assets: false,
-      chunks: false,
-      modules: false,
-      reasons: false,
-      children: false,
-      source: false,
-      errors: true,
-      errorDetails: true,
-      warnings: true,
-      publicPath: false,
-    },
-    // Make all 404's fallback to index.html - so react router works
-    historyApiFallback: {
-      index: '/',
-    },
+    historyApiFallback: true,
+    contentBase: './',
   },
   mode: 'development',
   module: {
@@ -69,5 +48,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [new HtmlWebpackPlugin({ template: 'index.html' })],
+  plugins: [new HtmlWebpackPlugin({ template: 'index.html' }), new Dotenv()],
 };

@@ -43,6 +43,7 @@
     "react-hot-loader": "^4.12.20",
     "react-query": "^1.2.0",
     "react-router-dom": "^5.1.2",
+    "react-stack-grid": "^0.7.1",
     "styled-components": "^4.4.1",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11",

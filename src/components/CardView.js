@@ -10,6 +10,7 @@ import {
   ListItemContent,
   FileIcon,
 } from '@trig-app/core-components';
+import StackGrid from 'react-stack-grid';
 import format from 'date-fns/format';
 import { client } from '../utils/apiClient';
 
@@ -37,65 +38,68 @@ const CardView = () => {
           size={1.6}
         />
       </ButtonToggle>
-      {cards &&
-        view === 'thumbnail' &&
-        cards.map(({ id, title, actual_created_at: createdAt }) => {
-          return (
-            <Card
-              onClick={() => null}
-              key={id}
-              title={title}
-              dateTime={new Date(createdAt)}
-              type="youtube"
-              renderAvatar={() => {
-                return <Avatar size={1.6} />;
-              }}
-              totalFavorites={0}
-              isFavorited={false}
-              totalComments={0}
-              onClickFavorite={() => null}
-              onClickComment={() => null}
-              navigationList={[
-                {
-                  onClick: () => null,
-                  item: (
-                    <HorizontalGroup margin={1.6}>
-                      <Icon type="new-window" size={1.6} />
-                      <span>Open in New Window</span>
-                    </HorizontalGroup>
-                  ),
-                },
-                {
-                  onClick: () => null,
-                  item: (
-                    <HorizontalGroup margin={1.6}>
-                      <Icon type="edit" size={1.6} />
-                      <span>Edit Card</span>
-                    </HorizontalGroup>
-                  ),
-                },
-                {
-                  onClick: () => null,
-                  item: (
-                    <HorizontalGroup margin={1.6}>
-                      <Icon type="lock" size={1.6} />
-                      <span>Share</span>
-                    </HorizontalGroup>
-                  ),
-                },
-                {
-                  onClick: () => null,
-                  item: (
-                    <HorizontalGroup margin={1.6}>
-                      <Icon type="trash" size={1.6} />
-                      <span>Remove From Trig</span>
-                    </HorizontalGroup>
-                  ),
-                },
-              ]}
-            />
-          );
-        })}
+      {cards && view === 'thumbnail' && (
+        <StackGrid columnWidth={251} gutterWidth={16} gutterHeight={16}>
+          {cards.map(({ id, title, actual_created_at: createdAt }) => {
+            return (
+              <Card
+                onClick={() => null}
+                key={id}
+                title={title}
+                dateTime={new Date(createdAt)}
+                type="youtube"
+                renderAvatar={() => {
+                  return <Avatar size={1.6} />;
+                }}
+                totalFavorites={0}
+                isFavorited={false}
+                totalComments={0}
+                onClickFavorite={() => null}
+                onClickComment={() => null}
+                navigationList={[
+                  {
+                    onClick: () => null,
+                    item: (
+                      <HorizontalGroup margin={1.6}>
+                        <Icon type="new-window" size={1.6} />
+                        <span>Open in New Window</span>
+                      </HorizontalGroup>
+                    ),
+                  },
+                  {
+                    onClick: () => null,
+                    item: (
+                      <HorizontalGroup margin={1.6}>
+                        <Icon type="edit" size={1.6} />
+                        <span>Edit Card</span>
+                      </HorizontalGroup>
+                    ),
+                  },
+                  {
+                    onClick: () => null,
+                    item: (
+                      <HorizontalGroup margin={1.6}>
+                        <Icon type="lock" size={1.6} />
+                        <span>Share</span>
+                      </HorizontalGroup>
+                    ),
+                  },
+                  {
+                    onClick: () => null,
+                    item: (
+                      <HorizontalGroup margin={1.6}>
+                        <Icon type="trash" size={1.6} />
+                        <span>Remove From Trig</span>
+                      </HorizontalGroup>
+                    ),
+                  },
+                ]}
+              />
+            );
+          })}
+        </StackGrid>
+      )}
+
       {cards && view === 'row' && (
         <List>
           {cards.map(({ title, actual_created_at: createdAt }) => {
@@ -121,7 +125,6 @@ const CardView = () => {
                     type="comment"
                     color="s"
                     size={1.6}
-                    count={16}
                     onClick={() => null}
                   />,
                   <Icon

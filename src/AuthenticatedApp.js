@@ -1,5 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+import Home from './pages/Home';
 import { useAuth } from './context/authContext';
 
 const AuthenticatedApp = () => {
@@ -12,6 +13,10 @@ const AuthenticatedApp = () => {
         <button type="button" onClick={logout}>
           Logout
         </button>
+
+        <div>
+          <Home user={user} />
+        </div>
       </Route>
     </Switch>
   );

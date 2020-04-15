@@ -60,8 +60,8 @@ const validateResetUrl = async ({ token, emailHash }) => {
   return result?.data;
 };
 
-const googleSSO = async ({ idToken }) => {
-  const result = await client('google-sso', { body: { idToken } });
+const googleSSO = async ({ code }) => {
+  const result = await client('google-sso', { body: { code } });
   return handleUserResponse(result);
 };
 

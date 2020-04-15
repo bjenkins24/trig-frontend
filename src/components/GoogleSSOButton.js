@@ -31,9 +31,9 @@ const GoogleSSOButton = ({ children, onSuccess, ...restProps }) => {
           </Button>
         );
       }}
-      onSuccess={async ({ tokenId }) => {
+      onSuccess={async ({ code }) => {
         onSuccess();
-        await googleSSO({ idToken: tokenId });
+        await googleSSO({ code });
         history.push('/');
       }}
       onFailure={response => {
@@ -46,6 +46,8 @@ const GoogleSSOButton = ({ children, onSuccess, ...restProps }) => {
       }}
       cookiePolicy="single_host_origin"
       scope="https://www.googleapis.com/auth/drive.readonly"
+      responseType="code"
+      accessType="offline"
     />
   );
 };

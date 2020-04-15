@@ -1,7 +1,8 @@
 import React from 'react';
+import CardView from '../components/CardView';
 
 const Home = () => {
-  return <div>My home!</div>;
+  return <CardView />;
 };
 
 export default Home;

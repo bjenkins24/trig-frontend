@@ -40,21 +40,23 @@ const CardView = () => {
       </ButtonToggle>
       {cards && view === 'thumbnail' && (
         <StackGrid columnWidth={251} gutterWidth={16} gutterHeight={16}>
-          {cards.map(
+          {cards.data.map(
             ({
               id,
               title,
               actual_created_at: createdAt,
               card_link: { link },
+              image,
             }) => {
               return (
                 <Card
+                  key={id}
                   onClick={() => {
                     window.location.href = link;
                   }}
                   href={link}
-                  key={id}
                   title={title}
+                  image={image}
                   dateTime={new Date(createdAt)}
                   type="youtube"
                   renderAvatar={() => {
@@ -112,12 +114,20 @@ const CardView = () => {
 
       {cards && view === 'row' && (
         <List>
-          {cards.map(
-            ({ title, actual_created_at: createdAt, card_link: { link } }) => {
+          {cards.data.map(
+            ({
+              id,
+              title,
+              actual_created_at: createdAt,
+              card_link: { link },
+            }) => {
               return (
                 <ListItem
+                  key={id}
                   href={link}
-                  onClick={() => null}
+                  onClick={() => {
+                    window.location.href = link;
+                  }}
                   renderItem={() => <FileIcon type="doc" size={2.4} />}
                   renderContent={() => (
                     <ListItemContent

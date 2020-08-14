@@ -1,3 +1,4 @@
+const Dotenv = require('dotenv-webpack');
 const base = require('./webpack.base.config');
 
 module.exports = {
@@ -14,4 +15,5 @@ module.exports = {
     contentBase: './',
   },
   mode: 'development',
+  plugins: [...base.plugins, new Dotenv({ path: './.env.development' })],
 };

@@ -1,3 +1,4 @@
+const Dotenv = require('dotenv-webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const base = require('./webpack.base.config');
 
@@ -7,6 +8,7 @@ module.exports = {
   mode: 'production',
   plugins: [
     ...base.plugins,
+    new Dotenv({ path: './.env.production' }),
     new CopyPlugin({
       patterns: [{ from: '_redirects' }],
     }),

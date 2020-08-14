@@ -1,7 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
-const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: './src/index.js',
@@ -10,18 +9,6 @@ module.exports = {
     publicPath: '/',
     filename: 'bundle.js',
   },
-  devtool: 'inline-source-map',
-  resolve: {
-    alias: {
-      'react-dom': '@hot-loader/react-dom',
-    },
-  },
-  devServer: {
-    hot: true,
-    historyApiFallback: true,
-    contentBase: './',
-  },
-  mode: 'development',
   module: {
     rules: [
       {
@@ -49,11 +36,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    new HtmlWebpackPlugin({ template: 'index.html' }),
-    new Dotenv(),
-    new CopyPlugin({
-      patterns: [{ from: '_redirects' }],
-    }),
-  ],
+  plugins: [new HtmlWebpackPlugin({ template: 'index.html' }), new Dotenv()],
 };

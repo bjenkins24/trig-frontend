@@ -10,7 +10,7 @@ module.exports = {
     ...base.plugins,
     new Dotenv({ path: './.env.production' }),
     new CopyPlugin({
-      patterns: [{ from: '_redirects' }, { from: '_headers' }],
+      patterns: [{ from: '_redirects' }],
     }),
   ],
 };

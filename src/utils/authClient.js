@@ -16,8 +16,7 @@ const getUser = async () => {
   if (!token) {
     return Promise.resolve(null);
   }
-  const result = await client('me');
-  return result;
+  return client('me');
 };
 
 const login = async ({ email, password }) => {

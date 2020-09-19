@@ -5,7 +5,7 @@ const HeroProps = {
   children: PropTypes.node.isRequired,
 };
 
-const Hero = ({ children }) => {
+const Hero = ({ children, ...restProps }) => {
   return (
     <div
       css={`
@@ -13,6 +13,7 @@ const Hero = ({ children }) => {
         color: ${({ theme }) => theme.colors.pc};
         padding: ${({ theme }) => theme.space[5]}px 4%;
       `}
+      {...restProps}
     >
       {children}
     </div>

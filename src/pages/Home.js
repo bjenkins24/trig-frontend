@@ -5,6 +5,9 @@ import { Carousel, Deck } from '@trig-app/core-components';
 import { useWindowWidth } from '@react-hook/window-size/throttled';
 import { breakpoints } from '@trig-app/constants';
 import Hero from '../components/Hero';
+import Content from '../components/Content';
+import CardView from '../components/CardView';
+import Filters from '../components/Filters';
 
 const Item = styled.div`
   height: 204px;
@@ -50,44 +53,59 @@ const Home = () => {
   };
 
   return (
-    <Hero>
-      <Tabs
-        variant="dark"
-        tabs={[
-          { text: 'All Decks' },
-          { text: 'My Decks' },
-          { text: 'Engineering' },
-          { text: 'Sales' },
-          { text: 'Support' },
-        ]}
-        tabPanels={[
-          <div
-            css={`
-              margin-left: -4.375%;
-              width: calc(100% + 8.75%);
-            `}
-          >
-            <Carousel slidesPerPage={getSlidesPerPage()}>
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-              <MockDeck />
-            </Carousel>
-          </div>,
-          'my decks',
-          'development',
-          'sales',
-        ]}
-      />
-    </Hero>
+    <div>
+      <Hero
+        css={`
+          margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;
+        `}
+      >
+        <Tabs
+          variant="dark"
+          tabs={[
+            { text: 'All Decks' },
+            { text: 'My Decks' },
+            { text: 'Engineering' },
+            { text: 'Sales' },
+            { text: 'Support' },
+          ]}
+          tabPanels={[
+            <div
+              css={`
+                margin-left: -4.375%;
+                width: calc(100% + 8.75%);
+              `}
+            >
+              <Carousel slidesPerPage={getSlidesPerPage()}>
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+                <MockDeck />
+              </Carousel>
+            </div>,
+            'my decks',
+            'development',
+            'sales',
+          ]}
+        />
+      </Hero>
+      <Content>
+        <CardView
+          css={`
+            margin-right: ${({ theme }) => theme.space[5]}px;
+          `}
+          location="/"
+        />
+        <Filters>Filters</Filters>
+      </Content>
+    </div>
   );
 };
 

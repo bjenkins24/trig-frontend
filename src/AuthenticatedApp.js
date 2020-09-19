@@ -1,19 +1,46 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
-import { useAuth } from './context/authContext';
+import { Switch, Route, useHistory } from 'react-router-dom';
+import { Tabs } from '@trig-app/core-components/dist/compositions';
+import Header from './components/Header';
+import Hero from './components/Hero';
 
 const AuthenticatedApp = () => {
-  const { user, logout } = useAuth();
+  const history = useHistory();
 
   return (
-    <Switch>
-      <Route path="/">
-        <div>Yay authenticated! {user.email}</div>
-        <button type="button" onClick={logout}>
-          Logout
-        </button>
-      </Route>
-    </Switch>
+    <div>
+      <Header
+        links={[
+          {
+            onClick: () => history.push('/'),
+            text: 'Dashboard',
+          },
+          {
+            onClick: () => history.push('/activity'),
+            text: 'Activity',
+          },
+        ]}
+      />
+      <Switch>
+        <Route path="/account-settings">
+          <Hero>My cool Account settings!</Hero>
+        </Route>
+        <Route path="/">
+          <Hero>
+            <Tabs
+              variant="dark"
+              tabs={[
+                { text: 'All Decks' },
+                { text: 'My Decks' },
+                { text: 'Development' },
+                { text: 'Sales' },
+              ]}
+              tabPanels={['all decks', 'my decks', 'development', 'sales']}
+            />
+          </Hero>
+        </Route>
+      </Switch>
+    </div>
   );
 };
 

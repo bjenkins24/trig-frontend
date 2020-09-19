@@ -1,43 +1,41 @@
 import React from 'react';
 import user from '@testing-library/user-event';
-import { render } from 'test/utils';
+import { render, screen } from '../../test/utils';
 import Header from '../Header';
 
 const links = [
-  { text: 'Dashboard', location: '/' },
-  { text: 'Activity', location: '/activity' },
+  { text: 'Dashboard', onClick: () => null },
+  { text: 'Activity', onClick: () => null },
 ];
 
-const activityContent = 'Activity Content';
+jest.mock('../../context/authContext', () => {
+  return {
+    useAuth: () => {
+      return {
+        logout: () => null,
+      };
+    },
+  };
+});
+jest.spyOn(console, 'error').mockImplementation();
 
 describe('<Header />', () => {
   it('renders and takes basic props', () => {
-    render(
-      <Router>
-        <Header links={links} />
-        <Switch>
-          <Route path="/">
-            <p>Dashboard Content</p>
-          </Route>
-          <Route path="/activity">
-            <p>{activityContent}</p>
-          </Route>
-        </Switch>
-      </Router>
-    );
+    render(<Header links={links} />);
 
-    expect(screen.queryByText(activityContent)).not.toBeInTheDocument();
     expect(screen.getByTitle('Trig')).toBeInTheDocument();
+    expect(screen.getAllByRole('button')[0]).toHaveTextContent(
+      'Type anywhere to search'
+    );
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByTitle('Notifications')).toBeInTheDocument();
     expect(screen.queryByText('Account Settings')).not.toBeInTheDocument();
 
-    user.click(getByTitle('Account Settings'));
+    user.click(screen.getByTitle('Profile'));
 
     expect(screen.getByText('Account Settings')).toBeInTheDocument();
+    expect(screen.getByText('Logout')).toBeInTheDocument();
 
-    user.click(screen.getByText(links[1].text));
-
-    expect(screen.getByText(activityContent)).toBeInTheDocument();
+    // Dark will throw a console error let's make sure there's only one
+    expect(console.error).toHaveBeenCalledTimes(1);
   });
 });

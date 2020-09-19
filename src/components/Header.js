@@ -40,7 +40,7 @@ const Header = ({ links, ...restProps }) => {
       css={`
         display: flex;
         background: ${({ theme }) => theme.p};
-        padding: ${({ theme }) => `14px ${theme.space[5]}px`};
+        padding: 14px 4%;
         align-items: center;
       `}
       {...restProps}

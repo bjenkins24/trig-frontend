@@ -12,7 +12,7 @@ const Hero = ({ children }) => {
         background: ${({ theme }) => theme.colors.p};
         height: 300px;
         color: ${({ theme }) => theme.colors.pc};
-        padding: ${({ theme }) => theme.space[5]}px;
+        padding: ${({ theme }) => theme.space[5]}px 4%;
       `}
     >
       {children}

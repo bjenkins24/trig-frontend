@@ -2,7 +2,7 @@ import React from 'react';
 import { Switch, Route, useHistory } from 'react-router-dom';
 import Home from './pages/Home';
 import Header from './components/Header';
-import Hero from './components/Hero';
+import AccountSettings from './pages/AccountSettings';
 
 const AuthenticatedApp = () => {
   const history = useHistory();
@@ -19,7 +19,7 @@ const AuthenticatedApp = () => {
       />
       <Switch>
         <Route path="/account-settings">
-          <Hero>My cool Account settings!</Hero>
+          <AccountSettings />
         </Route>
         <Route path="/">
           <Home />

@@ -4,6 +4,7 @@ import { Tabs } from '@trig-app/core-components/dist/compositions';
 import { Carousel, Deck } from '@trig-app/core-components';
 import { useWindowWidth } from '@react-hook/window-size/throttled';
 import { breakpoints } from '@trig-app/constants';
+import Head from '../components/Head';
 import Hero from '../components/Hero';
 import Content from '../components/Content';
 import CardView from '../components/CardView';
@@ -54,6 +55,7 @@ const Home = () => {
 
   return (
     <div>
+      <Head title="Dashboard" />
       <Hero
         css={`
           margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;

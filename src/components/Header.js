@@ -45,14 +45,15 @@ const Header = ({ links, ...restProps }) => {
       `}
       {...restProps}
     >
-      <Link to="/">
-        <Logo
-          title="Trig"
-          css={`
-            margin-right: ${({ theme }) => theme.space[5] + theme.space[4]}px;
-          `}
-        />
-      </Link>
+      <div
+        css={`
+          margin-right: ${({ theme }) => theme.space[5] + theme.space[4]}px;
+        `}
+      >
+        <Link to="/">
+          <Logo title="Trig" />
+        </Link>
+      </div>
       <Button
         variant="transparent"
         iconProps={{ type: 'search', color: 'pc' }}

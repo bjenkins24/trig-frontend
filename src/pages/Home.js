@@ -103,7 +103,7 @@ const Home = () => {
           `}
           location="/"
         />
-        <Filters>Filters</Filters>
+        <Filters />
       </Content>
     </div>
   );

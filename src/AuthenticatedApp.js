@@ -12,7 +12,7 @@ const AuthenticatedApp = () => {
 
   return (
     <div>
-      {isSearchOpen && searchKey && (
+      {isSearchOpen && (
         <Search defaultInput={searchKey} onRequestClose={closeSearch} />
       )}
       <Header

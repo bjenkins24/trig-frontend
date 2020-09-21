@@ -1,7 +1,33 @@
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Icon, HugeStyles } from '@trig-app/core-components';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
+import {
+  Icon,
+  HugeStyles,
+  Body2Styles,
+  Body2,
+} from '@trig-app/core-components';
+
+const MockRecentSelections = [
+  'How to memorize music 5 times faster',
+  'Onboarding Support',
+  'Brian Jenkins',
+  'Mary Jenkins',
+  'RFC Enterprise',
+];
+
+const RecentSelection = styled.button`
+  ${Body2Styles}
+  color: ${({ theme }) => theme.colors.s};
+  border: 0;
+  background: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  &:hover, &:focus {
+    text-decoration: underline;
+  }
+`;
 
 const GlobalStyle = createGlobalStyle`
     body {
@@ -71,15 +97,37 @@ const Search = ({ onRequestClose, defaultInput }) => {
           value={searchInput}
           css={`
             ${HugeStyles}
+            position: relative;
+            left: -5px;
             width: 100%;
             background: none;
             border: 0;
+            margin-top: ${({ theme }) => theme.space[4]}px;
             outline: none;
             &::placeholder {
               color: ${({ theme }) => theme.ps[100]};
             }
           `}
         />
+        <div>
+          <Body2>Recent searches: </Body2>
+          {MockRecentSelections.map((selection, index) => {
+            return (
+              <>
+                <RecentSelection
+                  onClick={() => {
+                    setSearchInput(selection);
+                  }}
+                >
+                  {selection.length > 25
+                    ? `${selection.substring(0, 22).trim()}...`
+                    : selection}
+                </RecentSelection>
+                {index !== MockRecentSelections.length - 1 && ', '}
+              </>
+            );
+          })}
+        </div>
       </div>
     </>
   );

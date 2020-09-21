@@ -17,9 +17,10 @@ const HeaderProps = {
       onClick: PropTypes.func,
     })
   ).isRequired,
+  openSearch: PropTypes.func.isRequired,
 };
 
-const Header = ({ links, ...restProps }) => {
+const Header = ({ links, openSearch, ...restProps }) => {
   const { logout } = useAuth();
   const history = useHistory();
   const location = useLocation();
@@ -36,67 +37,79 @@ const Header = ({ links, ...restProps }) => {
   };
 
   return (
-    <div
-      css={`
-        display: flex;
-        background: ${({ theme }) => theme.p};
-        padding: 14px 4%;
-        align-items: center;
-      `}
-      {...restProps}
-    >
+    <>
       <div
         css={`
-          margin-right: ${({ theme }) => theme.space[5] + theme.space[4]}px;
+          height: 68px;
         `}
-      >
-        <Link to="/">
-          <Logo title="Trig" />
-        </Link>
-      </div>
-      <Button
-        variant="transparent"
-        iconProps={{ type: 'search', color: 'pc' }}
-        css={`
-          margin-right: ${({ theme }) => theme.space[4]}px;
-        `}
-      >
-        Type anywhere to search
-      </Button>
-      <div
-        css={`
-          position: relative;
-          top: 1px;
-        `}
-      >
-        <TabsNavigation tabs={links} defaultTab={getDefaultTab()} />
-      </div>
+      />
       <div
         css={`
           display: flex;
-          margin-left: auto;
+          background: ${({ theme }) => theme.p};
+          padding: 14px 4%;
           align-items: center;
+          position: fixed;
+          width: 92%;
+          top: 0;
+          z-index: 2;
         `}
+        {...restProps}
       >
-        <PopoverNavigation
-          navigationList={[
-            {
-              item: 'Account Settings',
-              onClick: () => history.push('/account-settings'),
-            },
-            { item: 'Logout', onClick: logout },
-          ]}
+        <div
+          css={`
+            margin-right: ${({ theme }) => theme.space[5] + theme.space[4]}px;
+          `}
         >
-          <Avatar
-            title="Profile"
-            css={`
-              color: ${({ theme }) => theme.colors.pc};
-              cursor: pointer;
-            `}
-          />
-        </PopoverNavigation>
+          <Link to="/">
+            <Logo title="Trig" />
+          </Link>
+        </div>
+        <Button
+          onClick={openSearch}
+          variant="transparent"
+          iconProps={{ type: 'search', color: 'pc' }}
+          css={`
+            margin-right: ${({ theme }) => theme.space[4]}px;
+          `}
+        >
+          Type anywhere to search
+        </Button>
+        <div
+          css={`
+            position: relative;
+            top: 1px;
+          `}
+        >
+          <TabsNavigation tabs={links} defaultTab={getDefaultTab()} />
+        </div>
+        <div
+          css={`
+            display: flex;
+            margin-left: auto;
+            align-items: center;
+          `}
+        >
+          <PopoverNavigation
+            navigationList={[
+              {
+                item: 'Account Settings',
+                onClick: () => history.push('/account-settings'),
+              },
+              { item: 'Logout', onClick: logout },
+            ]}
+          >
+            <Avatar
+              title="Profile"
+              css={`
+                color: ${({ theme }) => theme.colors.pc};
+                cursor: pointer;
+              `}
+            />
+          </PopoverNavigation>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

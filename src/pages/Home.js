@@ -95,6 +95,7 @@ const Home = () => {
             'my decks',
             'development',
             'sales',
+            'support',
           ]}
         />
       </Hero>

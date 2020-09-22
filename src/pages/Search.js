@@ -6,8 +6,13 @@ import {
   HugeStyles,
   Body2Styles,
   Body2,
+  Heading2,
 } from '@trig-app/core-components';
-import { TabsNavigation } from '@trig-app/core-components/dist/compositions';
+import {
+  TabsNavigation,
+  CardItem,
+} from '@trig-app/core-components/dist/compositions';
+import Filters from '../components/Filters';
 
 const MockRecentSelections = [
   'How to memorize music 5 times faster',
@@ -15,6 +20,57 @@ const MockRecentSelections = [
   'Brian Jenkins',
   'Mary Jenkins',
   'RFC Enterprise',
+];
+
+const MockResults = [
+  {
+    id: '1',
+    title: 'My first result title',
+    dateTime: 'Oct 27, 2018 at 5:40pm',
+    user: {
+      firstName: 'Brian',
+      lastName: 'Jenkins',
+    },
+    cardType: 'doc',
+    context: 'This is my cool description',
+    link: 'https://google.com',
+  },
+  {
+    id: '2',
+    title: 'My first result title',
+    dateTime: 'Oct 27, 2018 at 5:40pm',
+    user: {
+      firstName: 'Brian',
+      lastName: 'Jenkins',
+    },
+    cardType: 'doc',
+    context: 'This is my cool description',
+    link: 'https://google.com',
+  },
+  {
+    id: '3',
+    title: 'My first result title',
+    dateTime: 'Oct 27, 2018 at 5:40pm',
+    user: {
+      firstName: 'Brian',
+      lastName: 'Jenkins',
+    },
+    cardType: 'doc',
+    context: 'This is my cool description',
+    link: 'https://google.com',
+  },
+  {
+    id: '4',
+    title: 'My first result title',
+    dateTime: 'Oct 27, 2018 at 5:40pm',
+    user: {
+      firstName: 'Brian',
+      lastName: 'Jenkins',
+    },
+    cardType: 'doc',
+    context: 'This is my cool description',
+    link: 'https://google.com',
+  },
 ];
 
 const RecentSelection = styled.button`
@@ -188,8 +244,63 @@ const Search = ({ onRequestClose, defaultInput }) => {
             `}
           />
         </div>
-        <div>
-          {currentView === VIEWS.CARDS && <div>Cards</div>}
+        <div
+          css={`
+            display: flex;
+            height: 40%;
+            overflow-y: scroll;
+          `}
+        >
+          {currentView === VIEWS.CARDS && (
+            <>
+              <div
+                css={`
+                  width: 80%;
+                  margin-right: ${({ theme }) => theme.space[5]}px;
+                `}
+              >
+                <Heading2
+                  css={`
+                    margin-bottom: ${({ theme }) => theme.space[4]};
+                  `}
+                >
+                  Results
+                </Heading2>
+
+                <ul
+                  css={`
+                    padding: 0;
+                  `}
+                >
+                  {MockResults.map(result => {
+                    return (
+                      <div
+                        css={`
+                          margin-bottom: ${({ theme }) => theme.space[2]};
+                        `}
+                      >
+                        <CardItem
+                          href={result.link}
+                          key={result.id}
+                          moreProps={{ onClick: () => null }}
+                          avatarProps={{
+                            firstName: result.user.firstName,
+                            lastName: result.user.lastName,
+                          }}
+                          cardType={result.cardType}
+                          title={result.title}
+                          dateTimeCreated={result.dateTime}
+                          favoriteProps={{ onClick: () => null }}
+                          content={result.context}
+                        />
+                      </div>
+                    );
+                  })}
+                </ul>
+              </div>
+              <Filters />
+            </>
+          )}
           {currentView === VIEWS.DECKS && <div>Decks</div>}
           {currentView === VIEWS.PEOPLE && <div>People</div>}
         </div>

@@ -96,12 +96,25 @@ const Search = ({ onRequestClose, defaultInput }) => {
         <Icon
           type="close"
           onClick={onRequestClose}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              onRequestClose();
+            }
+          }}
+          tabIndex={0}
+          role="button"
           color="ps.200"
           css={`
             cursor: pointer;
             position: absolute;
+            outline: 0;
             top: ${({ theme }) => theme.space[4]}px;
             right: ${({ theme }) => theme.space[4]}px;
+            transition: all 0.15s;
+            &:hover svg,
+            &:focus svg {
+              color: ${({ theme }) => theme.colors.p};
+            }
           `}
         />
         <input

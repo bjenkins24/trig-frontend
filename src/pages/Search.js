@@ -154,15 +154,26 @@ const Search = ({ onRequestClose, defaultInput }) => {
             position: relative;
           `}
         >
-          <Separator />
+          <Separator
+            css={`
+              margin-bottom: ${({ theme }) =>
+                theme.space[3] + theme.space[1]}px;
+            `}
+          />
           <TabsNavigation
+            variant="light"
             tabs={[
               { text: 'Cards', onClick: () => setCurrentView(VIEWS.CARDS) },
               { text: 'Decks', onClick: () => setCurrentView(VIEWS.DECKS) },
               { text: 'People', onClick: () => setCurrentView(VIEWS.PEOPLE) },
             ]}
           />
-          <Separator />
+          <Separator
+            css={`
+              margin-top: ${({ theme }) => theme.space[3]}px;
+              margin-bottom: ${({ theme }) => theme.space[5]}px;
+            `}
+          />
         </div>
         <div>
           {currentView === VIEWS.CARDS && <div>Cards</div>}

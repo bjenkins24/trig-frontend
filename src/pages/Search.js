@@ -7,6 +7,7 @@ import {
   Body2Styles,
   Body2,
 } from '@trig-app/core-components';
+import { TabsNavigation } from '@trig-app/core-components/dist/compositions';
 
 const MockRecentSelections = [
   'How to memorize music 5 times faster',
@@ -29,19 +30,37 @@ const RecentSelection = styled.button`
   }
 `;
 
+const Separator = styled.div`
+  height: 3px;
+  background: ${({ theme }) => theme.colors.ps[50]};
+  width: 108.8%;
+  margin-left: -4.4%;
+`;
+
 const GlobalStyle = createGlobalStyle`
     body {
         overflow: hidden;
     }
 `;
 
-const SearchProps = {
-  onRequestClose: PropTypes.func.isRequired,
+const VIEWS = {
+  CARDS: 'cards',
+  DECKS: 'decks',
+  PEOPLE: 'people',
 };
 
-// eslint-disable-next-line
+const SearchProps = {
+  onRequestClose: PropTypes.func.isRequired,
+  defaultInput: PropTypes.string,
+};
+
+const defaultProps = {
+  defaultInput: '',
+};
+
 const Search = ({ onRequestClose, defaultInput }) => {
   const [searchInput, setSearchInput] = useState(defaultInput);
+  const [currentView, setCurrentView] = useState(VIEWS.CARDS);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -65,15 +84,13 @@ const Search = ({ onRequestClose, defaultInput }) => {
       <GlobalStyle />
       <div
         css={`
-          width: calc(
-            100% - ${({ theme }) => theme.space[5] + theme.space[5]}px
-          );
+          width: calc(100% - 8%);
           height: 100%;
           background: ${({ theme }) => theme.b};
           opacity: 0.98;
           position: fixed;
           z-index: 1000;
-          padding: ${({ theme }) => theme.space[5]}px;
+          padding: ${({ theme }) => theme.space[5]}px 4%;
         `}
       >
         <Icon
@@ -109,7 +126,11 @@ const Search = ({ onRequestClose, defaultInput }) => {
             }
           `}
         />
-        <div>
+        <div
+          css={`
+            margin-bottom: ${({ theme }) => theme.space[5]}px;
+          `}
+        >
           <Body2>Recent searches: </Body2>
           {MockRecentSelections.map((selection, index) => {
             return (
@@ -128,11 +149,32 @@ const Search = ({ onRequestClose, defaultInput }) => {
             );
           })}
         </div>
+        <div
+          css={`
+            position: relative;
+          `}
+        >
+          <Separator />
+          <TabsNavigation
+            tabs={[
+              { text: 'Cards', onClick: () => setCurrentView(VIEWS.CARDS) },
+              { text: 'Decks', onClick: () => setCurrentView(VIEWS.DECKS) },
+              { text: 'People', onClick: () => setCurrentView(VIEWS.PEOPLE) },
+            ]}
+          />
+          <Separator />
+        </div>
+        <div>
+          {currentView === VIEWS.CARDS && <div>Cards</div>}
+          {currentView === VIEWS.DECKS && <div>Decks</div>}
+          {currentView === VIEWS.PEOPLE && <div>People</div>}
+        </div>
       </div>
     </>
   );
 };
 
 Search.propTypes = SearchProps;
+Search.defaultProps = defaultProps;
 
 export default Search;

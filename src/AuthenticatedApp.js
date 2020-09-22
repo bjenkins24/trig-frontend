@@ -1,19 +1,38 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
-import { useAuth } from './context/authContext';
+import { Switch, Route, useHistory } from 'react-router-dom';
+import Home from './pages/Home';
+import Search from './pages/Search';
+import Header from './components/Header';
+import AccountSettings from './pages/AccountSettings';
+import useSearch from './utils/useSearch';
 
 const AuthenticatedApp = () => {
-  const { user, logout } = useAuth();
+  const history = useHistory();
+  const { isSearchOpen, openSearch, closeSearch, searchKey } = useSearch();
 
   return (
-    <Switch>
-      <Route path="/">
-        <div>Yay authenticated! {user.email}</div>
-        <button type="button" onClick={logout}>
-          Logout
-        </button>
-      </Route>
-    </Switch>
+    <div>
+      {isSearchOpen && (
+        <Search defaultInput={searchKey} onRequestClose={closeSearch} />
+      )}
+      <Header
+        openSearch={openSearch}
+        links={[
+          {
+            onClick: () => history.push('/'),
+            text: 'Dashboard',
+          },
+        ]}
+      />
+      <Switch>
+        <Route path="/account-settings">
+          <AccountSettings />
+        </Route>
+        <Route path="/">
+          <Home />
+        </Route>
+      </Switch>
+    </div>
   );
 };
 

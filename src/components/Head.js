@@ -19,6 +19,7 @@ const Head = ({ title }) => {
   return (
     <Helmet>
       <title>{title} | Trig</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
       {isDarkMode && (
         <link rel="icon" type="image/png" href={IconDark64x64} sizes="64x64" />
       )}

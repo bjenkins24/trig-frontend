@@ -13,22 +13,32 @@ import {
   HorizontalGroup,
   toast,
 } from '@trig-app/core-components';
+import { device } from '@trig-app/constants';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
 import { forgotPassword } from '../utils/authClient';
 
 const Container = styled.div`
-  width: 45rem;
+  width: 35rem;
+  @media ${device.tabletPortraitUp} {
+    width: 40rem;
+  }
 `;
 
 const Description = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
-  margin-bottom: 4rem;
+  margin-bottom: ${({ theme }) => theme.space[3]}px;
   text-align: left;
+  @media ${device.tabletPortraitUp} {
+    margin-bottom: ${({ theme }) => theme.space[4]}px;
+  }
 `;
 
 const FormContainer = styled.div`
+  margin: 0 auto ${({ theme }) => theme.space[3]}px;
+  @media ${device.tabletPortraitUp} {
+    margin: 0 auto ${({ theme }) => theme.space[4]}px;
+  }
   text-align: left;
-  margin: 0 auto 4rem;
 `;
 
 const LoginInstead = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
@@ -63,7 +73,7 @@ const Login = () => {
         <Container>
           {!wasEmailSent ? (
             <>
-              <Heading1 color="pc">Reset your password</Heading1>
+              <Heading1 color="pc">Reset password</Heading1>
               <Description>
                 Enter the email address you used to create an account, and
                 we&apos;ll send you instructions on how to reset your password.

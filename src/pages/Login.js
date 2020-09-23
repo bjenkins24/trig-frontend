@@ -12,6 +12,7 @@ import {
   Icon,
   toast,
 } from '@trig-app/core-components';
+import { device } from '@trig-app/constants/src';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
 import { useAuth } from '../context/authContext';
@@ -19,13 +20,19 @@ import GoogleSSOButton from '../components/GoogleSSOButton';
 import FullPageSpinner from '../components/FullPageSpinner';
 
 const CreateAccount = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
-  margin-bottom: 4rem;
+  margin-bottom: ${({ theme }) => theme.space[3]}px;
+  @media ${device.tabletPortraitUp} {
+    margin-bottom: ${({ theme }) => theme.space[4]}px;
+  }
 `;
 
 const FormContainer = styled.div`
   text-align: left;
-  width: 35rem;
   margin: 0 auto;
+  width: 30rem;
+  @media ${device.tabletPortraitUp} {
+    width: 35rem;
+  }
 `;
 
 const ForgotPassword = styled(Body1)`
@@ -62,7 +69,18 @@ const Login = () => {
       <AuthBox>
         <Heading1 color="pc">Sign in</Heading1>
         <CreateAccount>
-          Need a Trig account? <Link to="/register">Create an account</Link>
+          Need a Trig account?{' '}
+          <Link
+            to="/register"
+            css={`
+              display: block;
+              @media ${device.tabletPortraitUp} {
+                display: inline;
+              }
+            `}
+          >
+            Create an account
+          </Link>
         </CreateAccount>
         <FormContainer>
           <Form

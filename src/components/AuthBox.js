@@ -1,17 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { device } from '@trig-app/constants';
 
 const Container = styled.div`
   text-align: center;
 `;
 
 const Box = styled.div`
-  border: 0.1rem solid ${({ theme }) => theme.ss[900]};
-  border-radius: ${({ theme }) => theme.br};
+  border: 0;
+  padding: ${({ theme }) => theme.space[3]}px;
+  @media ${device.tabletPortraitUp} {
+    border: 0.1rem solid ${({ theme }) => theme.ss[900]};
+    border-radius: ${({ theme }) => theme.br};
+    padding: 4.8rem;
+    margin: 2.4rem auto 6rem;
+  }
+
   display: inline-block;
-  margin: 2.4rem auto 6rem;
-  padding: 4.8rem;
   text-align: center;
 `;
 

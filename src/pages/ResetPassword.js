@@ -11,6 +11,7 @@ import {
   Button,
   toast,
 } from '@trig-app/core-components';
+import { device } from '@trig-app/constants';
 import Layout from '../components/Layout';
 import FullPageSpinner from '../components/FullPageSpinner';
 import AuthBox from '../components/AuthBox';
@@ -19,11 +20,17 @@ import { validateResetUrl } from '../utils/authClient';
 import useSafeSetState from '../utils/useSafeSetState';
 
 const Container = styled.div`
-  width: 45rem;
+  width: 35rem;
+  @media ${device.tabletPortraitUp} {
+    width: 40rem;
+  }
 `;
 
 const Description = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
-  margin-bottom: 4rem;
+  margin-bottom: ${({ theme }) => theme.space[3]}px;
+  @media ${device.tabletPortraitUp} {
+    margin-bottom: ${({ theme }) => theme.space[4]}px;
+  }
   text-align: left;
 `;
 

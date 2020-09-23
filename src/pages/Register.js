@@ -12,6 +12,7 @@ import {
   CheckboxForm,
   toast,
 } from '@trig-app/core-components';
+import { device } from '@trig-app/constants/src';
 import { useAuth } from '../context/authContext';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
@@ -19,13 +20,19 @@ import GoogleSSOButton from '../components/GoogleSSOButton';
 import FullPageSpinner from '../components/FullPageSpinner';
 
 const SignIn = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
-  margin-bottom: 4rem;
+  margin-bottom: ${({ theme }) => theme.space[3]}px;
+  @media ${device.tabletPortraitUp} {
+    margin-bottom: ${({ theme }) => theme.space[4]}px;
+  }
 `;
 
 const FormContainer = styled.div`
   text-align: left;
-  width: 35rem;
+  width: 30rem;
   margin: 0 auto;
+  @media ${device.tabletPortraitUp} {
+    width: 35rem;
+  }
 `;
 
 const Or = styled.p`

@@ -14,7 +14,6 @@ const Box = styled.div`
     border: 0.1rem solid ${({ theme }) => theme.ss[900]};
     border-radius: ${({ theme }) => theme.br};
     padding: 4.8rem;
-    margin: 2.4rem auto 6rem;
   }
 
   display: inline-block;

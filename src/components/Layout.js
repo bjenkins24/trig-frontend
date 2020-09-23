@@ -19,7 +19,7 @@ const Header = styled.div`
 `;
 
 const Container = styled.div`
-  @media ${device.bigDesktopUp} {
+  @media ${device.tabletPortraitUp} {
     margin: 0;
     position: absolute;
     top: 50%;

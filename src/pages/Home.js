@@ -4,6 +4,8 @@ import { Tabs } from '@trig-app/core-components/dist/compositions';
 import { Carousel, Deck } from '@trig-app/core-components';
 import { useWindowWidth } from '@react-hook/window-size/throttled';
 import { breakpoints } from '@trig-app/constants';
+import { useHistory } from 'react-router-dom';
+import faker from 'faker';
 import Head from '../components/Head';
 import Hero from '../components/Hero';
 import Content from '../components/Content';
@@ -15,22 +17,60 @@ const Item = styled.div`
   width: 100%;
 `;
 
-const MockDeck = () => (
-  <Item>
-    <Deck
-      user={{
-        firstName: 'Brian',
-        lastName: 'Jenkins',
-        position: 'President, CEO',
-      }}
-      image="https://code.org/images/fill-480x360/tutorials/hoc2018/danceparty-characters.jpg"
-      totalFollowers={9}
-      totalCards={22}
-      title="Onboarding Support"
-      description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea"
-    />
-  </Item>
-);
+const buildDeck = id => {
+  return {
+    id,
+    user: {
+      firstName: faker.name.firstName(),
+      lastName: faker.name.lastName(),
+      position: faker.name.jobTitle(),
+    },
+    image: `https://picsum.photos/${faker.random.number(
+      800
+    )}/${faker.random.number(800)}`,
+    totalFollowers: faker.random.number(1000),
+    totalCards: faker.random.number(999),
+    title: faker.random.words(),
+    description: faker.lorem.paragraph(),
+  };
+};
+
+const mockDecks = [
+  buildDeck(1),
+  buildDeck(2),
+  buildDeck(3),
+  buildDeck(4),
+  buildDeck(5),
+  buildDeck(6),
+  buildDeck(7),
+  buildDeck(8),
+  buildDeck(9),
+  buildDeck(10),
+  buildDeck(11),
+  buildDeck(12),
+];
+
+/* eslint-disable */
+const MockDeck = ({ data }) => {
+  const history = useHistory();
+  return (
+    <Item>
+      <Deck
+        onClick={() => {
+          history.push(`/deck/${data.id}`);
+        }}
+        href={`/deck/${data.id}`}
+        user={data.user}
+        image={data.image}
+        totalFollowers={data.totalFollowers}
+        totalCards={data.totalCards}
+        title={data.title}
+        description={data.description}
+      />
+    </Item>
+  );
+};
+/* eslint-enable */
 
 const Home = () => {
   const width = useWindowWidth();
@@ -77,19 +117,13 @@ const Home = () => {
                 width: calc(100% + 8.75%);
               `}
             >
-              <Carousel slidesPerPage={getSlidesPerPage()}>
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
-                <MockDeck />
+              <Carousel
+                slidesPerPage={getSlidesPerPage()}
+                defaultSlidesToScroll={getSlidesPerPage()}
+              >
+                {mockDecks.map(deck => {
+                  return <MockDeck data={deck} />;
+                })}
               </Carousel>
             </div>,
             'my decks',

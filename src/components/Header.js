@@ -52,7 +52,7 @@ const Header = ({ links, openSearch, ...restProps }) => {
           position: fixed;
           width: 92%;
           top: 0;
-          z-index: 2;
+          z-index: 3;
         `}
         {...restProps}
       >

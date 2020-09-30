@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Switch, Route, useHistory, useLocation } from 'react-router-dom';
+import CreateButton from './components/CreateButton';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Header from './components/Header';
@@ -21,6 +22,7 @@ const AuthenticatedApp = () => {
       {isSearchOpen && (
         <Search defaultInput={searchKey} onRequestClose={closeSearch} />
       )}
+      <CreateButton />
       <Header
         openSearch={openSearch}
         links={[

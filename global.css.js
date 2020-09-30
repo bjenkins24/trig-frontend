@@ -62,6 +62,7 @@ export default createGlobalStyle`
     body {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        background: ${({ theme }) => theme.colors.b};
     }  
 
     form {

@@ -91,6 +91,11 @@ const Header = ({ links, openSearch, ...restProps }) => {
           `}
         >
           <PopoverNavigation
+            variant="light"
+            placement="bottom-end"
+            css={`
+              margin-top: ${({ theme }) => theme.space[2]};
+            `}
             navigationList={[
               {
                 item: 'Account Settings',

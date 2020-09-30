@@ -6,6 +6,7 @@ import {
   Avatar,
   Icon,
   Body2,
+  Button,
 } from '@trig-app/core-components';
 import faker from 'faker';
 import Head from '../components/Head';
@@ -82,6 +83,20 @@ const Deck = () => {
                 />
                 <Body2 color="pc">{data.totalCards} cards</Body2>
               </div>
+            </div>
+            <div
+              css={`
+                background: ${({ theme }) => theme.colors.ps[300]};
+                width: 100%;
+                height: 1px;
+              `}
+            />
+            <div
+              css={`
+                display: flex;
+              `}
+            >
+              <Button iconProps={{ type: 'lock' }}>Share</Button>
             </div>
           </div>
         </div>

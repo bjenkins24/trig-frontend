@@ -1,13 +1,53 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   Fab,
   Icon,
+  List,
+  ListItem,
   ListItemContent,
-  ModalHeader,
   Popover,
-  Modal,
+  Heading1,
+  Body1,
+  Button,
+  StringFieldWithButtonForm,
+  ModalHeader,
 } from '@trig-app/core-components';
-import PropTypes from 'prop-types';
+import { string } from 'yup';
+import GSuite from '../images/GSuite';
+import Modal from './Modal';
+
+const user = {
+  email: 'brian@trytrig.com',
+};
+
+const ServiceButtonProps = {
+  connected: PropTypes.bool,
+};
+
+const ServiceButtonDefaultProps = {
+  connected: false,
+};
+
+const ServiceButton = ({ connected, ...restProps }) => {
+  return (
+    <Button
+      variant="inverse-s"
+      additionalContent={connected ? 'Connected' : ''}
+      size="hg"
+      css={`
+        width: 177px;
+        margin-bottom: ${({ theme }) => theme.space[3]}px;
+        margin-right: ${({ theme }) => theme.space[3]}px;
+        flex-shrink: 0;
+      `}
+      {...restProps}
+    />
+  );
+};
+
+ServiceButton.propTypes = ServiceButtonProps;
+ServiceButton.defaultProps = ServiceButtonDefaultProps;
 
 const CreateItemProps = {
   iconType: PropTypes.string.isRequired,
@@ -77,6 +117,8 @@ const CreateButton = () => {
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false);
   const [isCreateDeckOpen, setIsCreateDeckOpen] = useState(false);
   const [isConnectAppOpen, setIsConnectAppOpen] = useState(false);
+  const [addedLinks, setAddedLinks] = useState([]);
+
   return (
     <>
       <Popover
@@ -96,6 +138,25 @@ const CreateButton = () => {
               `}
             >
               <CreateItem
+                title="Connect a Service"
+                iconType="cards"
+                iconBackgroundColor="a2"
+                description="Create cards with data from other services"
+                onClick={() => {
+                  close();
+                  setIsConnectAppOpen(true);
+                }}
+                onKeyPress={e => {
+                  if (e.key === 'Enter') {
+                    close();
+                  }
+                }}
+                css={`
+                  border-top-right-radius: ${({ theme }) => theme.br};
+                  border-top-left-radius: ${({ theme }) => theme.br};
+                `}
+              />
+              <CreateItem
                 title="Create a Link Card"
                 iconType="link"
                 iconBackgroundColor="a1"
@@ -109,10 +170,6 @@ const CreateButton = () => {
                     close();
                   }
                 }}
-                css={`
-                  border-top-right-radius: ${({ theme }) => theme.br};
-                  border-top-left-radius: ${({ theme }) => theme.br};
-                `}
               />
               <CreateItem
                 title="Create a Deck"
@@ -128,25 +185,10 @@ const CreateButton = () => {
                     close();
                   }
                 }}
-              />
-              <CreateItem
-                title="Connect an App"
-                iconType="cards"
-                iconBackgroundColor="a2"
-                description="Create cards with data from other apps"
-                onClick={() => {
-                  close();
-                  setIsConnectAppOpen(true);
-                }}
-                onKeyPress={e => {
-                  if (e.key === 'Enter') {
-                    close();
-                  }
-                }}
                 css={`
                   border-bottom: 0;
-                  border-bottom-right-radius: ${({ theme }) => theme.br};
-                  border-bottom-left-radius: ${({ theme }) => theme.br};
+                  border-top-right-radius: ${({ theme }) => theme.br};
+                  border-top-left-radius: ${({ theme }) => theme.br};
                 `}
               />
             </ul>
@@ -159,6 +201,7 @@ const CreateButton = () => {
             bottom: ${({ theme }) => theme.space[4]}px;
             right: ${({ theme }) => theme.space[4]}px;
             padding-top: ${({ theme }) => theme.space[3]}px;
+            z-index: 3;
           `}
         >
           <Fab>
@@ -168,7 +211,7 @@ const CreateButton = () => {
               size={2.8}
               css={`
                 transition: transform 200ms;
-                transform: ${isCreateOpen ? 'rotate(-45deg)' : 'none'};
+                transform: ${isCreateOpen ? 'rotate(45deg)' : 'none'};
               `}
             />
           </Fab>
@@ -177,20 +220,134 @@ const CreateButton = () => {
       <Modal
         onRequestClose={() => setIsCreateLinkOpen(false)}
         isOpen={isCreateLinkOpen}
+        header="Create Link Cards"
+        onSubmit={() => null}
+        submitContent="Create Cards"
+        onCancel={() => {
+          setIsCreateLinkOpen(false);
+          setAddedLinks([]);
+        }}
+        renderHeader={() => (
+          <>
+            <ModalHeader>Create a Link Card</ModalHeader>
+            <StringFieldWithButtonForm
+              autoFocus
+              placeholder="Enter a url..."
+              buttonContent="Add"
+              validate={string()
+                .required("Don't forget a url!")
+                .matches(
+                  /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/,
+                  "Looks like you didn't enter a valid url. Try again!"
+                )}
+              onSubmit={({ value, resetForm }) => {
+                setAddedLinks([...addedLinks, { url: value, title: 'test' }]);
+                resetForm();
+              }}
+              links={addedLinks}
+              css={`
+                width: 700px;
+                margin-bottom: ${({ theme, links }) =>
+                  links.length > 0 ? `${theme.space[4]}px` : 0};
+              `}
+            />
+          </>
+        )}
       >
-        <ModalHeader>Create Link Cards</ModalHeader>
+        {addedLinks.length > 0 && (
+          <List>
+            {addedLinks.reverse().map((link, index) => {
+              return (
+                <ListItem
+                  renderItem={() => <Icon type="link" color="pc" size={2.4} />}
+                  renderContent={() => (
+                    <ListItemContent
+                      primary={link.title || link.url}
+                      secondary={link.title ? link.url : ''}
+                    />
+                  )}
+                  actions={[
+                    <Icon
+                      type="close"
+                      color="ps.200"
+                      size={1.6}
+                      onClick={() => {
+                        const newLinks = [...addedLinks];
+                        newLinks.splice(index, 1);
+                        setAddedLinks(newLinks);
+                      }}
+                    />,
+                  ]}
+                />
+              );
+            })}
+          </List>
+        )}
       </Modal>
       <Modal
         onRequestClose={() => setIsConnectAppOpen(false)}
         isOpen={isConnectAppOpen}
-      >
-        <ModalHeader>Connect an App</ModalHeader>
-      </Modal>
+        height="40%"
+        width={56}
+        tabNavigationProps={{
+          tabs: [
+            {
+              text: 'Add Service',
+            },
+            {
+              text: 'Connected Services',
+            },
+          ],
+          tabPanels: [
+            <>
+              <Heading1>Add Service</Heading1>
+              <Body1 as="p">
+                Connect services and sync documents and data to Trig.
+                <br />
+                Don’t see a service you need?{' '}
+                <a
+                  href={`https://brian325506.typeform.com/to/oDb8Z6Bn#email=${user.email}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Let us know
+                </a>
+                .
+              </Body1>
+              <div
+                css={`
+                  flex-wrap: wrap;
+                `}
+              >
+                <ServiceButton connected>
+                  <GSuite />
+                </ServiceButton>
+              </div>
+            </>,
+            <>
+              <Heading1>Connected Services</Heading1>
+              <List>
+                <ListItem
+                  renderItem={() => <Icon type="google" size={2.4} />}
+                  renderContent={() => (
+                    <ListItemContent
+                      primary="G Suite - bjenkins24"
+                      secondary="Up to date - Last synced 12 hours ago"
+                    />
+                  )}
+                  actions={[<Icon type="close" color="ps.200" size={1.6} />]}
+                />
+              </List>
+            </>,
+          ],
+        }}
+      />
       <Modal
         onRequestClose={() => setIsCreateDeckOpen(false)}
         isOpen={isCreateDeckOpen}
+        header="Create a Deck"
       >
-        <ModalHeader>Create a Deck</ModalHeader>
+        Create a deck
       </Modal>
     </>
   );

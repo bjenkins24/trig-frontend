@@ -114,7 +114,7 @@ const Home = () => {
             <div
               css={`
                 margin-left: -4.375%;
-                width: calc(100% + 8.75%);
+                width: calc(100% + 8.743%);
               `}
             >
               <Carousel

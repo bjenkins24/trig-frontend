@@ -40,14 +40,14 @@ const Header = ({ links, openSearch, ...restProps }) => {
     <>
       <div
         css={`
-          height: 68px;
+          height: 65px;
         `}
       />
       <div
         css={`
           display: flex;
           background: ${({ theme }) => theme.p};
-          padding: 14px 4%;
+          padding: 0 4%;
           align-items: center;
           position: fixed;
           width: 92%;
@@ -97,6 +97,10 @@ const Header = ({ links, openSearch, ...restProps }) => {
               margin-top: ${({ theme }) => theme.space[2]};
             `}
             navigationList={[
+              {
+                item: 'Connected Services',
+                onClick: () => null,
+              },
               {
                 item: 'Account Settings',
                 onClick: () => history.push('/account-settings'),

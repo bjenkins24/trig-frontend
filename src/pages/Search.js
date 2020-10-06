@@ -145,7 +145,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
           background: ${({ theme }) => theme.b};
           opacity: 0.98;
           position: fixed;
-          z-index: 1000;
+          z-index: 2000;
           padding: ${({ theme }) => theme.space[5]}px 4%;
         `}
       >
@@ -223,12 +223,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
             position: relative;
           `}
         >
-          <Separator
-            css={`
-              margin-bottom: ${({ theme }) =>
-                theme.space[3] + theme.space[1]}px;
-            `}
-          />
+          <Separator />
           <TabsNavigation
             variant="light"
             tabs={[
@@ -239,7 +234,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
           />
           <Separator
             css={`
-              margin-top: ${({ theme }) => theme.space[3]}px;
+              margin-top: -2px;
               margin-bottom: ${({ theme }) => theme.space[5]}px;
             `}
           />

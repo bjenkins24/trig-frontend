@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Tabs } from '@trig-app/core-components/dist/compositions';
-import { Carousel, Deck } from '@trig-app/core-components';
+import { Carousel, Collection } from '@trig-app/core-components';
 import { useWindowWidth } from '@react-hook/window-size/throttled';
 import { breakpoints } from '@trig-app/constants';
 import { useHistory } from 'react-router-dom';
@@ -17,7 +17,7 @@ const Item = styled.div`
   width: 100%;
 `;
 
-const buildDeck = id => {
+const buildCollection = id => {
   return {
     id,
     user: {
@@ -35,31 +35,31 @@ const buildDeck = id => {
   };
 };
 
-const mockDecks = [
-  buildDeck(1),
-  buildDeck(2),
-  buildDeck(3),
-  buildDeck(4),
-  buildDeck(5),
-  buildDeck(6),
-  buildDeck(7),
-  buildDeck(8),
-  buildDeck(9),
-  buildDeck(10),
-  buildDeck(11),
-  buildDeck(12),
+const mockCollections = [
+  buildCollection(1),
+  buildCollection(2),
+  buildCollection(3),
+  buildCollection(4),
+  buildCollection(5),
+  buildCollection(6),
+  buildCollection(7),
+  buildCollection(8),
+  buildCollection(9),
+  buildCollection(10),
+  buildCollection(11),
+  buildCollection(12),
 ];
 
 /* eslint-disable */
-const MockDeck = ({ data }) => {
+const MockCollection = ({ data }) => {
   const history = useHistory();
   return (
     <Item>
-      <Deck
+      <Collection
         onClick={() => {
-          history.push(`/deck/${data.id}`);
+          history.push(`/collection/${data.id}`);
         }}
-        href={`/deck/${data.id}`}
+        href={`/collection/${data.id}`}
         user={data.user}
         image={data.image}
         totalFollowers={data.totalFollowers}
@@ -104,8 +104,8 @@ const Home = () => {
         <Tabs
           variant="dark"
           tabs={[
-            { text: 'All Decks' },
-            { text: 'My Decks' },
+            { text: 'All Collections' },
+            { text: 'My Collections' },
             { text: 'Engineering' },
             { text: 'Sales' },
             { text: 'Support' },
@@ -121,12 +121,12 @@ const Home = () => {
                 slidesPerPage={getSlidesPerPage()}
                 defaultSlidesToScroll={getSlidesPerPage()}
               >
-                {mockDecks.map(deck => {
-                  return <MockDeck data={deck} />;
+                {mockCollections.map(collection => {
+                  return <MockCollection data={collection} />;
                 })}
               </Carousel>
             </div>,
-            'my decks',
+            'my collections',
             'development',
             'sales',
             'support',

@@ -15,7 +15,7 @@ import CardView from '../components/CardView';
 import Filters from '../components/Filters';
 import Content from '../components/Content';
 
-const Deck = () => {
+const Collection = () => {
   const { id } = useParams();
 
   const data = {
@@ -33,7 +33,7 @@ const Deck = () => {
 
   return (
     <>
-      <Head title={`Deck ${id}`} />
+      <Head title={`Collection ${id}`} />
       <Hero
         css={`
           margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;
@@ -114,4 +114,4 @@ const Deck = () => {
   );
 };
 
-export default Deck;
+export default Collection;

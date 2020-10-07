@@ -101,7 +101,7 @@ const GlobalStyle = createGlobalStyle`
 
 const VIEWS = {
   CARDS: 'cards',
-  DECKS: 'decks',
+  COLLECTIONS: 'collections',
   PEOPLE: 'people',
 };
 
@@ -228,7 +228,10 @@ const Search = ({ onRequestClose, defaultInput }) => {
             variant="light"
             tabs={[
               { text: 'Cards', onClick: () => setCurrentView(VIEWS.CARDS) },
-              { text: 'Decks', onClick: () => setCurrentView(VIEWS.DECKS) },
+              {
+                text: 'Collections',
+                onClick: () => setCurrentView(VIEWS.COLLECTIONS),
+              },
               { text: 'People', onClick: () => setCurrentView(VIEWS.PEOPLE) },
             ]}
           />
@@ -296,7 +299,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
               <Filters />
             </>
           )}
-          {currentView === VIEWS.DECKS && <div>Decks</div>}
+          {currentView === VIEWS.COLLECTIONS && <div>Collections</div>}
           {currentView === VIEWS.PEOPLE && <div>People</div>}
         </div>
       </div>

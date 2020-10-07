@@ -102,6 +102,10 @@ const Header = ({ links, openSearch, ...restProps }) => {
                 onClick: () => null,
               },
               {
+                item: 'Create Workspace',
+                onClick: () => null,
+              },
+              {
                 item: 'Account Settings',
                 onClick: () => history.push('/account-settings'),
               },

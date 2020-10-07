@@ -4,7 +4,7 @@ import CreateButton from './components/CreateButton';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Header from './components/Header';
-import Deck from './pages/Deck';
+import Collection from './pages/Collection';
 import AccountSettings from './pages/AccountSettings';
 import useSearch from './utils/useSearch';
 
@@ -33,8 +33,8 @@ const AuthenticatedApp = () => {
         ]}
       />
       <Switch>
-        <Route path="/deck/:id">
-          <Deck />
+        <Route path="/collection/:id">
+          <Collection />
         </Route>
         <Route path="/account-settings">
           <AccountSettings />

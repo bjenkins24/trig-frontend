@@ -9,9 +9,11 @@ import {
   Popover,
   Heading1,
   Body1,
+  Body1Component,
   Button,
   StringFieldWithButtonForm,
   ModalHeader,
+  toast,
 } from '@trig-app/core-components';
 import { string } from 'yup';
 import GSuite from '../images/GSuite';
@@ -85,7 +87,7 @@ const CreateItem = ({
             css={`
               margin: auto;
               position: relative;
-              left: ${({ type }) => (type === 'deck' ? '-1px' : 'auto')};
+              left: ${({ type }) => (type === 'collection' ? '-1px' : 'auto')};
             `}
           />
         </div>
@@ -115,7 +117,7 @@ CreateItem.propTypes = CreateItemProps;
 const CreateButton = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false);
-  const [isCreateDeckOpen, setIsCreateDeckOpen] = useState(false);
+  const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
   const [isConnectAppOpen, setIsConnectAppOpen] = useState(false);
   const [addedLinks, setAddedLinks] = useState([]);
 
@@ -172,13 +174,13 @@ const CreateButton = () => {
                 }}
               />
               <CreateItem
-                title="Create a Deck"
-                iconType="deck"
+                title="Create a Collection"
+                iconType="collection"
                 iconBackgroundColor="a3"
                 description="A shareable collection of cards"
                 onClick={() => {
                   close();
-                  setIsCreateDeckOpen(true);
+                  setIsCreateCollectionOpen(true);
                 }}
                 onKeyPress={e => {
                   if (e.key === 'Enter') {
@@ -218,18 +220,27 @@ const CreateButton = () => {
         </div>
       </Popover>
       <Modal
-        onRequestClose={() => setIsCreateLinkOpen(false)}
-        isOpen={isCreateLinkOpen}
-        header="Create Link Cards"
-        onSubmit={() => null}
-        submitContent="Create Cards"
-        onCancel={() => {
+        onRequestClose={() => {
           setIsCreateLinkOpen(false);
           setAddedLinks([]);
         }}
+        width={70}
+        isOpen={isCreateLinkOpen}
+        header="Create Link Cards"
         renderHeader={() => (
           <>
             <ModalHeader>Create a Link Card</ModalHeader>
+            <Body1Component
+              as="p"
+              css={`
+                margin-bottom: ${({ theme }) => theme.space[4]}px;
+              `}
+            >
+              Create a card by entering a URL for an online resource below. If
+              the link is publicly accessible, the content will be archived and
+              accessible in Trig even if the original resource is removed from
+              the internet.
+            </Body1Component>
             <StringFieldWithButtonForm
               autoFocus
               placeholder="Enter a url..."
@@ -241,12 +252,15 @@ const CreateButton = () => {
                   "Looks like you didn't enter a valid url. Try again!"
                 )}
               onSubmit={({ value, resetForm }) => {
+                toast({
+                  message: 'Your link card was created successfully.',
+                });
                 setAddedLinks([...addedLinks, { url: value, title: 'test' }]);
                 resetForm();
               }}
               links={addedLinks}
               css={`
-                width: 700px;
+                width: 100%;
                 margin-bottom: ${({ theme, links }) =>
                   links.length > 0 ? `${theme.space[4]}px` : 0};
               `}
@@ -256,7 +270,7 @@ const CreateButton = () => {
       >
         {addedLinks.length > 0 && (
           <List>
-            {addedLinks.reverse().map((link, index) => {
+            {addedLinks.reverse().map(link => {
               return (
                 <ListItem
                   renderItem={() => <Icon type="link" color="pc" size={2.4} />}
@@ -266,18 +280,6 @@ const CreateButton = () => {
                       secondary={link.title ? link.url : ''}
                     />
                   )}
-                  actions={[
-                    <Icon
-                      type="close"
-                      color="ps.200"
-                      size={1.6}
-                      onClick={() => {
-                        const newLinks = [...addedLinks];
-                        newLinks.splice(index, 1);
-                        setAddedLinks(newLinks);
-                      }}
-                    />,
-                  ]}
                 />
               );
             })}
@@ -287,7 +289,7 @@ const CreateButton = () => {
       <Modal
         onRequestClose={() => setIsConnectAppOpen(false)}
         isOpen={isConnectAppOpen}
-        height="40%"
+        height="50%"
         width={56}
         tabNavigationProps={{
           tabs: [
@@ -343,11 +345,11 @@ const CreateButton = () => {
         }}
       />
       <Modal
-        onRequestClose={() => setIsCreateDeckOpen(false)}
-        isOpen={isCreateDeckOpen}
-        header="Create a Deck"
+        onRequestClose={() => setIsCreateCollectionOpen(false)}
+        isOpen={isCreateCollectionOpen}
+        header="Create a Collection"
       >
-        Create a deck
+        Create a collection
       </Modal>
     </>
   );

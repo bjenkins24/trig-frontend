@@ -88,11 +88,11 @@ const keyMap = {
 
 const useSearch = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchKey, setSearchKey] = useState(null);
+  const [searchKey, setSearchKey] = useState('');
 
   const closeSearch = () => {
     setIsSearchOpen(false);
-    setSearchKey(null);
+    setSearchKey('');
   };
 
   const openSearch = () => {

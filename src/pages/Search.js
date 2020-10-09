@@ -203,7 +203,8 @@ const Search = ({ onRequestClose, defaultInput }) => {
           <Body2>Recent searches: </Body2>
           {MockRecentSelections.map((selection, index) => {
             return (
-              <>
+              // eslint-disable-next-line react/no-array-index-key
+              <span key={index}>
                 <RecentSelection
                   onClick={() => {
                     setSearchInput(selection);
@@ -214,7 +215,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
                     : selection}
                 </RecentSelection>
                 {index !== MockRecentSelections.length - 1 && ', '}
-              </>
+              </span>
             );
           })}
         </div>
@@ -276,10 +277,10 @@ const Search = ({ onRequestClose, defaultInput }) => {
                         css={`
                           margin-bottom: ${({ theme }) => theme.space[2]};
                         `}
+                        key={result.id}
                       >
                         <CardItem
                           href={result.link}
-                          key={result.id}
                           moreProps={{ onClick: () => null }}
                           avatarProps={{
                             firstName: result.user.firstName,

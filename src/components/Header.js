@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Logo,
@@ -9,6 +9,7 @@ import {
 import { TabsNavigation } from '@trig-app/core-components/dist/compositions';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
+import ServiceModal from './ServiceModal';
 
 const HeaderProps = {
   links: PropTypes.arrayOf(
@@ -22,6 +23,7 @@ const HeaderProps = {
 
 const Header = ({ links, openSearch, ...restProps }) => {
   const { logout } = useAuth();
+  const [isConnectedServicesOpen, setIsConnectedServicesOpen] = useState(false);
   const history = useHistory();
   const location = useLocation();
 
@@ -99,7 +101,7 @@ const Header = ({ links, openSearch, ...restProps }) => {
             navigationList={[
               {
                 item: 'Connected Services',
-                onClick: () => null,
+                onClick: () => setIsConnectedServicesOpen(true),
               },
               {
                 item: 'Create Workspace',
@@ -121,6 +123,11 @@ const Header = ({ links, openSearch, ...restProps }) => {
             />
           </PopoverNavigation>
         </div>
+        <ServiceModal
+          defaultTab={1}
+          isOpen={isConnectedServicesOpen}
+          onRequestClose={() => setIsConnectedServicesOpen(false)}
+        />
       </div>
     </>
   );

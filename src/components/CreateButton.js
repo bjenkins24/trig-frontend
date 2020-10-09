@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   Fab,
@@ -7,49 +7,14 @@ import {
   ListItem,
   ListItemContent,
   Popover,
-  Heading1,
-  Body1,
   Body1Component,
-  Button,
   StringFieldWithButtonForm,
   ModalHeader,
   toast,
 } from '@trig-app/core-components';
 import { string } from 'yup';
-import GSuite from '../images/GSuite';
 import Modal from './Modal';
-
-const user = {
-  email: 'brian@trytrig.com',
-};
-
-const ServiceButtonProps = {
-  connected: PropTypes.bool,
-};
-
-const ServiceButtonDefaultProps = {
-  connected: false,
-};
-
-const ServiceButton = ({ connected, ...restProps }) => {
-  return (
-    <Button
-      variant="inverse-s"
-      additionalContent={connected ? 'Connected' : ''}
-      size="hg"
-      css={`
-        width: 177px;
-        margin-bottom: ${({ theme }) => theme.space[3]}px;
-        margin-right: ${({ theme }) => theme.space[3]}px;
-        flex-shrink: 0;
-      `}
-      {...restProps}
-    />
-  );
-};
-
-ServiceButton.propTypes = ServiceButtonProps;
-ServiceButton.defaultProps = ServiceButtonDefaultProps;
+import ServiceModal from './ServiceModal';
 
 const CreateItemProps = {
   iconType: PropTypes.string.isRequired,
@@ -114,6 +79,99 @@ const CreateItem = ({
 
 CreateItem.propTypes = CreateItemProps;
 
+const PopoverContentProps = {
+  isOpen: PropTypes.bool.isRequired,
+  closePopover: PropTypes.func.isRequired,
+  setIsCreateOpen: PropTypes.func.isRequired,
+  setIsConnectAppOpen: PropTypes.func.isRequired,
+  setIsCreateLinkOpen: PropTypes.func.isRequired,
+  setIsCreateCollectionOpen: PropTypes.func.isRequired,
+};
+
+const PopoverContent = ({
+  isOpen,
+  closePopover,
+  setIsCreateOpen,
+  setIsConnectAppOpen,
+  setIsCreateLinkOpen,
+  setIsCreateCollectionOpen,
+}) => {
+  useEffect(() => {
+    setIsCreateOpen(isOpen);
+  }, [isOpen]);
+
+  const close = () => {
+    closePopover();
+    setIsCreateOpen(false);
+  };
+
+  return (
+    <ul
+      css={`
+        margin: -${({ theme }) => theme.space[3]};
+        padding: 0;
+      `}
+    >
+      <CreateItem
+        title="Connect a Service"
+        iconType="cards"
+        iconBackgroundColor="a2"
+        description="Create cards with data from other services"
+        onClick={() => {
+          close();
+          setIsConnectAppOpen(true);
+        }}
+        onKeyPress={e => {
+          if (e.key === 'Enter') {
+            close();
+          }
+        }}
+        css={`
+          border-top-right-radius: ${({ theme }) => theme.br};
+          border-top-left-radius: ${({ theme }) => theme.br};
+        `}
+      />
+      <CreateItem
+        title="Create a Link Card"
+        iconType="link"
+        iconBackgroundColor="a1"
+        description="Any online resource or article"
+        onClick={() => {
+          close();
+          setIsCreateLinkOpen(true);
+        }}
+        onKeyPress={e => {
+          if (e.key === 'Enter') {
+            close();
+          }
+        }}
+      />
+      <CreateItem
+        title="Create a Collection"
+        iconType="collection"
+        iconBackgroundColor="a3"
+        description="A shareable collection of cards"
+        onClick={() => {
+          close();
+          setIsCreateCollectionOpen(true);
+        }}
+        onKeyPress={e => {
+          if (e.key === 'Enter') {
+            close();
+          }
+        }}
+        css={`
+          border-bottom: 0;
+          border-top-right-radius: ${({ theme }) => theme.br};
+          border-top-left-radius: ${({ theme }) => theme.br};
+        `}
+      />
+    </ul>
+  );
+};
+
+PopoverContent.propTypes = PopoverContentProps;
+
 const CreateButton = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false);
@@ -126,76 +184,16 @@ const CreateButton = () => {
       <Popover
         placement="top-end"
         variant="light"
-        renderPopover={({ isOpen, closePopover }) => {
-          const close = () => {
-            closePopover();
-            setIsCreateOpen(false);
-          };
-          setIsCreateOpen(isOpen);
-          return (
-            <ul
-              css={`
-                margin: -${({ theme }) => theme.space[3]};
-                padding: 0;
-              `}
-            >
-              <CreateItem
-                title="Connect a Service"
-                iconType="cards"
-                iconBackgroundColor="a2"
-                description="Create cards with data from other services"
-                onClick={() => {
-                  close();
-                  setIsConnectAppOpen(true);
-                }}
-                onKeyPress={e => {
-                  if (e.key === 'Enter') {
-                    close();
-                  }
-                }}
-                css={`
-                  border-top-right-radius: ${({ theme }) => theme.br};
-                  border-top-left-radius: ${({ theme }) => theme.br};
-                `}
-              />
-              <CreateItem
-                title="Create a Link Card"
-                iconType="link"
-                iconBackgroundColor="a1"
-                description="Any online resource or article"
-                onClick={() => {
-                  close();
-                  setIsCreateLinkOpen(true);
-                }}
-                onKeyPress={e => {
-                  if (e.key === 'Enter') {
-                    close();
-                  }
-                }}
-              />
-              <CreateItem
-                title="Create a Collection"
-                iconType="collection"
-                iconBackgroundColor="a3"
-                description="A shareable collection of cards"
-                onClick={() => {
-                  close();
-                  setIsCreateCollectionOpen(true);
-                }}
-                onKeyPress={e => {
-                  if (e.key === 'Enter') {
-                    close();
-                  }
-                }}
-                css={`
-                  border-bottom: 0;
-                  border-top-right-radius: ${({ theme }) => theme.br};
-                  border-top-left-radius: ${({ theme }) => theme.br};
-                `}
-              />
-            </ul>
-          );
-        }}
+        renderPopover={({ isOpen, closePopover }) => (
+          <PopoverContent
+            isOpen={isOpen}
+            closePopover={closePopover}
+            setIsCreateOpen={setIsCreateOpen}
+            setIsConnectAppOpen={setIsConnectAppOpen}
+            setIsCreateLinkOpen={setIsCreateLinkOpen}
+            setIsCreateCollectionOpen={setIsCreateCollectionOpen}
+          />
+        )}
       >
         <div
           css={`
@@ -270,9 +268,11 @@ const CreateButton = () => {
       >
         {addedLinks.length > 0 && (
           <List>
-            {addedLinks.reverse().map(link => {
+            {addedLinks.reverse().map((link, index) => {
+              /* eslint-disable react/no-array-index-key */
               return (
                 <ListItem
+                  key={index}
                   renderItem={() => <Icon type="link" color="pc" size={2.4} />}
                   renderContent={() => (
                     <ListItemContent
@@ -282,67 +282,14 @@ const CreateButton = () => {
                   )}
                 />
               );
+              /* eslint-enable react/no-array-index-key */
             })}
           </List>
         )}
       </Modal>
-      <Modal
-        onRequestClose={() => setIsConnectAppOpen(false)}
+      <ServiceModal
         isOpen={isConnectAppOpen}
-        height="50%"
-        width={56}
-        tabNavigationProps={{
-          tabs: [
-            {
-              text: 'Add Service',
-            },
-            {
-              text: 'Connected Services',
-            },
-          ],
-          tabPanels: [
-            <>
-              <Heading1>Add Service</Heading1>
-              <Body1 as="p">
-                Connect services and sync documents and data to Trig.
-                <br />
-                Don’t see a service you need?{' '}
-                <a
-                  href={`https://brian325506.typeform.com/to/oDb8Z6Bn#email=${user.email}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Let us know
-                </a>
-                .
-              </Body1>
-              <div
-                css={`
-                  flex-wrap: wrap;
-                `}
-              >
-                <ServiceButton connected>
-                  <GSuite />
-                </ServiceButton>
-              </div>
-            </>,
-            <>
-              <Heading1>Connected Services</Heading1>
-              <List>
-                <ListItem
-                  renderItem={() => <Icon type="google" size={2.4} />}
-                  renderContent={() => (
-                    <ListItemContent
-                      primary="G Suite - bjenkins24"
-                      secondary="Up to date - Last synced 12 hours ago"
-                    />
-                  )}
-                  actions={[<Icon type="close" color="ps.200" size={1.6} />]}
-                />
-              </List>
-            </>,
-          ],
-        }}
+        onRequestClose={() => setIsConnectAppOpen(false)}
       />
       <Modal
         onRequestClose={() => setIsCreateCollectionOpen(false)}

@@ -357,6 +357,9 @@ const CardRenderer = ({ data }) => {
       dateTime={data.dateTime}
       isFavorited={data.favorited}
       totalFavorites={data.totalFavorites}
+      onClickFavorite={() => null}
+      onClick={() => null}
+      id={data.id}
       title={data.title}
       href={data.link}
       type={data.cardType}

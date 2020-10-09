@@ -122,7 +122,9 @@ const Home = () => {
                 defaultSlidesToScroll={getSlidesPerPage()}
               >
                 {mockCollections.map(collection => {
-                  return <MockCollection data={collection} />;
+                  return (
+                    <MockCollection key={collection.id} data={collection} />
+                  );
                 })}
               </Carousel>
             </div>,

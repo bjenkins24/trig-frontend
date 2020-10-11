@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useLocation } from 'react-router-dom';
 import faker from 'faker';
 import {
   ButtonToggle,
@@ -15,10 +15,6 @@ import {
 } from '@trig-app/core-components';
 import { Masonry } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
-
-const CardViewProps = {
-  location: PropTypes.string.isRequired,
-};
 
 const MockCardsSize = [
   { width: 600, height: 400 },
@@ -443,7 +439,8 @@ const MockListItem = () => {
   );
 };
 
-const CardView = ({ location, ...restProps }) => {
+const CardView = props => {
+  const location = useLocation();
   const [cardCategory, setCardCategory] = useState('all');
   const [viewType, setViewType] = useLocalStorage(
     `card-view-location:${location}`,
@@ -455,7 +452,7 @@ const CardView = ({ location, ...restProps }) => {
       css={`
         width: 982px;
       `}
-      {...restProps}
+      {...props}
     >
       <div
         css={`
@@ -530,7 +527,5 @@ const CardView = ({ location, ...restProps }) => {
     </div>
   );
 };
-
-CardView.propTypes = CardViewProps;
 
 export default CardView;

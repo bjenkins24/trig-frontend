@@ -5,7 +5,7 @@ import Home from './pages/Home';
 import Search from './pages/Search';
 import Header from './components/Header';
 import Collection from './pages/Collection';
-import AccountSettings from './pages/AccountSettings';
+import Profile from './pages/Profile';
 import useSearch from './utils/useSearch';
 
 const AuthenticatedApp = () => {
@@ -36,8 +36,8 @@ const AuthenticatedApp = () => {
         <Route path="/collection/:id">
           <Collection />
         </Route>
-        <Route path="/account-settings">
-          <AccountSettings />
+        <Route path="/profile">
+          <Profile />
         </Route>
         <Route path="/">
           <Home />

@@ -8,9 +8,7 @@ import { useHistory } from 'react-router-dom';
 import faker from 'faker';
 import Head from '../components/Head';
 import Hero from '../components/Hero';
-import Content from '../components/Content';
-import CardView from '../components/CardView';
-import Filters from '../components/Filters';
+import Cards from '../components/Cards';
 
 const Item = styled.div`
   height: 204px;
@@ -135,15 +133,7 @@ const Home = () => {
           ]}
         />
       </Hero>
-      <Content>
-        <CardView
-          css={`
-            margin-right: ${({ theme }) => theme.space[5]}px;
-          `}
-          location="/"
-        />
-        <Filters />
-      </Content>
+      <Cards />
     </div>
   );
 };

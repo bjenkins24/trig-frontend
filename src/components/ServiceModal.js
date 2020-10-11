@@ -59,7 +59,7 @@ const ServiceModal = ({ isOpen, onRequestClose, defaultTab }) => {
     <Modal
       onRequestClose={onRequestClose}
       isOpen={isOpen}
-      height="50%"
+      height={31.4}
       width={56}
       tabNavigationProps={{
         defaultTab,

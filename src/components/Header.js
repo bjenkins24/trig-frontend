@@ -100,16 +100,16 @@ const Header = ({ links, openSearch, ...restProps }) => {
             `}
             navigationList={[
               {
-                item: 'Connected Services',
-                onClick: () => setIsConnectedServicesOpen(true),
+                item: 'Profile',
+                onClick: () => history.push('/profile'),
               },
               {
                 item: 'Create Workspace',
                 onClick: () => null,
               },
               {
-                item: 'Account Settings',
-                onClick: () => history.push('/account-settings'),
+                item: 'Connected Services',
+                onClick: () => setIsConnectedServicesOpen(true),
               },
               { item: 'Logout', onClick: logout },
             ]}

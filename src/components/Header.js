@@ -28,7 +28,7 @@ const Header = ({ links, openSearch, ...restProps }) => {
   const location = useLocation();
 
   const getDefaultTab = () => {
-    const routes = ['/', '/activity'];
+    const routes = ['/', '/people'];
 
     return routes.reduce((accumulator, route, routeIndex) => {
       if (accumulator === -1 && location.pathname === route) {

@@ -96,7 +96,7 @@ const Home = () => {
       <Head title="Dashboard" />
       <Hero
         css={`
-          margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;
+          margin-bottom: ${({ theme }) => theme.space[5]}px;
         `}
       >
         <Tabs

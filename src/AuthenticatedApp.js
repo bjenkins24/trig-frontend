@@ -6,6 +6,7 @@ import Search from './pages/Search';
 import Header from './components/Header';
 import Collection from './pages/Collection';
 import Profile from './pages/Profile';
+import People from './pages/People';
 import useSearch from './utils/useSearch';
 
 const AuthenticatedApp = () => {
@@ -30,6 +31,10 @@ const AuthenticatedApp = () => {
             onClick: () => history.push('/'),
             text: 'Dashboard',
           },
+          {
+            onClick: () => history.push('/people'),
+            text: 'People',
+          },
         ]}
       />
       <Switch>
@@ -38,6 +43,9 @@ const AuthenticatedApp = () => {
         </Route>
         <Route path="/profile">
           <Profile />
+        </Route>
+        <Route path="/people">
+          <People />
         </Route>
         <Route path="/">
           <Home />

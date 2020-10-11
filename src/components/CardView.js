@@ -443,7 +443,7 @@ const CardView = props => {
   const location = useLocation();
   const [cardCategory, setCardCategory] = useState('all');
   const [viewType, setViewType] = useLocalStorage(
-    `card-view-location:${location}`,
+    `card-view-location:${location.pathname}`,
     'thumbnail'
   );
 

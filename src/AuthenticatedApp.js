@@ -44,6 +44,9 @@ const AuthenticatedApp = () => {
         <Route path="/profile">
           <Profile />
         </Route>
+        <Route path="/people/:id">
+          <Profile />
+        </Route>
         <Route path="/people">
           <People />
         </Route>

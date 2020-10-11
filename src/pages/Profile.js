@@ -9,25 +9,106 @@ import {
   Button,
 } from '@trig-app/core-components';
 import { TabsNavigation } from '@trig-app/core-components/dist/compositions';
+import { useParams } from 'react-router-dom';
 import faker from 'faker';
 import Hero from '../components/Hero';
 import Head from '../components/Head';
 import { heroContentMaxWidth } from '../utils/constants';
 import Cards from '../components/Cards';
 
-const user = {
-  id: 1,
-  firstName: faker.name.firstName(),
-  lastName: faker.name.lastName(),
-  image: faker.image.avatar(),
-  email: faker.internet.email(),
-  position: faker.name.jobTitle(),
-};
+const data = [
+  {
+    id: 1,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    position: faker.name.jobTitle(),
+    email: faker.internet.email(),
+    profilePicture: faker.image.avatar(),
+  },
+  {
+    id: 2,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    position: faker.name.jobTitle(),
+    email: faker.internet.email(),
+    profilePicture: faker.image.avatar(),
+  },
+  {
+    id: 3,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    position: faker.name.jobTitle(),
+    email: faker.internet.email(),
+    profilePicture: faker.image.avatar(),
+  },
+  {
+    id: 4,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    position: faker.name.jobTitle(),
+    email: faker.internet.email(),
+    profilePicture: faker.image.avatar(),
+  },
+  {
+    id: 5,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    position: faker.name.jobTitle(),
+    email: faker.internet.email(),
+    profilePicture: faker.image.avatar(),
+  },
+  {
+    id: 6,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    position: faker.name.jobTitle(),
+    email: faker.internet.email(),
+    profilePicture: faker.image.avatar(),
+  },
+  {
+    id: 7,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    position: faker.name.jobTitle(),
+    email: faker.internet.email(),
+    profilePicture: faker.image.avatar(),
+  },
+  {
+    id: 8,
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    position: faker.name.jobTitle(),
+    email: faker.internet.email(),
+    profilePicture: faker.image.avatar(),
+  },
+];
 
 const totalCards = 245;
 const totalCollections = 24;
 
 const Profile = () => {
+  const { id } = useParams();
+
+  let isCurrentUser = false;
+  if (typeof id === 'undefined') {
+    isCurrentUser = true;
+  }
+
+  let user = data[0];
+  if (!isCurrentUser) {
+    [user] = data.filter(person => person.id === parseInt(id, 10));
+  }
+
+  const tabs = [{ text: 'Cards' }, { text: 'Collections' }];
+  if (isCurrentUser) {
+    tabs.push({ text: 'Settings ' });
+  }
+
+  const tabPanels = [<Cards />, <div>Collections</div>];
+  if (isCurrentUser) {
+    tabPanels.push(<Heading1>YOU FOUND IT CHANGE YOUR PASSWORD NOW</Heading1>);
+  }
+
   return (
     <>
       <Head title={`${user.firstName} ${user.lastName}`} />
@@ -49,7 +130,7 @@ const Profile = () => {
               firstName={user.firstName}
               lastName={user.lastName}
               email={user.email}
-              image={user.image}
+              image={user.profilePicture}
               size={15}
               css={`
                 position: absolute;
@@ -138,16 +219,8 @@ const Profile = () => {
         <TabsNavigation
           variant="light"
           size="lg"
-          tabs={[
-            { text: 'Cards' },
-            { text: 'Collections' },
-            { text: 'Settings' },
-          ]}
-          tabPanels={[
-            <Cards />,
-            <div>Collections</div>,
-            <Heading1>YOU FOUND IT CHANGE YOUR PASSWORD NOW</Heading1>,
-          ]}
+          tabs={tabs}
+          tabPanels={tabPanels}
         />
       </div>
     </>

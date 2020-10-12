@@ -15,6 +15,7 @@ import {
 } from '@trig-app/core-components';
 import { Masonry } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
+import { useOpenCard } from '../context/openCardContext';
 
 const MockCardsSize = [
   { width: 600, height: 400 },
@@ -347,6 +348,7 @@ const MockCards = [
 
 /* eslint-disable */
 const CardRenderer = ({ data }) => {
+  const { setCard } = useOpenCard();
   return (
     <Card
       key={data.id}
@@ -354,7 +356,7 @@ const CardRenderer = ({ data }) => {
       isFavorited={data.favorited}
       totalFavorites={data.totalFavorites}
       onClickFavorite={() => null}
-      onClick={() => null}
+      onClick={() => setCard({ url: data.link, title: data.title })}
       id={data.id}
       title={data.title}
       href={data.link}

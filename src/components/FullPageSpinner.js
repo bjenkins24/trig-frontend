@@ -4,7 +4,7 @@ import { Loading } from '@trig-app/core-components';
 
 const GlobalStyles = createGlobalStyle`
     body {
-        background: ${({ theme }) => theme.p};
+        background: ${({ theme }) => theme.p}; !important;
     }
 `;
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   Body1,
@@ -10,7 +10,12 @@ import {
   ListItemContent,
 } from '@trig-app/core-components';
 import GSuite from '../images/GSuite';
+import slack from '../images/slack.svg';
+import slackWhite from '../images/slack_white.svg';
 import Modal from './Modal';
+import useLocalStorage from '../utils/useLocalStorage';
+
+export const STATE_KEY = 'state-key';
 
 const user = {
   email: 'brian@trytrig.com',
@@ -55,6 +60,18 @@ const defaultProps = {
 };
 
 const ServiceModal = ({ isOpen, onRequestClose, defaultTab }) => {
+  const [storedValue, setValue] = useLocalStorage(STATE_KEY);
+
+  useEffect(() => {
+    if (!storedValue) {
+      setValue(
+        Math.random()
+          .toString(36)
+          .slice(2)
+      );
+    }
+  }, []);
+
   return (
     <Modal
       onRequestClose={onRequestClose}
@@ -90,10 +107,44 @@ const ServiceModal = ({ isOpen, onRequestClose, defaultTab }) => {
             <div
               css={`
                 flex-wrap: wrap;
+                display: flex;
               `}
             >
               <ServiceButton connected>
                 <GSuite />
+              </ServiceButton>
+              <ServiceButton
+                css={`
+                  &:hover .service-modal__slack {
+                    display: none;
+                  }
+                  &:hover .service-modal__slack--hover {
+                    display: block;
+                  }
+                `}
+                onClick={() => {
+                  const scope = 'channels:read channels:history';
+                  const redirectUri = `${process.env.APP_FRONTEND_URL}/oauth/slack-connect`;
+                  window.location.href = `${process.env.SLACK_OAUTH_URL}?client_id=${process.env.SLACK_CLIENT_ID}&scope=${scope}&redirect_uri=${redirectUri}&state=${storedValue}`;
+                }}
+              >
+                <img
+                  className="service-modal__slack"
+                  src={slack}
+                  alt="Connect Slack"
+                  css={`
+                    width: 135px;
+                  `}
+                />
+                <img
+                  className="service-modal__slack--hover"
+                  src={slackWhite}
+                  alt="Connect Slack"
+                  css={`
+                    display: none;
+                    width: 135px;
+                  `}
+                />
               </ServiceButton>
             </div>
           </>,

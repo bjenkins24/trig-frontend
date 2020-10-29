@@ -5,7 +5,9 @@ import UnauthenticatedApp from './UnauthenticatedApp';
 import './utils/consoleOverrides';
 
 const App = () => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) return null;
 
   return user ? <AuthenticatedApp /> : <UnauthenticatedApp />;
 };

@@ -1,19 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import disableScroll from 'disable-scroll';
+import { useOpenCard } from '../context/openCardContext';
 
 const OpenCard = () => {
+  const { card } = useOpenCard();
+
+  useEffect(() => {
+    disableScroll.on(document.getElementsByTagName('body')[0]);
+    return () => disableScroll.off(document.getElementsByTagName('body')[0]);
+  });
+
   return (
     <div
       css={`
-        height: 100%;
+        height: calc(100% - 65px);
         width: 100%;
-        background: black;
-        position: absolute;
-        top: 0;
+        position: fixed;
+        top: 65px;
         left: 0;
         color: white;
+        z-index: 1000;
       `}
     >
-      <h1>Hello</h1>
+      <iframe
+        src="https://www.w3schools.com"
+        title={card.title}
+        css={`
+          height: 100%;
+          width: 100%;
+          border: 0;
+        `}
+      />
     </div>
   );
 };

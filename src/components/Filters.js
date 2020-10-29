@@ -37,9 +37,27 @@ const MockFilters = ({ category }) => {
       >
         {category}
       </Body1>
-      <MockCheckbox label="Document" />
-      <MockCheckbox label="File" />
-      <MockCheckbox label="Link" />
+      {category === 'Card Types' && (
+        <>
+          <MockCheckbox label="Twitter" />
+          <MockCheckbox label="Google Doc" />
+          <MockCheckbox label="Video" />
+        </>
+      )}
+      {category === 'People' && (
+        <>
+          <MockCheckbox label="Brian Jenkins" />
+          <MockCheckbox label="Vikram Rajagopalan" />
+          <MockCheckbox label="Scott Hanford" />
+        </>
+      )}
+      {category === 'Tags' && (
+        <>
+          <MockCheckbox label="Masterminds" />
+          <MockCheckbox label="Artificial Intelligence" />
+          <MockCheckbox label="Introductions" />
+        </>
+      )}
       <Body3
         color="ps.200"
         css={`

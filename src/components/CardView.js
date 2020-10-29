@@ -15,7 +15,6 @@ import {
 } from '@trig-app/core-components';
 import { Masonry } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
-import { useOpenCard } from '../context/openCardContext';
 
 const MockCardsSize = [
   { width: 600, height: 400 },
@@ -348,7 +347,6 @@ const MockCards = [
 
 /* eslint-disable */
 const CardRenderer = ({ data }) => {
-  const { setCard } = useOpenCard();
   return (
     <Card
       key={data.id}
@@ -356,7 +354,9 @@ const CardRenderer = ({ data }) => {
       isFavorited={data.favorited}
       totalFavorites={data.totalFavorites}
       onClickFavorite={() => null}
-      onClick={() => setCard({ url: data.link, title: data.title })}
+      onClick={() => {
+        window.open(data.link, '_blank');
+      }}
       id={data.id}
       title={data.title}
       href={data.link}
@@ -418,13 +418,16 @@ const MockListItem = () => {
   return (
     <ListItem
       href="https://google.com"
+      onClick={() => {
+        window.open('https://google.com', '_blank');
+      }}
       renderItem={() => <FileIcon type="doc" size={2.4} />}
       renderContent={() => (
         <ListItemContent
           renderItem={() => (
             <Avatar firstName="Brian" lastName="Jenkins" size={4} />
           )}
-          primary="How To Memorize Music 5 Times Faster"
+          primary="Copysmith.ai on Product Hunt"
           secondary="Oct 27, 2018 at 5:35pm"
         />
       )}

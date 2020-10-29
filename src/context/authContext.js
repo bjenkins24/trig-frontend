@@ -6,22 +6,26 @@ import React, {
   useState,
   useLayoutEffect,
 } from 'react';
+import PropTypes from 'prop-types';
 import * as authClient from '../utils/authClient';
 import FullPageSpinner from '../components/FullPageSpinner';
 
 const AuthContext = createContext();
 AuthContext.displayName = 'AuthContext';
 
-const AuthProvider = props => {
+const AuthProviderProps = {
+  children: PropTypes.node.isRequired,
+};
+
+const AuthProvider = ({ children, ...restProps }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useLayoutEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       const result = await authClient.getUser();
-      setIsLoading(false);
       setUser(result);
+      setIsLoading(false);
     };
     fetchData();
   }, []);
@@ -59,16 +63,26 @@ const AuthProvider = props => {
   }, []);
 
   const value = useMemo(
-    () => ({ user, login, logout, register, resetPassword, googleSSO }),
-    [login, logout, register, resetPassword, googleSSO, user]
+    () => ({
+      user,
+      login,
+      logout,
+      register,
+      resetPassword,
+      googleSSO,
+      isLoading,
+    }),
+    [login, logout, register, resetPassword, googleSSO, user, isLoading]
   );
 
-  if (isLoading) {
-    return <FullPageSpinner />;
-  }
-
-  return <AuthContext.Provider value={value} {...props} />;
+  return (
+    <AuthContext.Provider value={value} {...restProps}>
+      {isLoading ? <FullPageSpinner /> : children}
+    </AuthContext.Provider>
+  );
 };
+
+AuthProvider.propTypes = AuthProviderProps;
 
 function useAuth() {
   const context = useContext(AuthContext);

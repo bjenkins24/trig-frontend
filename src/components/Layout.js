@@ -7,8 +7,8 @@ import Head from './Head';
 
 const GlobalStyles = createGlobalStyle`
     body {
-        background: ${({ theme }) => theme.p};
-        color: ${({ theme }) => theme.pc};
+        background: ${({ theme }) => theme.p} !important;
+        color: ${({ theme }) => theme.pc} !important;
     }
 `;
 

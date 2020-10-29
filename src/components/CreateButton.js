@@ -85,7 +85,6 @@ const PopoverContentProps = {
   setIsCreateOpen: PropTypes.func.isRequired,
   setIsConnectAppOpen: PropTypes.func.isRequired,
   setIsCreateLinkOpen: PropTypes.func.isRequired,
-  setIsCreateCollectionOpen: PropTypes.func.isRequired,
 };
 
 const PopoverContent = ({
@@ -94,7 +93,6 @@ const PopoverContent = ({
   setIsCreateOpen,
   setIsConnectAppOpen,
   setIsCreateLinkOpen,
-  setIsCreateCollectionOpen,
 }) => {
   useEffect(() => {
     setIsCreateOpen(isOpen);
@@ -145,21 +143,6 @@ const PopoverContent = ({
             close();
           }
         }}
-      />
-      <CreateItem
-        title="Create a Collection"
-        iconType="collection"
-        iconBackgroundColor="a3"
-        description="A shareable collection of cards"
-        onClick={() => {
-          close();
-          setIsCreateCollectionOpen(true);
-        }}
-        onKeyPress={e => {
-          if (e.key === 'Enter') {
-            close();
-          }
-        }}
         css={`
           border-bottom: 0;
           border-top-right-radius: ${({ theme }) => theme.br};
@@ -175,7 +158,6 @@ PopoverContent.propTypes = PopoverContentProps;
 const CreateButton = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false);
-  const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
   const [isConnectAppOpen, setIsConnectAppOpen] = useState(false);
   const [addedLinks, setAddedLinks] = useState([]);
 
@@ -191,7 +173,6 @@ const CreateButton = () => {
             setIsCreateOpen={setIsCreateOpen}
             setIsConnectAppOpen={setIsConnectAppOpen}
             setIsCreateLinkOpen={setIsCreateLinkOpen}
-            setIsCreateCollectionOpen={setIsCreateCollectionOpen}
           />
         )}
       >
@@ -291,13 +272,6 @@ const CreateButton = () => {
         isOpen={isConnectAppOpen}
         onRequestClose={() => setIsConnectAppOpen(false)}
       />
-      <Modal
-        onRequestClose={() => setIsCreateCollectionOpen(false)}
-        isOpen={isCreateCollectionOpen}
-        header="Create a Collection"
-      >
-        Create a collection
-      </Modal>
     </>
   );
 };

@@ -26,7 +26,7 @@ const client = async (endpoint, { body, ...customConfig } = {}) => {
   }
 
   const result = await window.fetch(
-    `${process.env.TRIG_API_URL}/${endpoint}`,
+    `${process.env.APP_API_URL}/${endpoint}`,
     config
   );
 

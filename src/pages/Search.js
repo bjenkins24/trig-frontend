@@ -246,8 +246,6 @@ const Search = ({ onRequestClose, defaultInput }) => {
         <div
           css={`
             display: flex;
-            height: 40%;
-            overflow-y: scroll;
           `}
         >
           {currentView === VIEWS.CARDS && (
@@ -269,6 +267,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
                 <ul
                   css={`
                     padding: 0;
+                    list-style-type: none;
                   `}
                 >
                   {MockResults.map(result => {

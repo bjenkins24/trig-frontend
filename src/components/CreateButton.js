@@ -13,8 +13,10 @@ import {
   toast,
 } from '@trig-app/core-components';
 import { string } from 'yup';
+import { useMutation } from 'react-query';
 import Modal from './Modal';
 import ServiceModal from './ServiceModal';
+import { createCard } from '../utils/cardClient';
 
 const CreateItemProps = {
   iconType: PropTypes.string.isRequired,
@@ -145,8 +147,8 @@ const PopoverContent = ({
         }}
         css={`
           border-bottom: 0;
-          border-top-right-radius: ${({ theme }) => theme.br};
-          border-top-left-radius: ${({ theme }) => theme.br};
+          border-bottom-left-radius: ${({ theme }) => theme.br};
+          border-bottom-right-radius: ${({ theme }) => theme.br};
         `}
       />
     </ul>
@@ -160,6 +162,9 @@ const CreateButton = () => {
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false);
   const [isConnectAppOpen, setIsConnectAppOpen] = useState(false);
   const [addedLinks, setAddedLinks] = useState([]);
+  const [createCardMutate, { isLoading: isCreateCardLoading }] = useMutation(
+    createCard
+  );
 
   return (
     <>
@@ -224,18 +229,36 @@ const CreateButton = () => {
               autoFocus
               placeholder="Enter a url..."
               buttonContent="Add"
+              buttonProps={{ loading: isCreateCardLoading }}
+              disabled={isCreateCardLoading}
               validate={string()
-                .required("Don't forget a url!")
+                .required('This field is required.')
                 .matches(
                   /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/,
-                  "Looks like you didn't enter a valid url. Try again!"
+                  "It looks like you didn't enter a valid url. Please try again."
                 )}
-              onSubmit={({ value, resetForm }) => {
-                toast({
-                  message: 'Your link card was created successfully.',
-                });
-                setAddedLinks([...addedLinks, { url: value, title: 'test' }]);
-                resetForm();
+              onSubmit={async ({ value, resetForm }) => {
+                await createCardMutate(
+                  { url: value },
+                  {
+                    onError: () => {
+                      toast({
+                        message:
+                          'There was a problem submitting the url. Please try again.',
+                      });
+                    },
+                    onSuccess: () => {
+                      toast({
+                        message: 'Your link card was created successfully.',
+                      });
+                      setAddedLinks([
+                        ...addedLinks,
+                        { url: value, title: 'test' },
+                      ]);
+                      resetForm();
+                    },
+                  }
+                );
               }}
               links={addedLinks}
               css={`

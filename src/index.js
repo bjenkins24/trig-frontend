@@ -3,6 +3,7 @@ import { hot } from 'react-hot-loader/root';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import * as Sentry from '@sentry/react';
+import { ReactQueryDevtools } from 'react-query-devtools';
 
 import { ToastContainer } from '@trig-app/core-components';
 import AppProviders from './context';
@@ -12,11 +13,14 @@ import GlobalStyle from '../global.css';
 
 const Entry = hot(() => {
   return (
-    <AppProviders>
-      <GlobalStyle />
-      <ToastContainer />
-      <App />
-    </AppProviders>
+    <>
+      <AppProviders>
+        <GlobalStyle />
+        <ToastContainer />
+        <App />
+      </AppProviders>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </>
   );
 });
 

@@ -24,8 +24,9 @@ const CardBase = ({ data }) => {
   const queryCache = useQueryCache();
   const [favoritedMutate] = useMutation(updateCard, {
     onMutate: newCard => {
-      queryCache.cancelQueries('cards');
-      const previousCards = queryCache.getQueryData('cards');
+      const cardQueryKey = 'cards';
+      queryCache.cancelQueries(cardQueryKey);
+      const previousCards = queryCache.getQueryData(cardQueryKey);
       const newCards = get(previousCards, 'data', []).map(previousCard => {
         if (previousCard.id === newCard.id) {
           if (newCard.favorited) {
@@ -46,13 +47,11 @@ const CardBase = ({ data }) => {
         }
         return previousCard;
       });
-      queryCache.setQueryData('cards', () => ({ data: newCards }));
-      return () => queryCache.setQueryData('cards', previousCards);
+      queryCache.setQueryData(cardQueryKey, () => ({ data: newCards }));
+      return () => queryCache.setQueryData(cardQueryKey, previousCards);
     },
     onError: (err, newCard, rollback) => rollback(),
-    onSettled: () => {
-      queryCache.invalidateQueries('cards');
-    },
+    onSettled: () => queryCache.invalidateQueries(cardQueryKey),
   });
 
   const isFavorited = get(data, 'card_favorite.card_id', false);

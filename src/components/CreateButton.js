@@ -13,7 +13,7 @@ import {
   toast,
 } from '@trig-app/core-components';
 import { string } from 'yup';
-import { useMutation, queryCache } from 'react-query';
+import { useMutation, useQueryCache } from 'react-query';
 import Modal from './Modal';
 import ServiceModal from './ServiceModal';
 import { createCard } from '../utils/cardClient';
@@ -165,6 +165,24 @@ const CreateButton = () => {
   const [createCardMutate, { isLoading: isCreateCardLoading }] = useMutation(
     createCard
   );
+  const [shouldInvalidate, setShouldInvalidate] = useState(false);
+  const queryCache = useQueryCache();
+
+  // It takes a few seconds to get a card into elastic search which is why we're going to invalidate
+  // the query a few seconds later
+  useEffect(() => {
+    if (!shouldInvalidate) return () => null;
+
+    const timer = () =>
+      setTimeout(() => {
+        queryCache.invalidateQueries(['cards']);
+        setShouldInvalidate(false);
+      }, 3000);
+    const timerId = timer();
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [shouldInvalidate]);
 
   return (
     <>
@@ -248,7 +266,7 @@ const CreateButton = () => {
                       });
                     },
                     onSuccess: () => {
-                      queryCache.invalidateQueries('cards');
+                      setShouldInvalidate(true);
                       toast({
                         message: 'Your link card was created successfully.',
                       });

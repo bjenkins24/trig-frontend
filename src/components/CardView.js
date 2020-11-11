@@ -20,7 +20,6 @@ import { getCards } from '../utils/cardClient';
 
 /* eslint-disable */
 const CardRenderer = ({ data }) => {
-  console.log('data', data);
   return (
     <>
       <Card

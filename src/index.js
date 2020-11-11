@@ -13,14 +13,12 @@ import GlobalStyle from '../global.css';
 
 const Entry = hot(() => {
   return (
-    <>
-      <AppProviders>
-        <GlobalStyle />
-        <ToastContainer />
-        <App />
-      </AppProviders>
+    <AppProviders>
+      <GlobalStyle />
+      <ToastContainer />
+      <App />
       <ReactQueryDevtools initialIsOpen={false} />
-    </>
+    </AppProviders>
   );
 });
 

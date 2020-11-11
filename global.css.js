@@ -77,4 +77,8 @@ export default createGlobalStyle`
            color: ${({ theme }) => theme.ss[200]} !important;
         }
     }
+    
+    .ReactQueryDevTools div, .ReactQueryDevTools span, .ReactQueryDevTools code, .ReactQueryDevTools button {
+      font-size: 1.2rem !important;
+    }
 `;

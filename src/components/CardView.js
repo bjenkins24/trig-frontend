@@ -19,12 +19,13 @@ import { Masonry } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, getCards } from '../utils/cardClient';
 
+const cardQueryKey = 'cards';
+
 /* eslint-disable */
 const CardBase = ({ data }) => {
   const queryCache = useQueryCache();
   const [favoritedMutate] = useMutation(updateCard, {
     onMutate: newCard => {
-      const cardQueryKey = 'cards';
       queryCache.cancelQueries(cardQueryKey);
       const previousCards = queryCache.getQueryData(cardQueryKey);
       const newCards = get(previousCards, 'data', []).map(previousCard => {

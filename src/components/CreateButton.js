@@ -13,7 +13,7 @@ import {
   toast,
 } from '@trig-app/core-components';
 import { string } from 'yup';
-import { useMutation } from 'react-query';
+import { useMutation, queryCache } from 'react-query';
 import Modal from './Modal';
 import ServiceModal from './ServiceModal';
 import { createCard } from '../utils/cardClient';
@@ -248,6 +248,7 @@ const CreateButton = () => {
                       });
                     },
                     onSuccess: () => {
+                      queryCache.invalidateQueries('cards');
                       toast({
                         message: 'Your link card was created successfully.',
                       });

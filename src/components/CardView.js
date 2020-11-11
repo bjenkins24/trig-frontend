@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import faker from 'faker';
+import { useQuery } from 'react-query';
 import {
   ButtonToggle,
   Icon,
@@ -8,426 +8,98 @@ import {
   List,
   ListItem,
   ListItemContent,
-  FileIcon,
   Avatar,
   Card,
   HorizontalGroup,
+  Loading,
+  TypeIcon,
 } from '@trig-app/core-components';
 import { Masonry } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
-
-const MockCardsSize = [
-  { width: 600, height: 400 },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-  { width: faker.random.number(800), height: faker.random.number(800) },
-];
-
-const MockCards = [
-  {
-    id: 1,
-    title: 'This is a long title for good and I dont know how to fix it',
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[0].width,
-    height: MockCardsSize[0].height,
-    image: `https://picsum.photos/${MockCardsSize[0].width}/${MockCardsSize[0].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 2,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'xls',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[1].width,
-    height: MockCardsSize[1].height,
-    image: `https://picsum.photos/${MockCardsSize[1].width}/${MockCardsSize[1].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 3,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[2].width,
-    height: MockCardsSize[2].height,
-    image: `https://picsum.photos/${MockCardsSize[2].width}/${MockCardsSize[2].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 4,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[3].width,
-    height: MockCardsSize[3].height,
-    image: `https://picsum.photos/${MockCardsSize[3].width}/${MockCardsSize[3].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 5,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[4].width,
-    height: MockCardsSize[4].height,
-    image: `https://picsum.photos/${MockCardsSize[4].width}/${MockCardsSize[4].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 6,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[5].width,
-    height: MockCardsSize[5].height,
-    image: `https://picsum.photos/${MockCardsSize[5].width}/${MockCardsSize[5].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 7,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[6].width,
-    height: MockCardsSize[6].height,
-    image: `https://picsum.photos/${MockCardsSize[6].width}/${MockCardsSize[6].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 8,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[7].width,
-    height: MockCardsSize[7].height,
-    image: `https://picsum.photos/${MockCardsSize[7].width}/${MockCardsSize[7].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 9,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[8].width,
-    height: MockCardsSize[8].height,
-    image: `https://picsum.photos/${MockCardsSize[8].width}/${MockCardsSize[8].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 10,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[9].width,
-    height: MockCardsSize[9].height,
-    image: `https://picsum.photos/${MockCardsSize[9].width}/${MockCardsSize[9].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 11,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[10].width,
-    height: MockCardsSize[10].height,
-    image: `https://picsum.photos/${MockCardsSize[10].width}/${MockCardsSize[10].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 12,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[11].width,
-    height: MockCardsSize[11].height,
-    image: `https://picsum.photos/${MockCardsSize[11].width}/${MockCardsSize[11].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 13,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[12].width,
-    height: MockCardsSize[12].height,
-    image: `https://picsum.photos/${MockCardsSize[12].width}/${MockCardsSize[12].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 14,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[13].width,
-    height: MockCardsSize[13].height,
-    image: `https://picsum.photos/${MockCardsSize[13].width}/${MockCardsSize[13].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 15,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[14].width,
-    height: MockCardsSize[14].height,
-    image: `https://picsum.photos/${MockCardsSize[14].width}/${MockCardsSize[14].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 16,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[15].width,
-    height: MockCardsSize[15].height,
-    image: `https://picsum.photos/${MockCardsSize[15].width}/${MockCardsSize[15].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 17,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[16].width,
-    height: MockCardsSize[16].height,
-    image: `https://picsum.photos/${MockCardsSize[16].width}/${MockCardsSize[16].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 18,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[17].width,
-    height: MockCardsSize[17].height,
-    image: `https://picsum.photos/${MockCardsSize[17].width}/${MockCardsSize[17].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-  {
-    id: 19,
-    title: faker.random.words(),
-    dateTime: faker.date.future(),
-    cardType: 'doc',
-    totalFavorites: faker.random.number(45),
-    favorited: faker.random.boolean(),
-    width: MockCardsSize[18].width,
-    height: MockCardsSize[18].height,
-    image: `https://picsum.photos/${MockCardsSize[18].width}/${MockCardsSize[18].height}`,
-    link: faker.internet.url(),
-    user: {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-    },
-  },
-];
+import { getCards } from '../utils/cardClient';
 
 /* eslint-disable */
 const CardRenderer = ({ data }) => {
+  console.log('data', data);
   return (
-    <Card
-      key={data.id}
-      dateTime={data.dateTime}
-      isFavorited={data.favorited}
-      totalFavorites={data.totalFavorites}
-      onClickFavorite={() => null}
-      onClick={() => {
-        window.open(data.link, '_blank');
-      }}
-      id={data.id}
-      title={data.title}
-      href={data.link}
-      type={data.cardType}
-      image={data.image}
-      renderAvatar={() => {
-        return (
-          <Avatar
-            size={1.6}
-            firstName={data.user.firstName}
-            lastName={data.user.lastName}
-          />
-        );
-      }}
-      navigationList={[
-        {
-          onClick: () => null,
-          item: (
-            <HorizontalGroup margin={1.6}>
-              <Icon type="new-window" size={1.6} />
-              <span>Open in New Window</span>
-            </HorizontalGroup>
-          ),
-        },
-        {
-          onClick: () => null,
-          item: (
-            <HorizontalGroup margin={1.6}>
-              <Icon type="edit" size={1.6} />
-              <span>Edit Card</span>
-            </HorizontalGroup>
-          ),
-        },
-        {
-          onClick: () => null,
-          item: (
-            <HorizontalGroup margin={1.6}>
-              <Icon type="lock" size={1.6} />
-              <span>Share</span>
-            </HorizontalGroup>
-          ),
-        },
-        {
-          onClick: () => null,
-          item: (
-            <HorizontalGroup margin={1.6}>
-              <Icon type="trash" size={1.6} />
-              <span>Remove From Trig</span>
-            </HorizontalGroup>
-          ),
-        },
-      ]}
-    />
+    <>
+      <Card
+        key={data.id}
+        dateTime={new Date(data.actual_created_at)}
+        isFavorited={false}
+        totalFavorites={0}
+        onClickFavorite={() => null}
+        openInNewTab
+        id={data.id}
+        title={data.title}
+        href={data.url}
+        type={data.card_type.name}
+        image={data.image}
+        renderAvatar={() => {
+          return (
+            <Avatar
+              size={1.6}
+              firstName={data.user.firstName}
+              lastName={data.user.lastName}
+              email={data.user.email}
+            />
+          );
+        }}
+        navigationList={[
+          {
+            onClick: () => null,
+            item: (
+              <HorizontalGroup margin={1.6}>
+                <Icon type="edit" size={1.6} />
+                <span>Edit Card</span>
+              </HorizontalGroup>
+            ),
+          },
+          {
+            onClick: () => null,
+            item: (
+              <HorizontalGroup margin={1.6}>
+                <Icon type="lock" size={1.6} />
+                <span>Share</span>
+              </HorizontalGroup>
+            ),
+          },
+          {
+            onClick: () => null,
+            item: (
+              <HorizontalGroup margin={1.6}>
+                <Icon type="trash" size={1.6} />
+                <span>Remove From Trig</span>
+              </HorizontalGroup>
+            ),
+          },
+        ]}
+      />
+    </>
   );
 };
-/* eslint-enable */
 
-const MockListItem = () => {
+const CardListItem = ({ card }) => {
   return (
     <ListItem
-      href="https://google.com"
+      href={card.url}
       onClick={() => {
-        window.open('https://google.com', '_blank');
+        window.open(card.url, '_blank');
       }}
-      renderItem={() => <FileIcon type="doc" size={2.4} />}
+      renderItem={() => (
+        <TypeIcon url={card.url} type={card.card_type.name} size={2.4} />
+      )}
       renderContent={() => (
         <ListItemContent
           renderItem={() => (
-            <Avatar firstName="Brian" lastName="Jenkins" size={4} />
+            <Avatar
+              firstName={card.user.first_name}
+              lastName={card.user.last_name}
+              email={card.user.email}
+              size={4}
+            />
           )}
-          primary="Copysmith.ai on Product Hunt"
+          primary={card.title}
           secondary="Oct 27, 2018 at 5:35pm"
         />
       )}
@@ -443,6 +115,7 @@ const MockListItem = () => {
     />
   );
 };
+/* eslint-enable */
 
 const CardView = props => {
   const location = useLocation();
@@ -450,6 +123,11 @@ const CardView = props => {
   const [viewType, setViewType] = useLocalStorage(
     `card-view-location:${location.pathname}`,
     'thumbnail'
+  );
+  const { data: cards, isLoading: isCardsLoading } = useQuery(
+    'cards',
+    getCards,
+    { refetchInterval: 15000 }
   );
 
   return (
@@ -499,10 +177,11 @@ const CardView = props => {
           }
         `}
       >
-        {viewType === 'thumbnail' && (
+        {isCardsLoading && <Loading size={4.8} />}
+        {viewType === 'thumbnail' && !isCardsLoading && cards.data && (
           <Masonry
             // Provides the data for our grid items
-            items={MockCards}
+            items={cards.data}
             itemHeightEstimate={400}
             itemKey={data => data.id}
             // Adds 8px of space between the grid cells
@@ -515,17 +194,11 @@ const CardView = props => {
             render={CardRenderer}
           />
         )}
-        {viewType === 'row' && (
+        {viewType === 'row' && !isCardsLoading && cards.data && (
           <List>
-            <MockListItem />
-            <MockListItem />
-            <MockListItem />
-            <MockListItem />
-            <MockListItem />
-            <MockListItem />
-            <MockListItem />
-            <MockListItem />
-            <MockListItem />
+            {cards.data.map(card => {
+              return <CardListItem card={card} />;
+            })}
           </List>
         )}
       </div>

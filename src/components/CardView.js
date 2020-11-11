@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useQuery } from 'react-query';
+import get from 'lodash/get';
+import { useQuery, useMutation, useQueryCache } from 'react-query';
 import {
   ButtonToggle,
   Icon,
@@ -16,66 +17,114 @@ import {
 } from '@trig-app/core-components';
 import { Masonry } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
-import { getCards } from '../utils/cardClient';
+import { updateCard, getCards } from '../utils/cardClient';
 
 /* eslint-disable */
-const CardRenderer = ({ data }) => {
+const CardBase = ({ data }) => {
+  const queryCache = useQueryCache();
+  const [favoritedMutate] = useMutation(updateCard, {
+    onMutate: newCard => {
+      queryCache.cancelQueries('cards');
+      const previousCards = queryCache.getQueryData('cards');
+      const newCards = get(previousCards, 'data', []).map(previousCard => {
+        if (previousCard.id === newCard.id) {
+          if (newCard.favorited) {
+            return {
+              ...previousCard,
+              favorites: previousCard.favorites + 1,
+              card_favorite: {
+                card_id: newCard.id,
+              },
+            };
+          } else {
+            return {
+              ...previousCard,
+              favorites: previousCard.favorites - 1,
+              card_favorite: null,
+            };
+          }
+        }
+        return previousCard;
+      });
+      queryCache.setQueryData('cards', () => ({ data: newCards }));
+      return () => queryCache.setQueryData('cards', previousCards);
+    },
+    onError: (err, newCard, rollback) => rollback(),
+    onSettled: () => {
+      queryCache.invalidateQueries('cards');
+    },
+  });
+
+  const isFavorited = get(data, 'card_favorite.card_id', false);
+
   return (
-    <>
-      <Card
-        key={data.id}
-        dateTime={new Date(data.actual_created_at)}
-        isFavorited={false}
-        totalFavorites={0}
-        onClickFavorite={() => null}
-        openInNewTab
-        id={data.id}
-        title={data.title}
-        href={data.url}
-        type={data.card_type.name}
-        image={data.image}
-        renderAvatar={() => {
-          return (
-            <Avatar
-              size={1.6}
-              firstName={data.user.firstName}
-              lastName={data.user.lastName}
-              email={data.user.email}
-            />
-          );
-        }}
-        navigationList={[
+    <Card
+      key={data.id}
+      dateTime={new Date(data.actual_created_at)}
+      isFavorited={isFavorited}
+      totalFavorites={data.favorites}
+      onClickFavorite={async () => {
+        await favoritedMutate(
+          { favorited: !isFavorited, id: data.id },
           {
-            onClick: () => null,
-            item: (
-              <HorizontalGroup margin={1.6}>
-                <Icon type="edit" size={1.6} />
-                <span>Edit Card</span>
-              </HorizontalGroup>
-            ),
-          },
-          {
-            onClick: () => null,
-            item: (
-              <HorizontalGroup margin={1.6}>
-                <Icon type="lock" size={1.6} />
-                <span>Share</span>
-              </HorizontalGroup>
-            ),
-          },
-          {
-            onClick: () => null,
-            item: (
-              <HorizontalGroup margin={1.6}>
-                <Icon type="trash" size={1.6} />
-                <span>Remove From Trig</span>
-              </HorizontalGroup>
-            ),
-          },
-        ]}
-      />
-    </>
+            onSuccess: () => {
+              console.log('success!');
+            },
+          }
+        );
+      }}
+      openInNewTab
+      id={data.id}
+      title={data.title}
+      href={data.url}
+      type={data.card_type.name}
+      image={data.image}
+      renderAvatar={() => {
+        return (
+          <Avatar
+            size={1.6}
+            firstName={data.user.firstName}
+            lastName={data.user.lastName}
+            email={data.user.email}
+          />
+        );
+      }}
+      navigationList={[
+        {
+          onClick: () => null,
+          item: (
+            <HorizontalGroup margin={1.6}>
+              <Icon type="edit" size={1.6} />
+              <span>Edit Card</span>
+            </HorizontalGroup>
+          ),
+        },
+        {
+          onClick: () => null,
+          item: (
+            <HorizontalGroup margin={1.6}>
+              <Icon type="lock" size={1.6} />
+              <span>Share</span>
+            </HorizontalGroup>
+          ),
+        },
+        {
+          onClick: () => null,
+          item: (
+            <HorizontalGroup margin={1.6}>
+              <Icon type="trash" size={1.6} />
+              <span>Remove From Trig</span>
+            </HorizontalGroup>
+          ),
+        },
+      ]}
+    />
   );
+};
+
+// this has to be defined outside of the component or the UI flashes
+const CardRenderer = ({ data }) => {
+  return <CardBase data={data} />;
 };
 
 const CardListItem = ({ card }) => {

@@ -4,7 +4,7 @@ const logout = () => {
   window.localStorage.removeItem(localStorageKey);
 };
 
-const client = async (endpoint, { body, ...customConfig } = {}) => {
+const client = async (endpoint, { body, method, ...customConfig } = {}) => {
   const token = window.localStorage.getItem(localStorageKey);
   const headers = {
     'Content-Type': 'application/json',
@@ -13,8 +13,14 @@ const client = async (endpoint, { body, ...customConfig } = {}) => {
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
+
+  let finalMethod = method;
+  if (!finalMethod) {
+    finalMethod = body ? 'POST' : 'GET';
+  }
+
   const config = {
-    method: body ? 'POST' : 'GET',
+    method: finalMethod,
     ...customConfig,
     headers: {
       ...headers,

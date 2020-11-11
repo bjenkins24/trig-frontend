@@ -6,8 +6,15 @@ const createCard = fields => {
   });
 };
 
+const updateCard = fields => {
+  return client('card', {
+    method: 'PUT',
+    body: { ...fields },
+  });
+};
+
 const getCards = () => {
   return client('cards');
 };
 
-export { createCard, getCards };
+export { createCard, updateCard, getCards };

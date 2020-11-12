@@ -3,6 +3,9 @@
   const { error } = console;
 
   console.error = function() {
+    if (typeof arguments[0] !== 'string') {
+      return error.apply(console, arguments);
+    }
     if (
       typeof arguments[0] === 'undefined' ||
       (!arguments[0].includes('If you want to write it to the DOM,') &&

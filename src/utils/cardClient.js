@@ -13,8 +13,14 @@ const updateCard = fields => {
   });
 };
 
+const deleteCard = ({ id }) => {
+  return client(`card/${id}`, {
+    method: 'DELETE',
+  });
+};
+
 const getCards = () => {
   return client('cards');
 };
 
-export { createCard, updateCard, getCards };
+export { createCard, updateCard, getCards, deleteCard };

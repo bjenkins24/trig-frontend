@@ -43,6 +43,10 @@ const client = async (endpoint, { body, method, ...customConfig } = {}) => {
     return false;
   }
 
+  if (result.status === 204) {
+    return true;
+  }
+
   const data = await result.json();
   if (result.ok) {
     return data;

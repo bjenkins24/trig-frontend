@@ -14,18 +14,39 @@ import {
   HorizontalGroup,
   Loading,
   TypeIcon,
+  toast,
 } from '@trig-app/core-components';
-import { Masonry } from 'masonic';
+import { MasonryScroller, usePositioner, useResizeObserver } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
-import { updateCard, getCards } from '../utils/cardClient';
+import { updateCard, deleteCard, getCards } from '../utils/cardClient';
 
 const cardQueryKey = 'cards';
 
 /* eslint-disable */
 const CardBase = ({ data }) => {
   const queryCache = useQueryCache();
+  const [deleteMutate] = useMutation(deleteCard, {
+    onMutate: deletedId => {
+      queryCache.cancelQueries(cardQueryKey);
+      const previousCards = queryCache.getQueryData(cardQueryKey);
+      const newCards = get(previousCards, 'data', []).filter(
+        previousCard => previousCard.id !== deletedId.id
+      );
+      queryCache.setQueryData(cardQueryKey, () => ({ data: newCards }));
+      return () => queryCache.setQueryData(cardQueryKey, previousCards);
+    },
+    onError: (err, newCard, rollback) => {
+      toast({
+        type: 'error',
+        message: 'Something went wrong, the card could not be deleted.',
+      });
+      rollback();
+    },
+    onSettled: () => queryCache.invalidateQueries(cardQueryKey),
+  });
   const [favoritedMutate] = useMutation(updateCard, {
     onMutate: newCard => {
+      // Optimistic update
       queryCache.cancelQueries(cardQueryKey);
       const previousCards = queryCache.getQueryData(cardQueryKey);
       const newCards = get(previousCards, 'data', []).map(previousCard => {
@@ -55,7 +76,7 @@ const CardBase = ({ data }) => {
     onSettled: () => queryCache.invalidateQueries(cardQueryKey),
   });
 
-  const isFavorited = get(data, 'card_favorite.card_id', false);
+  const isFavorited = Boolean(get(data, 'card_favorite.card_id', false));
 
   return (
     <Card
@@ -64,14 +85,7 @@ const CardBase = ({ data }) => {
       isFavorited={isFavorited}
       totalFavorites={data.favorites}
       onClickFavorite={async () => {
-        await favoritedMutate(
-          { favorited: !isFavorited, id: data.id },
-          {
-            onSuccess: () => {
-              console.log('success!');
-            },
-          }
-        );
+        await favoritedMutate({ favorited: !isFavorited, id: data.id });
       }}
       openInNewTab
       id={data.id}
@@ -109,7 +123,12 @@ const CardBase = ({ data }) => {
           ),
         },
         {
-          onClick: () => null,
+          onClick: async () => {
+            toast({
+              message: `The card "${data.title}" was removed from Trig successfully.`,
+            });
+            await deleteMutate({ id: data.id });
+          },
           item: (
             <HorizontalGroup margin={1.6}>
               <Icon type="trash" size={1.6} />
@@ -178,6 +197,18 @@ const CardView = props => {
     { refetchInterval: 15000 }
   );
 
+  const items = get(cards, 'data', []);
+
+  const positioner = usePositioner(
+    { width: 780, columnWidth: 251, columnGutter: 6 },
+    // This is our dependencies array. When these dependencies
+    // change, the positioner cache will be cleared and the
+    // masonry component will reset as a result.
+    [items.length]
+  );
+
+  const resizeObserver = useResizeObserver(positioner);
+
   return (
     <div
       css={`
@@ -226,16 +257,15 @@ const CardView = props => {
         `}
       >
         {isCardsLoading && <Loading size={4.8} />}
-        {viewType === 'thumbnail' && !isCardsLoading && cards.data && (
-          <Masonry
+        {viewType === 'thumbnail' && !isCardsLoading && items && (
+          <MasonryScroller
             // Provides the data for our grid items
-            items={cards.data}
+            items={items}
             itemHeightEstimate={400}
-            itemKey={data => data.id}
-            // Adds 8px of space between the grid cells
-            columnGutter={6}
-            // Sets the minimum column width to 172px
-            columnWidth={251}
+            itemkey={data => data.id}
+            positioner={positioner}
+            height={900}
+            resizeObserver={resizeObserver}
             // Pre-renders 5 windows worth of content
             overscanBy={5}
             // This is the grid item component

@@ -3,14 +3,13 @@ import PropTypes from 'prop-types';
 import {
   Fab,
   Icon,
-  List,
-  ListItem,
   ListItemContent,
   Popover,
   Body1Component,
   StringFieldWithButtonForm,
   ModalHeader,
   toast,
+  Heading4,
 } from '@trig-app/core-components';
 import { string } from 'yup';
 import { useMutation, useQueryCache } from 'react-query';
@@ -135,7 +134,45 @@ const PopoverContent = ({
         title="Create a Link Card"
         iconType="link"
         iconBackgroundColor="a1"
-        description="Any online resource or article"
+        description={
+          /* eslint-disable react/jsx-wrap-multilines */
+          <span>
+            Any online resource or article{' '}
+            <Heading4
+              css={`
+                margin: 0;
+                display: inline;
+                font-weight: 400;
+                font-size: 1.1rem;
+                margin-left: ${({ theme }) => theme.space[2]}px;
+              `}
+              color="ps.200"
+            >
+              <span
+                css={`
+                  background: #f6f8f9;
+                  border-radius: ${({ theme }) => theme.br};
+                  border: 1px solid #cbd4db;
+                  padding: 0 4px;
+                `}
+              >
+                Option
+              </span>{' '}
+              +{' '}
+              <span
+                css={`
+                  background: #f6f8f9;
+                  border-radius: ${({ theme }) => theme.br};
+                  border: 1px solid #cbd4db;
+                  padding: 0 4px;
+                `}
+              >
+                L
+              </span>
+            </Heading4>
+          </span>
+          /* eslint-enable react/jsx-wrap-multilines */
+        }
         onClick={() => {
           close();
           setIsCreateLinkOpen(true);
@@ -157,32 +194,43 @@ const PopoverContent = ({
 
 PopoverContent.propTypes = PopoverContentProps;
 
-const CreateButton = () => {
+const CreateButtonTypes = {
+  isCreateLinkOpen: PropTypes.bool.isRequired,
+  setIsCreateLinkOpen: PropTypes.func.isRequired,
+};
+
+const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false);
   const [isConnectAppOpen, setIsConnectAppOpen] = useState(false);
-  const [addedLinks, setAddedLinks] = useState([]);
-  const [createCardMutate, { isLoading: isCreateCardLoading }] = useMutation(
-    createCard
-  );
-  const [shouldInvalidate, setShouldInvalidate] = useState(false);
   const queryCache = useQueryCache();
+  const [createCardMutate, { isLoading: isCreateCardLoading }] = useMutation(
+    createCard,
+    {
+      onMutate: newCard => {
+        queryCache.cancelQueries('cards');
+        const previousCards = queryCache.getQueryData('cards');
+        const newCards = [
+          {
+            url: newCard.url,
+            title: newCard.url,
+            card_type: {
+              name: 'link',
+            },
+            user: {
+              email: 'brian@trytrig.com',
+            },
+            actual_created_at: new Date(),
+            favorites: 0,
+          },
+          ...previousCards.data,
+        ];
 
-  // It takes a few seconds to get a card into elastic search which is why we're going to invalidate
-  // the query a few seconds later
-  useEffect(() => {
-    if (!shouldInvalidate) return () => null;
-
-    const timer = () =>
-      setTimeout(() => {
-        queryCache.invalidateQueries(['cards']);
-        setShouldInvalidate(false);
-      }, 3000);
-    const timerId = timer();
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [shouldInvalidate]);
+        queryCache.setQueryData('cards', () => ({ data: newCards }));
+        return () => queryCache.setQueryData('cards', previousCards);
+      },
+      onError: (error, newCard, rollback) => rollback(),
+    }
+  );
 
   return (
     <>
@@ -224,7 +272,6 @@ const CreateButton = () => {
       <Modal
         onRequestClose={() => {
           setIsCreateLinkOpen(false);
-          setAddedLinks([]);
         }}
         width={70}
         isOpen={isCreateLinkOpen}
@@ -266,50 +313,22 @@ const CreateButton = () => {
                       });
                     },
                     onSuccess: () => {
-                      setShouldInvalidate(true);
                       toast({
-                        message: 'Your link card was created successfully.',
+                        timeout: 2500,
+                        message: 'Your card was created successfully.',
                       });
-                      setAddedLinks([
-                        ...addedLinks,
-                        { url: value, title: 'test' },
-                      ]);
                       resetForm();
                     },
                   }
                 );
               }}
-              links={addedLinks}
               css={`
                 width: 100%;
-                margin-bottom: ${({ theme, links }) =>
-                  links.length > 0 ? `${theme.space[4]}px` : 0};
               `}
             />
           </>
         )}
-      >
-        {addedLinks.length > 0 && (
-          <List>
-            {addedLinks.reverse().map((link, index) => {
-              /* eslint-disable react/no-array-index-key */
-              return (
-                <ListItem
-                  key={index}
-                  renderItem={() => <Icon type="link" color="pc" size={2.4} />}
-                  renderContent={() => (
-                    <ListItemContent
-                      primary={link.title || link.url}
-                      secondary={link.title ? link.url : ''}
-                    />
-                  )}
-                />
-              );
-              /* eslint-enable react/no-array-index-key */
-            })}
-          </List>
-        )}
-      </Modal>
+      />
       <ServiceModal
         isOpen={isConnectAppOpen}
         onRequestClose={() => setIsConnectAppOpen(false)}
@@ -317,5 +336,7 @@ const CreateButton = () => {
     </>
   );
 };
+
+CreateButton.propTypes = CreateButtonTypes;
 
 export default CreateButton;

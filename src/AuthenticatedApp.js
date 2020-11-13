@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Switch, Route, useHistory, useLocation } from 'react-router-dom';
+import MouseTrap from 'mousetrap';
 import CreateButton from './components/CreateButton';
 import Home from './pages/Home';
 import Search from './pages/Search';
@@ -14,18 +15,32 @@ import useSearch from './utils/useSearch';
 const AuthenticatedApp = () => {
   const history = useHistory();
   const { isSearchOpen, openSearch, closeSearch, searchKey } = useSearch();
+  const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false);
   const { pathname } = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  useEffect(() => {
+    let timer = 0;
+    MouseTrap.bind('option+l', () => {
+      timer = setTimeout(() => {
+        setIsCreateLinkOpen(!isCreateLinkOpen);
+      }, 10);
+    });
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div>
       {isSearchOpen && (
         <Search defaultInput={searchKey} onRequestClose={closeSearch} />
       )}
-      <CreateButton />
+      <CreateButton
+        isCreateLinkOpen={isCreateLinkOpen}
+        setIsCreateLinkOpen={setIsCreateLinkOpen}
+      />
       <Header
         openSearch={openSearch}
         links={[

@@ -80,6 +80,9 @@ const CardBase = ({ data }) => {
 
   return (
     <Card
+      isLoading={
+        !get(data, 'id', false) || !get(data, 'card_sync.card_id', false)
+      }
       key={data.id}
       dateTime={new Date(data.actual_created_at)}
       isFavorited={isFavorited}

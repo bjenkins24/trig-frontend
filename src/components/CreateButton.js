@@ -213,14 +213,12 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
           {
             url: newCard.url,
             title: newCard.url,
-            card_type: {
-              name: 'link',
-            },
+            cardType: 'link',
             user: {
               email: 'brian@trytrig.com',
             },
-            actual_created_at: new Date(),
-            favorites: 0,
+            createdAt: new Date(),
+            totalFavorites: 0,
           },
           ...previousCards.data,
         ];
@@ -303,6 +301,11 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
                   "It looks like you didn't enter a valid url. Please try again."
                 )}
               onSubmit={async ({ value, resetForm }) => {
+                toast({
+                  timeout: 2500,
+                  message: 'Your card was created successfully.',
+                });
+                resetForm();
                 await createCardMutate(
                   { url: value },
                   {
@@ -311,13 +314,6 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
                         message:
                           'There was a problem submitting the url. Please try again.',
                       });
-                    },
-                    onSuccess: () => {
-                      toast({
-                        timeout: 2500,
-                        message: 'Your card was created successfully.',
-                      });
-                      resetForm();
                     },
                   }
                 );

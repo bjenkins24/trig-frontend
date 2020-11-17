@@ -8,7 +8,7 @@ const createCard = fields => {
 
 const updateCard = fields => {
   return client('card', {
-    method: 'PUT',
+    method: 'PATCH',
     body: { ...fields },
   });
 };
@@ -19,8 +19,8 @@ const deleteCard = ({ id }) => {
   });
 };
 
-const getCards = () => {
-  return client('cards');
+const getCards = queryKey => {
+  return client(queryKey);
 };
 
 export { createCard, updateCard, getCards, deleteCard };

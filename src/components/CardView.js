@@ -51,19 +51,17 @@ const CardBase = ({ data }) => {
       const previousCards = queryCache.getQueryData(cardQueryKey);
       const newCards = get(previousCards, 'data', []).map(previousCard => {
         if (previousCard.id === newCard.id) {
-          if (newCard.favorited) {
+          if (newCard.isFavorited) {
             return {
               ...previousCard,
-              favorites: previousCard.favorites + 1,
-              card_favorite: {
-                card_id: newCard.id,
-              },
+              totalFavorites: previousCard.totalFavorites + 1,
+              isFavorited: true,
             };
           } else {
             return {
               ...previousCard,
-              favorites: previousCard.favorites - 1,
-              card_favorite: null,
+              totalFavorites: previousCard.totalFavorites - 1,
+              isFavorited: false,
             };
           }
         }
@@ -76,25 +74,21 @@ const CardBase = ({ data }) => {
     onSettled: () => queryCache.invalidateQueries(cardQueryKey),
   });
 
-  const isFavorited = Boolean(get(data, 'card_favorite.card_id', false));
-
   return (
     <Card
-      isLoading={
-        !get(data, 'id', false) || !get(data, 'card_sync.card_id', false)
-      }
+      isLoading={!get(data, 'id', false) || !data.lastAttemptedSync}
       key={data.id}
-      dateTime={new Date(data.actual_created_at)}
-      isFavorited={isFavorited}
-      totalFavorites={data.favorites}
+      dateTime={new Date(data.createdAt)}
+      isFavorited={data.isFavorited}
+      totalFavorites={data.totalFavorites}
       onClickFavorite={async () => {
-        await favoritedMutate({ favorited: !isFavorited, id: data.id });
+        await favoritedMutate({ isFavorited: !data.isFavorited, id: data.id });
       }}
       openInNewTab
       id={data.id}
       title={data.title}
       href={data.url}
-      type={data.card_type.name}
+      type={data.cardType}
       image={data.image}
       renderAvatar={() => {
         return (
@@ -197,7 +191,7 @@ const CardView = props => {
   const { data: cards, isLoading: isCardsLoading } = useQuery(
     'cards',
     getCards,
-    { refetchInterval: 15000 }
+    { refetchInterval: 10000 }
   );
 
   const items = get(cards, 'data', []);

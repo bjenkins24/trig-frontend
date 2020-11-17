@@ -22,10 +22,9 @@ import { updateCard, deleteCard, getCards } from '../utils/cardClient';
 
 const cardQueryKey = 'cards';
 
-/* eslint-disable */
-const CardBase = ({ data }) => {
+const useDelete = () => {
   const queryCache = useQueryCache();
-  const [deleteMutate] = useMutation(deleteCard, {
+  const [mutate] = useMutation(deleteCard, {
     onMutate: deletedId => {
       queryCache.cancelQueries(cardQueryKey);
       const previousCards = queryCache.getQueryData(cardQueryKey);
@@ -44,7 +43,12 @@ const CardBase = ({ data }) => {
     },
     onSettled: () => queryCache.invalidateQueries(cardQueryKey),
   });
-  const [favoritedMutate] = useMutation(updateCard, {
+  return mutate;
+};
+
+const useFavorite = () => {
+  const queryCache = useQueryCache();
+  const [mutate] = useMutation(updateCard, {
     onMutate: newCard => {
       // Optimistic update
       queryCache.cancelQueries(cardQueryKey);
@@ -57,13 +61,12 @@ const CardBase = ({ data }) => {
               totalFavorites: previousCard.totalFavorites + 1,
               isFavorited: true,
             };
-          } else {
-            return {
-              ...previousCard,
-              totalFavorites: previousCard.totalFavorites - 1,
-              isFavorited: false,
-            };
           }
+          return {
+            ...previousCard,
+            totalFavorites: previousCard.totalFavorites - 1,
+            isFavorited: false,
+          };
         }
         return previousCard;
       });
@@ -73,6 +76,13 @@ const CardBase = ({ data }) => {
     onError: (err, newCard, rollback) => rollback(),
     onSettled: () => queryCache.invalidateQueries(cardQueryKey),
   });
+  return mutate;
+};
+
+/* eslint-disable */
+const CardBase = ({ data }) => {
+  const mutateFavorite = useFavorite();
+  const mutateDelete = useDelete();
 
   return (
     <Card
@@ -82,7 +92,7 @@ const CardBase = ({ data }) => {
       isFavorited={data.isFavorited}
       totalFavorites={data.totalFavorites}
       onClickFavorite={async () => {
-        await favoritedMutate({ isFavorited: !data.isFavorited, id: data.id });
+        await mutateFavorite({ isFavorited: !data.isFavorited, id: data.id });
       }}
       openInNewTab
       id={data.id}
@@ -124,7 +134,7 @@ const CardBase = ({ data }) => {
             toast({
               message: `The card "${data.title}" was removed from Trig successfully.`,
             });
-            await deleteMutate({ id: data.id });
+            await mutateDelete({ id: data.id });
           },
           item: (
             <HorizontalGroup margin={1.6}>
@@ -144,6 +154,8 @@ const CardRenderer = ({ data }) => {
 };
 
 const CardListItem = ({ card }) => {
+  const mutateFavorite = useFavorite();
+
   return (
     <ListItem
       href={card.url}
@@ -151,14 +163,14 @@ const CardListItem = ({ card }) => {
         window.open(card.url, '_blank');
       }}
       renderItem={() => (
-        <TypeIcon url={card.url} type={card.card_type.name} size={2.4} />
+        <TypeIcon url={card.url} type={card.cardType} size={2.4} />
       )}
       renderContent={() => (
         <ListItemContent
           renderItem={() => (
             <Avatar
-              firstName={card.user.first_name}
-              lastName={card.user.last_name}
+              firstName={card.user.firstName}
+              lastName={card.user.lastName}
               email={card.user.email}
               size={4}
             />
@@ -168,7 +180,14 @@ const CardListItem = ({ card }) => {
         />
       )}
       actions={[
-        <Icon onClick={() => null} type="heart" color="s" size={1.6} />,
+        <Icon
+          onClick={() =>
+            mutateFavorite({ isFavorited: !card.isFavorited, id: card.id })
+          }
+          type={card.isFavorited ? 'heart-filled' : 'heart'}
+          color="s"
+          size={1.6}
+        />,
         <Icon
           type="horizontal-dots"
           color="s"
@@ -272,7 +291,7 @@ const CardView = props => {
         {viewType === 'row' && !isCardsLoading && cards.data && (
           <List>
             {cards.data.map(card => {
-              return <CardListItem card={card} />;
+              return <CardListItem card={card} key={card.id} />;
             })}
           </List>
         )}

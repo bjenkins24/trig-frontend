@@ -79,6 +79,7 @@ const Filters = ({ ...restProps }) => {
     <div
       css={`
         width: 366px;
+        flex-shrink: 0;
         position: sticky;
       `}
       {...restProps}

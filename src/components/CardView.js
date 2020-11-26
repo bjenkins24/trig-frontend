@@ -208,7 +208,7 @@ const CardView = props => {
     'thumbnail'
   );
   const { data: cards, isLoading: isCardsLoading } = useQuery(
-    'cards',
+    cardQueryKey,
     getCards,
     { refetchInterval: 10000 }
   );
@@ -228,7 +228,7 @@ const CardView = props => {
   return (
     <div
       css={`
-        width: 982px;
+        width: 776px;
       `}
       {...props}
     >

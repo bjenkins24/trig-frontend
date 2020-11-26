@@ -1,90 +1,24 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
+import debounce from 'lodash/debounce';
+import get from 'lodash/get';
 import {
   Icon,
   HugeStyles,
-  Body2Styles,
-  Body2,
   Heading2,
+  Heading1,
+  Loading,
 } from '@trig-app/core-components';
 import {
   TabsNavigation,
   CardItem,
 } from '@trig-app/core-components/dist/compositions';
+import { useQuery } from 'react-query';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import 'react-perfect-scrollbar/dist/css/styles.css';
 import Filters from '../components/Filters';
-
-const MockRecentSelections = [
-  'How to memorize music 5 times faster',
-  'Onboarding Support',
-  'Brian Jenkins',
-  'Mary Jenkins',
-  'RFC Enterprise',
-];
-
-const MockResults = [
-  {
-    id: '1',
-    title: 'My first result title',
-    dateTime: 'Oct 27, 2018 at 5:40pm',
-    user: {
-      firstName: 'Brian',
-      lastName: 'Jenkins',
-    },
-    cardType: 'doc',
-    context: 'This is my cool description',
-    link: 'https://google.com',
-  },
-  {
-    id: '2',
-    title: 'My first result title',
-    dateTime: 'Oct 27, 2018 at 5:40pm',
-    user: {
-      firstName: 'Brian',
-      lastName: 'Jenkins',
-    },
-    cardType: 'doc',
-    context: 'This is my cool description',
-    link: 'https://google.com',
-  },
-  {
-    id: '3',
-    title: 'My first result title',
-    dateTime: 'Oct 27, 2018 at 5:40pm',
-    user: {
-      firstName: 'Brian',
-      lastName: 'Jenkins',
-    },
-    cardType: 'doc',
-    context: 'This is my cool description',
-    link: 'https://google.com',
-  },
-  {
-    id: '4',
-    title: 'My first result title',
-    dateTime: 'Oct 27, 2018 at 5:40pm',
-    user: {
-      firstName: 'Brian',
-      lastName: 'Jenkins',
-    },
-    cardType: 'doc',
-    context: 'This is my cool description',
-    link: 'https://google.com',
-  },
-];
-
-const RecentSelection = styled.button`
-  ${Body2Styles}
-  color: ${({ theme }) => theme.colors.s};
-  border: 0;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  padding: 0;
-  &:hover, &:focus {
-    text-decoration: underline;
-  }
-`;
+import { getCards } from '../utils/cardClient';
 
 const Separator = styled.div`
   height: 3px;
@@ -118,6 +52,20 @@ const Search = ({ onRequestClose, defaultInput }) => {
   const [searchInput, setSearchInput] = useState(defaultInput);
   const [currentView, setCurrentView] = useState(VIEWS.CARDS);
   const inputRef = useRef(null);
+  const {
+    data: rawCards,
+    isLoading: isCardsLoading,
+    refetch: fetchCards,
+  } = useQuery(`cards?h=1&q=${searchInput}`, getCards, { enabled: false });
+
+  const debouncedFetch = useCallback(debounce(fetchCards, 200), []);
+
+  useEffect(() => {
+    if (!searchInput) return;
+    debouncedFetch();
+  }, [searchInput]);
+
+  const cards = get(rawCards, 'data', []);
 
   useEffect(() => {
     const closeSearch = event => {
@@ -141,10 +89,10 @@ const Search = ({ onRequestClose, defaultInput }) => {
       <div
         css={`
           width: calc(100% - 8%);
-          height: 100%;
+          height: calc(100% - ${({ theme }) => theme.space[5] * 2}px);
+          position: fixed;
           background: ${({ theme }) => theme.b};
           opacity: 0.98;
-          position: fixed;
           z-index: 2000;
           padding: ${({ theme }) => theme.space[5]}px 4%;
         `}
@@ -162,7 +110,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
           color="ps.200"
           css={`
             cursor: pointer;
-            position: absolute;
+            position: fixed;
             outline: 0;
             top: ${({ theme }) => theme.space[4]}px;
             right: ${({ theme }) => theme.space[4]}px;
@@ -173,134 +121,182 @@ const Search = ({ onRequestClose, defaultInput }) => {
             }
           `}
         />
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="Search..."
-          onChange={e => {
-            setSearchInput(e.target.value);
-          }}
-          value={searchInput}
+        <div
           css={`
-            ${HugeStyles}
-            position: relative;
-            left: -5px;
             width: 100%;
-            background: none;
-            border: 0;
-            margin-top: ${({ theme }) => theme.space[4]}px;
-            outline: none;
-            &::placeholder {
-              color: ${({ theme }) => theme.ps[100]};
-            }
-          `}
-        />
-        <div
-          css={`
-            margin-bottom: ${({ theme }) => theme.space[5]}px;
+            background: ${({ theme }) => theme.b};
+            margin: -64px 0 0 -4%;
+            padding: 64px 0 0 4%;
+            z-index: 1;
           `}
         >
-          <Body2>Recent searches: </Body2>
-          {MockRecentSelections.map((selection, index) => {
-            return (
-              // eslint-disable-next-line react/no-array-index-key
-              <span key={index}>
-                <RecentSelection
-                  onClick={() => {
-                    setSearchInput(selection);
-                  }}
-                >
-                  {selection.length > 25
-                    ? `${selection.substring(0, 22).trim()}...`
-                    : selection}
-                </RecentSelection>
-                {index !== MockRecentSelections.length - 1 && ', '}
-              </span>
-            );
-          })}
-        </div>
-        <div
-          css={`
-            position: relative;
-          `}
-        >
-          <Separator />
-          <TabsNavigation
-            variant="light"
-            tabs={[
-              { text: 'Cards', onClick: () => setCurrentView(VIEWS.CARDS) },
-              {
-                text: 'Collections',
-                onClick: () => setCurrentView(VIEWS.COLLECTIONS),
-              },
-              { text: 'People', onClick: () => setCurrentView(VIEWS.PEOPLE) },
-            ]}
-          />
-          <Separator
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Search..."
+            onChange={e => {
+              setSearchInput(e.target.value);
+            }}
+            value={searchInput}
             css={`
-              margin-top: -2px;
-              margin-bottom: ${({ theme }) => theme.space[5]}px;
+              ${HugeStyles}
+              position: relative;
+              left: -5px;
+              width: 100%;
+              background: ${({ theme }) => theme.b};
+              border: 0;
+              margin-bottom: ${({ theme }) =>
+                theme.space[5] - theme.space[2]}px;
+              outline: none;
+              &::placeholder {
+                color: ${({ theme }) => theme.ps[100]};
+              }
             `}
           />
+          <div
+            css={`
+              position: relative;
+            `}
+          >
+            <Separator />
+            <TabsNavigation
+              variant="light"
+              tabs={[
+                { text: 'Cards', onClick: () => setCurrentView(VIEWS.CARDS) },
+                {
+                  text: 'Collections',
+                  onClick: () => setCurrentView(VIEWS.COLLECTIONS),
+                },
+                { text: 'People', onClick: () => setCurrentView(VIEWS.PEOPLE) },
+              ]}
+            />
+            <Separator
+              css={`
+                margin-top: -2px;
+                margin-bottom: ${({ theme }) =>
+                  theme.space[5] - theme.space[2]}px;
+              `}
+            />
+          </div>
         </div>
         <div
           css={`
-            display: flex;
+            position: relative;
+            height: calc(100% - 266px);
+            width: calc(100% + ${({ theme }) => theme.space[5]}px);
+            margin-left: -${({ theme }) => theme.space[4]}px;
+            margin-top: -${({ theme }) => theme.space[3]}px;
+            &:after {
+              content: '';
+              position: absolute;
+              z-index: 1;
+              bottom: 0;
+              left: 0;
+              pointer-events: none;
+              background-image: linear-gradient(
+                to bottom,
+                rgba(245, 245, 245, 0),
+                rgba(245, 245, 245, 1) 90%
+              );
+              width: 100%;
+              height: ${({ theme }) => theme.space[3]}px;
+            }
+            &:before {
+              content: '';
+              position: absolute;
+              z-index: 1;
+              top: 0;
+              left: 0;
+              pointer-events: none;
+              background-image: linear-gradient(
+                to top,
+                rgba(245, 245, 245, 0),
+                rgba(245, 245, 245, 1) 90%
+              );
+              width: 100%;
+              height: ${({ theme }) => theme.space[3]}px;
+            }
           `}
         >
-          {currentView === VIEWS.CARDS && (
-            <>
-              <div
-                css={`
-                  width: 80%;
-                  margin-right: ${({ theme }) => theme.space[5]}px;
-                `}
-              >
-                <Heading2
-                  css={`
-                    margin-bottom: ${({ theme }) => theme.space[4]};
-                  `}
-                >
-                  Results
-                </Heading2>
-
-                <ul
-                  css={`
-                    padding: 0;
-                    list-style-type: none;
-                  `}
-                >
-                  {MockResults.map(result => {
-                    return (
-                      <div
-                        css={`
-                          margin-bottom: ${({ theme }) => theme.space[2]};
-                        `}
-                        key={result.id}
-                      >
-                        <CardItem
-                          href={result.link}
-                          moreProps={{ onClick: () => null }}
-                          avatarProps={{
-                            firstName: result.user.firstName,
-                            lastName: result.user.lastName,
-                          }}
-                          cardType={result.cardType}
-                          title={result.title}
-                          dateTimeCreated={result.dateTime}
-                          favoriteProps={{ onClick: () => null }}
-                          content={result.context}
-                        />
-                      </div>
-                    );
-                  })}
-                </ul>
-              </div>
-              <Filters />
-            </>
-          )}
-          {currentView === VIEWS.COLLECTIONS && <div>Collections</div>}
-          {currentView === VIEWS.PEOPLE && <div>People</div>}
+          <PerfectScrollbar
+            css={`
+              .ps__rail-y {
+                z-index: 2;
+              }
+            `}
+          >
+            <div
+              css={`
+                max-width: 1200px;
+                display: flex;
+                margin: 0 auto ${({ theme }) => theme.space[3]}px;
+              `}
+            >
+              {currentView === VIEWS.CARDS && (
+                <>
+                  <div
+                    css={`
+                      width: 100%;
+                      margin-right: ${({ theme }) => theme.space[5]}px;
+                    `}
+                  >
+                    <Heading2
+                      css={`
+                        margin-top: ${({ theme }) => theme.space[3]}px;
+                        margin-bottom: ${({ theme }) => theme.space[4]};
+                      `}
+                    >
+                      Results
+                    </Heading2>
+                    {!isCardsLoading && cards.length === 0 && (
+                      <Heading1>No results</Heading1>
+                    )}
+                    {isCardsLoading && <Loading size={4.8} />}
+                    <ul
+                      css={`
+                        padding: 0;
+                        list-style-type: none;
+                      `}
+                    >
+                      {cards.length > 0 &&
+                        cards.map(card => {
+                          return (
+                            <div
+                              css={`
+                                margin-bottom: ${({ theme }) => theme.space[2]};
+                              `}
+                              key={card.id}
+                            >
+                              <CardItem
+                                href={card.url}
+                                openInNewTab
+                                moreProps={{ onClick: () => null }}
+                                avatarProps={{
+                                  firstName: card.user.firstName,
+                                  lastName: card.user.lastName,
+                                }}
+                                cardType={card.cardType}
+                                title={card.title}
+                                dateTime={new Date(card.createdAt)}
+                                favoriteProps={{ onClick: () => null }}
+                                content={card.highlights.content}
+                              />
+                            </div>
+                          );
+                        })}
+                    </ul>
+                  </div>
+                  <Filters
+                    css={`
+                      margin-top: ${({ theme }) => theme.space[3]}px;
+                    `}
+                  />
+                </>
+              )}
+              {currentView === VIEWS.COLLECTIONS && <div>Collections</div>}
+              {currentView === VIEWS.PEOPLE && <div>People</div>}
+            </div>
+          </PerfectScrollbar>
         </div>
       </div>
     </>

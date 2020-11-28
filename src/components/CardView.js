@@ -95,7 +95,6 @@ const CardBase = ({ data }) => {
         await mutateFavorite({ isFavorited: !data.isFavorited, id: data.id });
       }}
       openInNewTab
-      id={data.id}
       title={data.title}
       href={data.url}
       type={data.cardType}

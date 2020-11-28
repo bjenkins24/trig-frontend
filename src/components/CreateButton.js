@@ -218,6 +218,7 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
               email: 'brian@trytrig.com',
             },
             createdAt: new Date(),
+            isFavorited: false,
             totalFavorites: 0,
           },
           ...previousCards.data,
@@ -309,10 +310,20 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
                 await createCardMutate(
                   { url: value },
                   {
-                    onError: () => {
-                      toast({
+                    onError: error => {
+                      if (typeof error.error !== 'undefined') {
+                        if (error.error === 'exists') {
+                          return toast({
+                            message:
+                              'You already have a card created for the submitted link. You cannot have duplicate cards. The card was not created.',
+                            type: 'error',
+                          });
+                        }
+                      }
+                      return toast({
                         message:
                           'There was a problem submitting the url. Please try again.',
+                        type: 'error',
                       });
                     },
                   }

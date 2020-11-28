@@ -66,6 +66,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
   }, [searchInput]);
 
   const cards = get(rawCards, 'data', []);
+  const totalResults = parseInt(get(rawCards, 'meta.totalResults', 0), 10);
 
   useEffect(() => {
     const closeSearch = event => {
@@ -110,7 +111,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
           color="ps.200"
           css={`
             cursor: pointer;
-            position: fixed;
+            position: absolute;
             outline: 0;
             top: ${({ theme }) => theme.space[4]}px;
             right: ${({ theme }) => theme.space[4]}px;
@@ -162,7 +163,11 @@ const Search = ({ onRequestClose, defaultInput }) => {
             <TabsNavigation
               variant="light"
               tabs={[
-                { text: 'Cards', onClick: () => setCurrentView(VIEWS.CARDS) },
+                {
+                  text:
+                    totalResults !== 0 ? `Cards (${totalResults})` : 'Cards',
+                  onClick: () => setCurrentView(VIEWS.CARDS),
+                },
                 {
                   text: 'Collections',
                   onClick: () => setCurrentView(VIEWS.COLLECTIONS),
@@ -279,7 +284,9 @@ const Search = ({ onRequestClose, defaultInput }) => {
                                 title={card.title}
                                 dateTime={new Date(card.createdAt)}
                                 favoriteProps={{ onClick: () => null }}
-                                content={card.highlights.content}
+                                content={
+                                  card.highlights ? card.highlights.content : ''
+                                }
                               />
                             </div>
                           );

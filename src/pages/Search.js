@@ -56,7 +56,9 @@ const Search = ({ onRequestClose, defaultInput }) => {
     data: rawCards,
     isLoading: isCardsLoading,
     refetch: fetchCards,
-  } = useQuery(`cards?h=1&q=${searchInput}`, getCards, { enabled: false });
+  } = useQuery(`cards?h=1&q=${searchInput}`, getCards, {
+    enabled: false,
+  });
 
   const debouncedFetch = useCallback(debounce(fetchCards, 200), []);
 
@@ -90,12 +92,12 @@ const Search = ({ onRequestClose, defaultInput }) => {
       <div
         css={`
           width: calc(100% - 8%);
-          height: calc(100% - ${({ theme }) => theme.space[5] * 2}px);
+          height: calc(100% - ${({ theme }) => theme.space[5]}px);
           position: fixed;
           background: ${({ theme }) => theme.b};
           opacity: 0.98;
           z-index: 2000;
-          padding: ${({ theme }) => theme.space[5]}px 4%;
+          padding: ${({ theme }) => theme.space[5]}px 4% 0;
         `}
       >
         <Icon
@@ -281,12 +283,20 @@ const Search = ({ onRequestClose, defaultInput }) => {
                                   lastName: card.user.lastName,
                                 }}
                                 cardType={card.cardType}
-                                title={card.title}
+                                title={get(
+                                  card,
+                                  'highlights.title',
+                                  card.title
+                                )}
                                 dateTime={new Date(card.createdAt)}
                                 favoriteProps={{ onClick: () => null }}
-                                content={
-                                  card.highlights ? card.highlights.content : ''
-                                }
+                                content={get(card, 'highlights.content', '')}
+                                navigationList={[
+                                  {
+                                    onClick: () => null,
+                                    text: 'Remove from trig or something',
+                                  },
+                                ]}
                               />
                             </div>
                           );

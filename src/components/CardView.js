@@ -7,15 +7,13 @@ import {
   Icon,
   SelectField,
   List,
-  ListItem,
-  ListItemContent,
   Avatar,
   Card,
   HorizontalGroup,
   Loading,
-  TypeIcon,
   toast,
 } from '@trig-app/core-components';
+import { CardItem } from '@trig-app/core-components/dist/compositions';
 import { MasonryScroller, usePositioner, useResizeObserver } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, deleteCard, getCards } from '../utils/cardClient';
@@ -79,6 +77,23 @@ const useFavorite = () => {
   return mutate;
 };
 
+const makeMoreList = ({ mutate, title, id }) => [
+  {
+    onClick: async () => {
+      toast({
+        message: `The card "${title}" was removed from Trig successfully.`,
+      });
+      await mutate({ id });
+    },
+    item: (
+      <HorizontalGroup margin={1.6}>
+        <Icon type="trash" size={1.6} />
+        <span>Remove From Trig</span>
+      </HorizontalGroup>
+    ),
+  },
+];
+
 /* eslint-disable */
 const CardBase = ({ data }) => {
   const mutateFavorite = useFavorite();
@@ -94,11 +109,14 @@ const CardBase = ({ data }) => {
       onClickFavorite={async () => {
         await mutateFavorite({ isFavorited: !data.isFavorited, id: data.id });
       }}
+      description={data.description}
       openInNewTab
       title={data.title}
       href={data.url}
       type={data.cardType}
       image={data.image}
+      imageWidth={data.imageWidth}
+      imageHeight={data.imageHeight}
       renderAvatar={() => {
         return (
           <Avatar
@@ -109,40 +127,11 @@ const CardBase = ({ data }) => {
           />
         );
       }}
-      navigationList={[
-        {
-          onClick: () => null,
-          item: (
-            <HorizontalGroup margin={1.6}>
-              <Icon type="edit" size={1.6} />
-              <span>Edit Card</span>
-            </HorizontalGroup>
-          ),
-        },
-        {
-          onClick: () => null,
-          item: (
-            <HorizontalGroup margin={1.6}>
-              <Icon type="lock" size={1.6} />
-              <span>Share</span>
-            </HorizontalGroup>
-          ),
-        },
-        {
-          onClick: async () => {
-            toast({
-              message: `The card "${data.title}" was removed from Trig successfully.`,
-            });
-            await mutateDelete({ id: data.id });
-          },
-          item: (
-            <HorizontalGroup margin={1.6}>
-              <Icon type="trash" size={1.6} />
-              <span>Remove From Trig</span>
-            </HorizontalGroup>
-          ),
-        },
-      ]}
+      navigationList={makeMoreList({
+        mutate: mutateDelete,
+        id: data.id,
+        title: data.title,
+      })}
     />
   );
 };
@@ -154,46 +143,32 @@ const CardRenderer = ({ data }) => {
 
 const CardListItem = ({ card }) => {
   const mutateFavorite = useFavorite();
+  const mutateDelete = useDelete();
 
   return (
-    <ListItem
+    <CardItem
       href={card.url}
-      onClick={() => {
-        window.open(card.url, '_blank');
+      openInNewTab
+      dateTime={new Date(card.createdAt)}
+      favoriteProps={{
+        onClick: () => {
+          mutateFavorite({ isFavorited: !card.isFavorited, id: card.id });
+        },
+        type: card.isFavorited ? 'heart-filled' : 'heart',
       }}
-      renderItem={() => (
-        <TypeIcon url={card.url} type={card.cardType} size={2.4} />
-      )}
-      renderContent={() => (
-        <ListItemContent
-          renderItem={() => (
-            <Avatar
-              firstName={card.user.firstName}
-              lastName={card.user.lastName}
-              email={card.user.email}
-              size={4}
-            />
-          )}
-          primary={card.title}
-          secondary="Oct 27, 2018 at 5:35pm"
-        />
-      )}
-      actions={[
-        <Icon
-          onClick={() =>
-            mutateFavorite({ isFavorited: !card.isFavorited, id: card.id })
-          }
-          type={card.isFavorited ? 'heart-filled' : 'heart'}
-          color="s"
-          size={1.6}
-        />,
-        <Icon
-          type="horizontal-dots"
-          color="s"
-          size={1.6}
-          onClick={() => null}
-        />,
-      ]}
+      avatarProps={{
+        firstName: card.user.firstName,
+        lastName: card.user.lastName,
+        email: card.user.email,
+      }}
+      cardType={card.cardType}
+      title={card.title}
+      moreProps={{}}
+      navigationList={makeMoreList({
+        mutate: mutateDelete,
+        id: card.id,
+        title: card.title,
+      })}
     />
   );
 };

@@ -44,37 +44,42 @@ const useDelete = () => {
   return mutate;
 };
 
+// For some reason useMutate makes the heart flash a little bit - so we're just doing it manually instead
 const useFavorite = () => {
   const queryCache = useQueryCache();
-  const [mutate] = useMutation(updateCard, {
-    onMutate: newCard => {
-      // Optimistic update
-      queryCache.cancelQueries(cardQueryKey);
-      const previousCards = queryCache.getQueryData(cardQueryKey);
-      const newCards = get(previousCards, 'data', []).map(previousCard => {
-        if (previousCard.id === newCard.id) {
-          if (newCard.isFavorited) {
-            return {
-              ...previousCard,
-              totalFavorites: previousCard.totalFavorites + 1,
-              isFavorited: true,
-            };
-          }
+  return async fields => {
+    queryCache.cancelQueries(cardQueryKey);
+    const previousCards = queryCache.getQueryData(cardQueryKey);
+    const newCards = get(previousCards, 'data', []).map(previousCard => {
+      if (previousCard.id === fields.id) {
+        if (fields.isFavorited) {
           return {
             ...previousCard,
-            totalFavorites: previousCard.totalFavorites - 1,
-            isFavorited: false,
+            totalFavorites: previousCard.totalFavorites + 1,
+            isFavorited: true,
           };
         }
-        return previousCard;
+        return {
+          ...previousCard,
+          totalFavorites: previousCard.totalFavorites - 1,
+          isFavorited: false,
+        };
+      }
+      return previousCard;
+    });
+    queryCache.setQueryData(cardQueryKey, () => ({ data: newCards }));
+    try {
+      await updateCard(fields);
+      // We're not going to invalidate the query because it makes the heart flash
+    } catch (error) {
+      // Rollback
+      queryCache.setQueryData(cardQueryKey, previousCards);
+      toast({
+        type: 'error',
+        message: 'Something went wrong, the card could not be favorited.',
       });
-      queryCache.setQueryData(cardQueryKey, () => ({ data: newCards }));
-      return () => queryCache.setQueryData(cardQueryKey, previousCards);
-    },
-    onError: (err, newCard, rollback) => rollback(),
-    onSettled: () => queryCache.invalidateQueries(cardQueryKey),
-  });
-  return mutate;
+    }
+  };
 };
 
 const makeMoreList = ({ mutate, title, id }) => [
@@ -141,8 +146,8 @@ const CardRenderer = ({ data }) => {
   return <CardBase data={data} />;
 };
 
-const CardListItem = ({ card }) => {
-  const mutateFavorite = useFavorite();
+const CardListItem = React.memo(({ card }) => {
+  const updateFavorite = useFavorite();
   const mutateDelete = useDelete();
 
   return (
@@ -151,8 +156,8 @@ const CardListItem = ({ card }) => {
       openInNewTab
       dateTime={new Date(card.createdAt)}
       favoriteProps={{
-        onClick: () => {
-          mutateFavorite({ isFavorited: !card.isFavorited, id: card.id });
+        onClick: async () => {
+          await updateFavorite({ isFavorited: !card.isFavorited, id: card.id });
         },
         type: card.isFavorited ? 'heart-filled' : 'heart',
       }}
@@ -171,7 +176,7 @@ const CardListItem = ({ card }) => {
       })}
     />
   );
-};
+});
 /* eslint-enable */
 
 const CardView = props => {

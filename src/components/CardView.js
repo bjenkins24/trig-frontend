@@ -152,6 +152,7 @@ const CardListItem = React.memo(({ card }) => {
 
   return (
     <CardItem
+      isLoading={!get(card, 'id', false) || !card.lastAttemptedSync}
       href={card.url}
       openInNewTab
       dateTime={new Date(card.createdAt)}

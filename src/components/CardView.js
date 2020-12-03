@@ -19,13 +19,13 @@ import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, deleteCard, getCards } from '../utils/cardClient';
 import { useAuth } from '../context/authContext';
 
-const cardQueryKey = 'cards';
+const generalCardQueryKey = 'cards';
 
-const saveView = async ({ id, userId }) => {
+export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewedBy: userId });
 };
 
-const useDelete = () => {
+export const useDelete = cardQueryKey => {
   const queryCache = useQueryCache();
   const [mutate] = useMutation(deleteCard, {
     onMutate: deletedId => {
@@ -34,7 +34,12 @@ const useDelete = () => {
       const newCards = get(previousCards, 'data', []).filter(
         previousCard => previousCard.id !== deletedId.id
       );
-      queryCache.setQueryData(cardQueryKey, () => ({ data: newCards }));
+      const newData = {
+        ...previousCards,
+        data: newCards,
+      };
+      newData.meta.totalResults = previousCards.meta.totalResults - 1;
+      queryCache.setQueryData(cardQueryKey, () => newData);
       return () => queryCache.setQueryData(cardQueryKey, previousCards);
     },
     onError: (err, newCard, rollback) => {
@@ -50,7 +55,7 @@ const useDelete = () => {
 };
 
 // For some reason useMutate makes the heart flash a little bit - so we're just doing it manually instead
-const useFavorite = () => {
+export const useFavorite = cardQueryKey => {
   const queryCache = useQueryCache();
   const { user } = useAuth();
 
@@ -74,7 +79,10 @@ const useFavorite = () => {
       }
       return previousCard;
     });
-    queryCache.setQueryData(cardQueryKey, () => ({ data: newCards }));
+    queryCache.setQueryData(cardQueryKey, () => ({
+      ...previousCards,
+      data: newCards,
+    }));
     try {
       let newFields = fields;
       if (fields.isFavorited) {
@@ -96,7 +104,7 @@ const useFavorite = () => {
   };
 };
 
-const makeMoreList = ({ mutate, title, id }) => [
+export const makeMoreList = ({ mutate, title, id }) => [
   {
     onClick: async () => {
       toast({
@@ -115,8 +123,8 @@ const makeMoreList = ({ mutate, title, id }) => [
 
 /* eslint-disable */
 const CardBase = ({ data }) => {
-  const mutateFavorite = useFavorite();
-  const mutateDelete = useDelete();
+  const mutateFavorite = useFavorite(generalCardQueryKey);
+  const mutateDelete = useDelete(generalCardQueryKey);
   const { user } = useAuth();
 
   return (
@@ -167,8 +175,8 @@ const CardRenderer = ({ data }) => {
 };
 
 const CardListItem = React.memo(({ card }) => {
-  const updateFavorite = useFavorite();
-  const mutateDelete = useDelete();
+  const updateFavorite = useFavorite(generalCardQueryKey);
+  const mutateDelete = useDelete(generalCardQueryKey);
   const { user } = useAuth();
 
   return (
@@ -213,11 +221,10 @@ const CardView = props => {
     `card-view-location:${location.pathname}`,
     'thumbnail'
   );
-  const { data: cards, isLoading: isCardsLoading } = useQuery(
-    cardQueryKey,
-    getCards,
-    { refetchInterval: 10000 }
-  );
+  const {
+    data: cards,
+    isLoading: isCardsLoading,
+  } = useQuery(generalCardQueryKey, getCards, { refetchInterval: 10000 });
 
   const items = get(cards, 'data', []);
 

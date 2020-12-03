@@ -18,8 +18,14 @@ import { useQuery } from 'react-query';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import Filters from '../components/Filters';
-import { getCards, updateCard } from '../utils/cardClient';
+import { getCards } from '../utils/cardClient';
 import { useAuth } from '../context/authContext';
+import {
+  makeMoreList,
+  saveView,
+  useDelete,
+  useFavorite,
+} from '../components/CardView';
 
 const Separator = styled.div`
   height: 3px;
@@ -49,16 +55,64 @@ const defaultProps = {
   defaultInput: '',
 };
 
+/* eslint-disable react/prop-types */
+const CardResult = React.memo(({ card, cardQueryKey }) => {
+  const { user } = useAuth();
+  const mutateFavorite = useFavorite(cardQueryKey);
+  const mutateDelete = useDelete(cardQueryKey);
+
+  return (
+    <div
+      css={`
+        margin-bottom: ${({ theme }) => theme.space[2]};
+      `}
+      key={card.id}
+    >
+      <CardItem
+        onClick={async () => {
+          await saveView({ id: card.id, useId: user.id });
+        }}
+        href={card.url}
+        openInNewTab
+        moreProps={{ onClick: () => null }}
+        avatarProps={{
+          firstName: card.user.firstName,
+          lastName: card.user.lastName,
+        }}
+        favoriteProps={{
+          onClick: async () => {
+            await mutateFavorite({
+              isFavorited: !card.isFavorited,
+              id: card.id,
+            });
+          },
+          type: card.isFavorited ? 'heart-filled' : 'heart',
+        }}
+        cardType={card.cardType}
+        title={get(card, 'highlights.title', card.title)}
+        dateTime={new Date(card.createdAt)}
+        content={get(card, 'highlights.content', '')}
+        navigationList={makeMoreList({
+          mutate: mutateDelete,
+          id: card.id,
+          title: card.title,
+        })}
+      />
+    </div>
+  );
+});
+/* esline-enable react/prop-types */
+
 const Search = ({ onRequestClose, defaultInput }) => {
   const [searchInput, setSearchInput] = useState(defaultInput);
   const [currentView, setCurrentView] = useState(VIEWS.CARDS);
-  const { user } = useAuth();
   const inputRef = useRef(null);
+  const cardQueryKey = `cards?h=1&q=${searchInput}`;
   const {
     data: rawCards,
     isLoading: isCardsLoading,
     refetch: fetchCards,
-  } = useQuery(`cards?h=1&q=${searchInput}`, getCards, {
+  } = useQuery(cardQueryKey, getCards, {
     enabled: false,
   });
 
@@ -270,43 +324,11 @@ const Search = ({ onRequestClose, defaultInput }) => {
                       {cards.length > 0 &&
                         cards.map(card => {
                           return (
-                            <div
-                              css={`
-                                margin-bottom: ${({ theme }) => theme.space[2]};
-                              `}
+                            <CardResult
                               key={card.id}
-                            >
-                              <CardItem
-                                onClick={async () => {
-                                  await updateCard({
-                                    id: card.id,
-                                    viewedBy: user.id,
-                                  });
-                                }}
-                                href={card.url}
-                                openInNewTab
-                                moreProps={{ onClick: () => null }}
-                                avatarProps={{
-                                  firstName: card.user.firstName,
-                                  lastName: card.user.lastName,
-                                }}
-                                cardType={card.cardType}
-                                title={get(
-                                  card,
-                                  'highlights.title',
-                                  card.title
-                                )}
-                                dateTime={new Date(card.createdAt)}
-                                favoriteProps={{ onClick: () => null }}
-                                content={get(card, 'highlights.content', '')}
-                                navigationList={[
-                                  {
-                                    onClick: () => null,
-                                    item: 'Remove from trig or something',
-                                  },
-                                ]}
-                              />
-                            </div>
+                              card={card}
+                              cardQueryKey={cardQueryKey}
+                            />
                           );
                         })}
                     </ul>

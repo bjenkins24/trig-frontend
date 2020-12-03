@@ -18,7 +18,8 @@ import { useQuery } from 'react-query';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import Filters from '../components/Filters';
-import { getCards } from '../utils/cardClient';
+import { getCards, updateCard } from '../utils/cardClient';
+import { useAuth } from '../context/authContext';
 
 const Separator = styled.div`
   height: 3px;
@@ -51,6 +52,7 @@ const defaultProps = {
 const Search = ({ onRequestClose, defaultInput }) => {
   const [searchInput, setSearchInput] = useState(defaultInput);
   const [currentView, setCurrentView] = useState(VIEWS.CARDS);
+  const { user } = useAuth();
   const inputRef = useRef(null);
   const {
     data: rawCards,
@@ -275,6 +277,12 @@ const Search = ({ onRequestClose, defaultInput }) => {
                               key={card.id}
                             >
                               <CardItem
+                                onClick={async () => {
+                                  await updateCard({
+                                    id: card.id,
+                                    viewedBy: user.id,
+                                  });
+                                }}
                                 href={card.url}
                                 openInNewTab
                                 moreProps={{ onClick: () => null }}
@@ -294,7 +302,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
                                 navigationList={[
                                   {
                                     onClick: () => null,
-                                    text: 'Remove from trig or something',
+                                    item: 'Remove from trig or something',
                                   },
                                 ]}
                               />

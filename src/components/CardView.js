@@ -17,8 +17,13 @@ import { CardItem } from '@trig-app/core-components/dist/compositions';
 import { MasonryScroller, usePositioner, useResizeObserver } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, deleteCard, getCards } from '../utils/cardClient';
+import { useAuth } from '../context/authContext';
 
 const cardQueryKey = 'cards';
+
+const saveView = async ({ id, userId }) => {
+  await updateCard({ id, viewedBy: userId });
+};
 
 const useDelete = () => {
   const queryCache = useQueryCache();
@@ -47,6 +52,8 @@ const useDelete = () => {
 // For some reason useMutate makes the heart flash a little bit - so we're just doing it manually instead
 const useFavorite = () => {
   const queryCache = useQueryCache();
+  const { user } = useAuth();
+
   return async fields => {
     queryCache.cancelQueries(cardQueryKey);
     const previousCards = queryCache.getQueryData(cardQueryKey);
@@ -69,7 +76,14 @@ const useFavorite = () => {
     });
     queryCache.setQueryData(cardQueryKey, () => ({ data: newCards }));
     try {
-      await updateCard(fields);
+      let newFields = fields;
+      if (fields.isFavorited) {
+        newFields = { ...fields, favoritedBy: user.id };
+      } else {
+        newFields = { ...fields, unfavoritedBy: user.id };
+      }
+      delete newFields.isFavorited;
+      await updateCard(newFields);
       // We're not going to invalidate the query because it makes the heart flash
     } catch (error) {
       // Rollback
@@ -103,11 +117,17 @@ const makeMoreList = ({ mutate, title, id }) => [
 const CardBase = ({ data }) => {
   const mutateFavorite = useFavorite();
   const mutateDelete = useDelete();
+  const { user } = useAuth();
 
   return (
     <Card
       isLoading={!get(data, 'id', false) || !data.lastAttemptedSync}
       key={data.id}
+      onClick={async () => {
+        if (get(data, 'id', false)) {
+          await saveView({ id: data.id, userId: user.id });
+        }
+      }}
       dateTime={new Date(data.createdAt)}
       isFavorited={data.isFavorited}
       totalFavorites={data.totalFavorites}
@@ -149,11 +169,17 @@ const CardRenderer = ({ data }) => {
 const CardListItem = React.memo(({ card }) => {
   const updateFavorite = useFavorite();
   const mutateDelete = useDelete();
+  const { user } = useAuth();
 
   return (
     <CardItem
       isLoading={!get(card, 'id', false) || !card.lastAttemptedSync}
       href={card.url}
+      onClick={async () => {
+        if (get(card, 'id', false)) {
+          await saveView({ id: card.id, userId: user.id });
+        }
+      }}
       openInNewTab
       dateTime={new Date(card.createdAt)}
       favoriteProps={{

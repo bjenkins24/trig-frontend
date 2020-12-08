@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import get from 'lodash/get';
 import { useQuery, useMutation, useQueryCache } from 'react-query';
@@ -214,17 +215,62 @@ const CardListItem = React.memo(({ card }) => {
 });
 /* eslint-enable */
 
-const CardView = props => {
+const dateAdjust = date => {
+  if (!date) return null;
+  const endOfDate = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    23,
+    59,
+    59
+  );
+  return Math.round(endOfDate.getTime() / 1000);
+};
+
+const createConstraints = ({ startDate, endDate }) => {
+  let params = new URLSearchParams({
+    s: dateAdjust(startDate),
+    e: dateAdjust(endDate),
+  });
+  const keysForDeletion = [];
+  params.forEach((value, key) => {
+    if (value === 'null') keysForDeletion.push(key);
+  });
+  keysForDeletion.forEach(key => {
+    params.delete(key);
+  });
+  params = params.toString();
+  if (!params) {
+    return generalCardQueryKey;
+  }
+  return `${generalCardQueryKey}?${params}`;
+};
+
+const CardViewProps = {
+  startDate: PropTypes.instanceOf(Date),
+  endDate: PropTypes.instanceOf(Date),
+};
+
+const defaultProps = {
+  startDate: null,
+  endDate: null,
+};
+
+const CardView = ({ startDate, endDate, ...restProps }) => {
   const location = useLocation();
   const [cardCategory, setCardCategory] = useState('all');
   const [viewType, setViewType] = useLocalStorage(
     `card-view-location:${location.pathname}`,
     'thumbnail'
   );
-  const {
-    data: cards,
-    isLoading: isCardsLoading,
-  } = useQuery(generalCardQueryKey, getCards, { refetchInterval: 10000 });
+  const { data: cards, isLoading: isCardsLoading } = useQuery(
+    createConstraints({ startDate, endDate }),
+    getCards,
+    {
+      refetchInterval: 10000,
+    }
+  );
 
   const items = get(cards, 'data', []);
 
@@ -243,7 +289,7 @@ const CardView = props => {
       css={`
         width: 776px;
       `}
-      {...props}
+      {...restProps}
     >
       <div
         css={`
@@ -312,5 +358,8 @@ const CardView = props => {
     </div>
   );
 };
+
+CardView.propTypes = CardViewProps;
+CardView.defaultProps = defaultProps;
 
 export default CardView;

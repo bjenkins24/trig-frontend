@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Heading2,
   Body1,
@@ -71,10 +72,25 @@ const MockFilters = ({ category }) => {
   );
 };
 
-const Filters = ({ ...restProps }) => {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+const FiltersProps = {
+  startDate: PropTypes.instanceOf(Date),
+  setStartDate: PropTypes.func.isRequired,
+  endDate: PropTypes.instanceOf(Date),
+  setEndDate: PropTypes.func.isRequired,
+};
 
+const defaultProps = {
+  startDate: null,
+  endDate: null,
+};
+
+const Filters = ({
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  ...restProps
+}) => {
   return (
     <div
       css={`
@@ -122,5 +138,8 @@ const Filters = ({ ...restProps }) => {
     </div>
   );
 };
+
+Filters.propTypes = FiltersProps;
+Filters.defaultProps = defaultProps;
 
 export default Filters;

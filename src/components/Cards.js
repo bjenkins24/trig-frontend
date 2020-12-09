@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Content from './Content';
 import CardView from './CardView';
 import Filters from './Filters';
+import useFilters from '../utils/useFilters';
 
 const Cards = props => {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const { queryString, filterProps } = useFilters();
 
   return (
     <Content
@@ -18,15 +18,9 @@ const Cards = props => {
         css={`
           margin-right: ${({ theme }) => theme.space[5]}px;
         `}
-        startDate={startDate}
-        endDate={endDate}
+        queryString={queryString}
       />
-      <Filters
-        startDate={startDate}
-        endDate={endDate}
-        setStartDate={setStartDate}
-        setEndDate={setEndDate}
-      />
+      <Filters {...filterProps} />
     </Content>
   );
 };

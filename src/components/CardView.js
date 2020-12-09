@@ -215,49 +215,15 @@ const CardListItem = React.memo(({ card }) => {
 });
 /* eslint-enable */
 
-const dateAdjust = date => {
-  if (!date) return null;
-  const endOfDate = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-    23,
-    59,
-    59
-  );
-  return Math.round(endOfDate.getTime() / 1000);
-};
-
-const createConstraints = ({ startDate, endDate }) => {
-  let params = new URLSearchParams({
-    s: dateAdjust(startDate),
-    e: dateAdjust(endDate),
-  });
-  const keysForDeletion = [];
-  params.forEach((value, key) => {
-    if (value === 'null') keysForDeletion.push(key);
-  });
-  keysForDeletion.forEach(key => {
-    params.delete(key);
-  });
-  params = params.toString();
-  if (!params) {
-    return generalCardQueryKey;
-  }
-  return `${generalCardQueryKey}?${params}`;
-};
-
 const CardViewProps = {
-  startDate: PropTypes.instanceOf(Date),
-  endDate: PropTypes.instanceOf(Date),
+  queryString: PropTypes.string,
 };
 
 const defaultProps = {
-  startDate: null,
-  endDate: null,
+  queryString: '',
 };
 
-const CardView = ({ startDate, endDate, ...restProps }) => {
+const CardView = ({ queryString, ...restProps }) => {
   const location = useLocation();
   const [cardCategory, setCardCategory] = useState('all');
   const [viewType, setViewType] = useLocalStorage(
@@ -265,7 +231,7 @@ const CardView = ({ startDate, endDate, ...restProps }) => {
     'thumbnail'
   );
   const { data: cards, isLoading: isCardsLoading } = useQuery(
-    createConstraints({ startDate, endDate }),
+    `${generalCardQueryKey}?${queryString}`,
     getCards,
     {
       refetchInterval: 10000,

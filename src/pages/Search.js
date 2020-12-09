@@ -26,6 +26,7 @@ import {
   useDelete,
   useFavorite,
 } from '../components/CardView';
+import useFilters from '../utils/useFilters';
 
 const Separator = styled.div`
   height: 3px;
@@ -108,7 +109,8 @@ const Search = ({ onRequestClose, defaultInput }) => {
   const [searchInput, setSearchInput] = useState(defaultInput);
   const [currentView, setCurrentView] = useState(VIEWS.CARDS);
   const inputRef = useRef(null);
-  const cardQueryKey = `cards?h=1&q=${searchInput}`;
+  const { filterProps, queryString } = useFilters();
+  const cardQueryKey = `cards?h=1&q=${searchInput}&${queryString}`;
   const {
     data: rawCards,
     isLoading: isCardsLoading,
@@ -122,7 +124,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
   useEffect(() => {
     if (!searchInput) return;
     debouncedFetch();
-  }, [searchInput]);
+  }, [searchInput, cardQueryKey]);
 
   const cards = get(rawCards, 'data', []);
   const totalResults = parseInt(get(rawCards, 'meta.totalResults', 0), 10);
@@ -335,6 +337,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
                     </ul>
                   </div>
                   <Filters
+                    {...filterProps}
                     css={`
                       margin-top: ${({ theme }) => theme.space[3]}px;
                     `}

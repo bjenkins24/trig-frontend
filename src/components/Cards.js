@@ -3,9 +3,11 @@ import Content from './Content';
 import CardView from './CardView';
 import Filters from './Filters';
 import useFilters from '../utils/useFilters';
+import useCards from '../utils/useCards';
 
 const Cards = props => {
   const { queryString, filterProps } = useFilters();
+  const { cards, filters, isLoading } = useCards({ queryString });
 
   return (
     <Content
@@ -15,12 +17,13 @@ const Cards = props => {
       {...props}
     >
       <CardView
+        cards={cards}
+        isLoading={isLoading}
         css={`
           margin-right: ${({ theme }) => theme.space[5]}px;
         `}
-        queryString={queryString}
       />
-      <Filters {...filterProps} />
+      <Filters tags={filters.tags} types={filters.types} {...filterProps} />
     </Content>
   );
 };

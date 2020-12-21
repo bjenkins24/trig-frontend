@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import get from 'lodash/get';
-import { useQuery, useMutation, useQueryCache } from 'react-query';
+import { useMutation, useQueryCache } from 'react-query';
 import {
   ButtonToggle,
   Icon,
@@ -17,10 +17,9 @@ import {
 import { CardItem } from '@trig-app/core-components/dist/compositions';
 import { MasonryScroller, usePositioner, useResizeObserver } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
-import { updateCard, deleteCard, getCards } from '../utils/cardClient';
+import { updateCard, deleteCard } from '../utils/cardClient';
 import { useAuth } from '../context/authContext';
-
-const generalCardQueryKey = 'cards';
+import { generalCardQueryKey } from '../utils/useCards';
 
 export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewedBy: userId });
@@ -216,36 +215,29 @@ const CardListItem = React.memo(({ card }) => {
 /* eslint-enable */
 
 const CardViewProps = {
-  queryString: PropTypes.string,
+  cards: PropTypes.array,
+  isLoading: PropTypes.bool,
 };
 
 const defaultProps = {
-  queryString: '',
+  cards: [],
+  isLoading: false,
 };
 
-const CardView = ({ queryString, ...restProps }) => {
+const CardView = ({ cards, isLoading, ...restProps }) => {
   const location = useLocation();
   const [cardCategory, setCardCategory] = useState('all');
   const [viewType, setViewType] = useLocalStorage(
     `card-view-location:${location.pathname}`,
     'thumbnail'
   );
-  const { data: cards, isLoading: isCardsLoading } = useQuery(
-    `${generalCardQueryKey}?${queryString}`,
-    getCards,
-    {
-      refetchInterval: 10000,
-    }
-  );
-
-  const items = get(cards, 'data', []);
 
   const positioner = usePositioner(
     { width: 780, columnWidth: 251, columnGutter: 6 },
     // This is our dependencies array. When these dependencies
     // change, the positioner cache will be cleared and the
     // masonry component will reset as a result.
-    [items.length]
+    [cards.length]
   );
 
   const resizeObserver = useResizeObserver(positioner);
@@ -297,11 +289,11 @@ const CardView = ({ queryString, ...restProps }) => {
           }
         `}
       >
-        {isCardsLoading && <Loading size={4.8} />}
-        {viewType === 'thumbnail' && !isCardsLoading && items && (
+        {isLoading && <Loading size={4.8} />}
+        {viewType === 'thumbnail' && !isLoading && cards && (
           <MasonryScroller
             // Provides the data for our grid items
-            items={items}
+            items={cards}
             itemHeightEstimate={400}
             itemkey={data => data.id}
             positioner={positioner}
@@ -313,7 +305,7 @@ const CardView = ({ queryString, ...restProps }) => {
             render={CardRenderer}
           />
         )}
-        {viewType === 'row' && !isCardsLoading && cards.data && (
+        {viewType === 'row' && !isLoading && cards.data && (
           <List>
             {cards.data.map(card => {
               return <CardListItem card={card} key={card.id} />;

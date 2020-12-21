@@ -208,7 +208,7 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
     {
       onMutate: newCard => {
         queryCache.cancelQueries('cards');
-        const previousCards = queryCache.getQueryData('cards');
+        const previousCards = queryCache.getQueryData('cards') ?? { data: [] };
         const newCards = [
           {
             url: newCard.url,

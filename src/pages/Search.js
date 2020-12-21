@@ -14,11 +14,9 @@ import {
   TabsNavigation,
   CardItem,
 } from '@trig-app/core-components/dist/compositions';
-import { useQuery } from 'react-query';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import Filters from '../components/Filters';
-import { getCards } from '../utils/cardClient';
 import { useAuth } from '../context/authContext';
 import {
   makeMoreList,
@@ -27,6 +25,7 @@ import {
   useFavorite,
 } from '../components/CardView';
 import useFilters from '../utils/useFilters';
+import useCards from '../utils/useCards';
 
 const Separator = styled.div`
   height: 3px;
@@ -110,13 +109,9 @@ const Search = ({ onRequestClose, defaultInput }) => {
   const [currentView, setCurrentView] = useState(VIEWS.CARDS);
   const inputRef = useRef(null);
   const { filterProps, queryString } = useFilters();
-  const cardQueryKey = `cards?h=1&q=${searchInput}&${queryString}`;
-  const {
-    data: rawCards,
-    isLoading: isCardsLoading,
-    refetch: fetchCards,
-  } = useQuery(cardQueryKey, getCards, {
-    enabled: false,
+  const cardQueryKey = `h=1&q=${searchInput}&${queryString}`;
+  const { cards, totalResults, fetchCards, isLoading, filters } = useCards({
+    queryString: cardQueryKey,
   });
 
   const debouncedFetch = useCallback(debounce(fetchCards, 200), []);
@@ -125,9 +120,6 @@ const Search = ({ onRequestClose, defaultInput }) => {
     if (!searchInput) return;
     debouncedFetch();
   }, [searchInput, cardQueryKey]);
-
-  const cards = get(rawCards, 'data', []);
-  const totalResults = parseInt(get(rawCards, 'meta.totalResults', 0), 10);
 
   useEffect(() => {
     const closeSearch = event => {
@@ -314,10 +306,10 @@ const Search = ({ onRequestClose, defaultInput }) => {
                     >
                       Results
                     </Heading2>
-                    {!isCardsLoading && cards.length === 0 && (
+                    {!isLoading && cards.length === 0 && (
                       <Heading1>No results</Heading1>
                     )}
-                    {isCardsLoading && <Loading size={4.8} />}
+                    {isLoading && <Loading size={4.8} />}
                     <ul
                       css={`
                         padding: 0;
@@ -337,6 +329,8 @@ const Search = ({ onRequestClose, defaultInput }) => {
                     </ul>
                   </div>
                   <Filters
+                    tags={filters.tags}
+                    types={filters.types}
                     {...filterProps}
                     css={`
                       margin-top: ${({ theme }) => theme.space[3]}px;

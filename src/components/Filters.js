@@ -9,7 +9,7 @@ import {
 } from '@trig-app/core-components';
 
 // eslint-disable-next-line
-const MockCheckbox = ({ label }) => {
+const Item = ({ label }) => {
   return (
     <Checkbox
       width="100%"
@@ -25,72 +25,36 @@ const MockCheckbox = ({ label }) => {
   );
 };
 
-// eslint-disable-next-line
-const MockFilters = ({ category }) => {
-  return (
-    <div>
-      <Body1
-        separator
-        color="ps.200"
-        css={`
-          margin-bottom: ${({ theme }) => theme.space[3]}px;
-        `}
-      >
-        {category}
-      </Body1>
-      {category === 'Card Types' && (
-        <>
-          <MockCheckbox label="Twitter" />
-          <MockCheckbox label="Google Doc" />
-          <MockCheckbox label="Video" />
-        </>
-      )}
-      {category === 'People' && (
-        <>
-          <MockCheckbox label="Brian Jenkins" />
-          <MockCheckbox label="Vikram Rajagopalan" />
-          <MockCheckbox label="Scott Hanford" />
-        </>
-      )}
-      {category === 'Tags' && (
-        <>
-          <MockCheckbox label="Masterminds" />
-          <MockCheckbox label="Artificial Intelligence" />
-          <MockCheckbox label="Introductions" />
-        </>
-      )}
-      <Body3
-        color="ps.200"
-        css={`
-          display: block;
-          margin-bottom: ${({ theme }) => theme.space[4]}px;
-        `}
-      >
-        More...
-      </Body3>
-    </div>
-  );
-};
-
 const FiltersProps = {
   startDate: PropTypes.instanceOf(Date),
   setStartDate: PropTypes.func.isRequired,
   endDate: PropTypes.instanceOf(Date),
   setEndDate: PropTypes.func.isRequired,
+  tags: PropTypes.array,
+  types: PropTypes.array,
 };
 
 const defaultProps = {
   startDate: null,
   endDate: null,
+  tags: [],
+  types: [],
 };
+
+const maxTypes = 5;
+const maxTags = 5;
 
 const Filters = ({
   startDate,
   setStartDate,
   endDate,
   setEndDate,
+  tags,
+  types,
   ...restProps
 }) => {
+  let totalTags = 0;
+  let totalTypes = 0;
   return (
     <div
       css={`
@@ -131,9 +95,75 @@ const Filters = ({
         />
       </div>
       <div>
-        <MockFilters category="Card Types" />
-        <MockFilters category="People" />
-        <MockFilters category="Tags" />
+        {tags.length > 0 && (
+          <div>
+            <Body1
+              separator
+              color="ps.200"
+              css={`
+                margin-bottom: ${({ theme }) => theme.space[3]}px;
+              `}
+            >
+              Topics
+            </Body1>
+            <>
+              {tags.map(tag => {
+                totalTags += 1;
+                if (totalTags > maxTags) return null;
+                return (
+                  <Item key={tag.tag} label={`${tag.tag} (${tag.count})`} />
+                );
+              })}
+            </>
+            {tags.length > maxTags && (
+              <Body3
+                color="ps.200"
+                css={`
+                  display: block;
+                  margin-bottom: ${({ theme }) => theme.space[4]}px;
+                `}
+              >
+                More...
+              </Body3>
+            )}
+          </div>
+        )}
+        {types.length > 1 && (
+          <div>
+            <Body1
+              separator
+              color="ps.200"
+              css={`
+                margin-bottom: ${({ theme }) => theme.space[3]}px;
+              `}
+            >
+              Card Types
+            </Body1>
+            <>
+              {types.map(type => {
+                totalTypes += 1;
+                if (totalTypes > maxTypes) return null;
+                return (
+                  <Item
+                    key={type.type}
+                    label={`${type.type} (${type.count})`}
+                  />
+                );
+              })}
+            </>
+            {types.length > maxTypes && (
+              <Body3
+                color="ps.200"
+                css={`
+                  display: block;
+                  margin-bottom: ${({ theme }) => theme.space[4]}px;
+                `}
+              >
+                More...
+              </Body3>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

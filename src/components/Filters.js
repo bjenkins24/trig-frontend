@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Heading2,
@@ -53,6 +53,8 @@ const Filters = ({
   types,
   ...restProps
 }) => {
+  const [moreTags, setMoreTags] = useState(false);
+  const [moreTypes, setMoreTypes] = useState(false);
   let totalTags = 0;
   let totalTypes = 0;
   return (
@@ -109,7 +111,7 @@ const Filters = ({
             <>
               {tags.map(tag => {
                 totalTags += 1;
-                if (totalTags > maxTags) return null;
+                if (totalTags > maxTags && !moreTags) return null;
                 return (
                   <Item key={tag.tag} label={`${tag.tag} (${tag.count})`} />
                 );
@@ -117,13 +119,20 @@ const Filters = ({
             </>
             {tags.length > maxTags && (
               <Body3
+                onClick={() => {
+                  if (!moreTags) {
+                    setMoreTags(true);
+                  } else {
+                    setMoreTags(false);
+                  }
+                }}
                 color="ps.200"
                 css={`
                   display: block;
                   margin-bottom: ${({ theme }) => theme.space[4]}px;
                 `}
               >
-                More...
+                {!moreTags ? 'More...' : 'Less...'}
               </Body3>
             )}
           </div>
@@ -142,7 +151,7 @@ const Filters = ({
             <>
               {types.map(type => {
                 totalTypes += 1;
-                if (totalTypes > maxTypes) return null;
+                if (totalTypes > maxTypes && !moreTypes) return null;
                 return (
                   <Item
                     key={type.type}
@@ -154,12 +163,19 @@ const Filters = ({
             {types.length > maxTypes && (
               <Body3
                 color="ps.200"
+                onClick={() => {
+                  if (!moreTypes) {
+                    setMoreTypes(true);
+                  } else {
+                    setMoreTypes(false);
+                  }
+                }}
                 css={`
                   display: block;
                   margin-bottom: ${({ theme }) => theme.space[4]}px;
                 `}
               >
-                More...
+                {!moreTypes ? 'More...' : 'Less...'}
               </Body3>
             )}
           </div>

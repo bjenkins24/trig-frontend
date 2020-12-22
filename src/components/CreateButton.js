@@ -4,7 +4,6 @@ import {
   Fab,
   Icon,
   ListItemContent,
-  Popover,
   Body1Component,
   StringFieldWithButtonForm,
   ModalHeader,
@@ -200,7 +199,6 @@ const CreateButtonTypes = {
 };
 
 const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isConnectAppOpen, setIsConnectAppOpen] = useState(false);
   const queryClient = useQueryClient();
   const {
@@ -233,41 +231,19 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
 
   return (
     <>
-      <Popover
-        placement="top-end"
-        variant="light"
-        renderPopover={({ isOpen, closePopover }) => (
-          <PopoverContent
-            isOpen={isOpen}
-            closePopover={closePopover}
-            setIsCreateOpen={setIsCreateOpen}
-            setIsConnectAppOpen={setIsConnectAppOpen}
-            setIsCreateLinkOpen={setIsCreateLinkOpen}
-          />
-        )}
+      <div
+        css={`
+          position: fixed;
+          bottom: ${({ theme }) => theme.space[4]}px;
+          right: ${({ theme }) => theme.space[4]}px;
+          padding-top: ${({ theme }) => theme.space[3]}px;
+          z-index: 3;
+        `}
       >
-        <div
-          css={`
-            position: fixed;
-            bottom: ${({ theme }) => theme.space[4]}px;
-            right: ${({ theme }) => theme.space[4]}px;
-            padding-top: ${({ theme }) => theme.space[3]}px;
-            z-index: 3;
-          `}
-        >
-          <Fab>
-            <Icon
-              type="plus"
-              color="sc"
-              size={2.8}
-              css={`
-                transition: transform 200ms;
-                transform: ${isCreateOpen ? 'rotate(45deg)' : 'none'};
-              `}
-            />
-          </Fab>
-        </div>
-      </Popover>
+        <Fab onClick={() => setIsCreateLinkOpen(true)}>
+          <Icon type="plus" color="sc" size={2.8} />
+        </Fab>
+      </div>
       <Modal
         onRequestClose={() => {
           setIsCreateLinkOpen(false);

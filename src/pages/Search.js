@@ -223,11 +223,6 @@ const Search = ({ onRequestClose, defaultInput }) => {
                     totalResults !== 0 ? `Cards (${totalResults})` : 'Cards',
                   onClick: () => setCurrentView(VIEWS.CARDS),
                 },
-                {
-                  text: 'Collections',
-                  onClick: () => setCurrentView(VIEWS.COLLECTIONS),
-                },
-                { text: 'People', onClick: () => setCurrentView(VIEWS.PEOPLE) },
               ]}
             />
             <Separator

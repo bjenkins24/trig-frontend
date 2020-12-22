@@ -306,9 +306,9 @@ const CardView = ({ cards, isLoading, ...restProps }) => {
             render={CardRenderer}
           />
         )}
-        {viewType === 'row' && !isLoading && cards.data && (
+        {viewType === 'row' && !isLoading && cards && (
           <List>
-            {cards.data.map(card => {
+            {cards.map(card => {
               return <CardListItem card={card} key={card.id} />;
             })}
           </List>

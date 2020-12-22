@@ -3,6 +3,8 @@ import { useState } from 'react';
 const useFilters = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTypes, setSelectedTypes] = useState([]);
 
   const dateAdjust = ({ date, type }) => {
     if (!date) return null;
@@ -24,8 +26,11 @@ const useFilters = () => {
     let params = new URLSearchParams({
       s: dateAdjust({ date: startDate, type: 'start' }),
       e: dateAdjust({ date: endDate, type: 'end' }),
+      t: selectedTags.join(',') || null,
+      ty: selectedTypes.join(',') || null,
     });
 
+    // remove null values
     const keysForDeletion = [];
     params.forEach((value, key) => {
       if (value === 'null') keysForDeletion.push(key);
@@ -47,6 +52,10 @@ const useFilters = () => {
       setStartDate,
       endDate,
       setEndDate,
+      selectedTags,
+      setSelectedTags,
+      selectedTypes,
+      setSelectedTypes,
     },
     queryString: createQueryString(),
   };

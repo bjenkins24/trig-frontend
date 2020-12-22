@@ -9,7 +9,7 @@ import {
 } from '@trig-app/core-components';
 
 // eslint-disable-next-line
-const Item = ({ label }) => {
+const Item = ({ label, ...restProps }) => {
   return (
     <Checkbox
       width="100%"
@@ -21,6 +21,7 @@ const Item = ({ label }) => {
       css={`
         margin-bottom: ${({ theme }) => theme.space[2]}px;
       `}
+      {...restProps}
     />
   );
 };
@@ -30,6 +31,10 @@ const FiltersProps = {
   setStartDate: PropTypes.func.isRequired,
   endDate: PropTypes.instanceOf(Date),
   setEndDate: PropTypes.func.isRequired,
+  selectedTags: PropTypes.array.isRequired,
+  setSelectedTags: PropTypes.func.isRequired,
+  selectedTypes: PropTypes.array.isRequired,
+  setSelectedTypes: PropTypes.func.isRequired,
   tags: PropTypes.array,
   types: PropTypes.array,
 };
@@ -49,6 +54,10 @@ const Filters = ({
   setStartDate,
   endDate,
   setEndDate,
+  selectedTags,
+  setSelectedTags,
+  selectedTypes,
+  setSelectedTypes,
   tags,
   types,
   ...restProps
@@ -97,7 +106,7 @@ const Filters = ({
         />
       </div>
       <div>
-        {tags.length > 0 && (
+        {(tags.length > 0 || selectedTags.length > 0) && (
           <div>
             <Body1
               separator
@@ -113,7 +122,20 @@ const Filters = ({
                 totalTags += 1;
                 if (totalTags > maxTags && !moreTags) return null;
                 return (
-                  <Item key={tag.tag} label={`${tag.tag} (${tag.count})`} />
+                  <Item
+                    key={tag.tag}
+                    label={`${tag.tag} (${tag.count})`}
+                    onChange={() => {
+                      if (selectedTags.includes(tag.tag)) {
+                        setSelectedTags(
+                          selectedTags.filter(item => item !== tag.tag)
+                        );
+                      } else {
+                        setSelectedTags([...selectedTags, tag.tag]);
+                      }
+                    }}
+                    checked={selectedTags.includes(tag.tag)}
+                  />
                 );
               })}
             </>
@@ -128,6 +150,7 @@ const Filters = ({
                 }}
                 color="ps.200"
                 css={`
+                  cursor: pointer;
                   display: block;
                   margin-bottom: ${({ theme }) => theme.space[4]}px;
                 `}
@@ -137,7 +160,7 @@ const Filters = ({
             )}
           </div>
         )}
-        {types.length > 1 && (
+        {(types.length > 1 || selectedTypes.length > 0) && (
           <div>
             <Body1
               separator
@@ -156,6 +179,16 @@ const Filters = ({
                   <Item
                     key={type.type}
                     label={`${type.type} (${type.count})`}
+                    onChange={() => {
+                      if (selectedTypes.includes(type.type)) {
+                        setSelectedTypes(
+                          selectedTypes.filter(item => item !== type.type)
+                        );
+                      } else {
+                        setSelectedTypes([...selectedTypes, type.type]);
+                      }
+                    }}
+                    checked={selectedTypes.includes(type.type)}
                   />
                 );
               })}
@@ -171,6 +204,7 @@ const Filters = ({
                   }
                 }}
                 css={`
+                  cursor: pointer;
                   display: block;
                   margin-bottom: ${({ theme }) => theme.space[4]}px;
                 `}

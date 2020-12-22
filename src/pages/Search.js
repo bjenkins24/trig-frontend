@@ -75,6 +75,8 @@ const CardResult = React.memo(({ card, cardQueryKey }) => {
         openInNewTab
         moreProps={{ onClick: () => null }}
         avatarProps={{
+          size: 0,
+          style: { marginRight: 0 },
           email: card.user.email,
           firstName: card.user.firstName,
           lastName: card.user.lastName,

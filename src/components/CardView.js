@@ -8,7 +8,6 @@ import {
   Icon,
   SelectField,
   List,
-  Avatar,
   Card,
   HorizontalGroup,
   Loading,
@@ -138,6 +137,7 @@ const CardBase = ({ data }) => {
           await saveView({ id: data.id, userId: user.id });
         }
       }}
+      showTotalFavorites={false}
       dateTime={new Date(data.createdAt)}
       isFavorited={data.isFavorited}
       totalFavorites={data.totalFavorites}
@@ -152,16 +152,7 @@ const CardBase = ({ data }) => {
       image={data.image}
       imageWidth={data.imageWidth}
       imageHeight={data.imageHeight}
-      renderAvatar={() => {
-        return (
-          <Avatar
-            size={1.6}
-            firstName={data.user.firstName}
-            lastName={data.user.lastName}
-            email={data.user.email}
-          />
-        );
-      }}
+      renderAvatar={() => null}
       navigationList={makeMoreList({
         mutate: mutateDelete,
         id: data.id,
@@ -199,6 +190,8 @@ const CardListItem = React.memo(({ card }) => {
         type: card.isFavorited ? 'heart-filled' : 'heart',
       }}
       avatarProps={{
+        style: { 'margin-right': 0 },
+        size: 0,
         firstName: card.user.firstName,
         lastName: card.user.lastName,
         email: card.user.email,

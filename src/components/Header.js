@@ -128,14 +128,10 @@ const Header = ({ links, openSearch, ...restProps }) => {
                     item: 'Profile',
                     onClick: () => history.push('/profile'),
                   },
-                  {
-                    item: 'Create Workspace',
-                    onClick: () => null,
-                  },
-                  {
-                    item: 'Connected Services',
-                    onClick: () => setIsConnectedServicesOpen(true),
-                  },
+                  // {
+                  //   item: 'Connected Services',
+                  //   onClick: () => setIsConnectedServicesOpen(true),
+                  // },
                   { item: 'Logout', onClick: logout },
                 ]}
               >

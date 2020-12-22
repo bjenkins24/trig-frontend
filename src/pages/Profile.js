@@ -3,18 +3,14 @@ import {
   Avatar,
   VerticalGroup,
   Heading1,
-  Body1,
   Body2,
   HorizontalGroup,
-  Button,
 } from '@trig-app/core-components';
-import { TabsNavigation } from '@trig-app/core-components/dist/compositions';
 import { useParams } from 'react-router-dom';
 import faker from 'faker';
 import Hero from '../components/Hero';
 import Head from '../components/Head';
 import { heroContentMaxWidth } from '../utils/constants';
-import Cards from '../components/Cards';
 
 const data = [
   {
@@ -84,7 +80,6 @@ const data = [
 ];
 
 const totalCards = 245;
-const totalCollections = 24;
 
 const Profile = () => {
   const { id } = useParams();
@@ -97,16 +92,6 @@ const Profile = () => {
   let user = data[0];
   if (!isCurrentUser) {
     [user] = data.filter(person => person.id === parseInt(id, 10));
-  }
-
-  const tabs = [{ text: 'Cards' }, { text: 'Collections' }];
-  if (isCurrentUser) {
-    tabs.push({ text: 'Settings ' });
-  }
-
-  const tabPanels = [<Cards />, <div>Collections</div>];
-  if (isCurrentUser) {
-    tabPanels.push(<Heading1>YOU FOUND IT CHANGE YOUR PASSWORD NOW</Heading1>);
   }
 
   return (
@@ -130,7 +115,6 @@ const Profile = () => {
               firstName={user.firstName}
               lastName={user.lastName}
               email={user.email}
-              image={user.profilePicture}
               size={15}
               css={`
                 position: absolute;
@@ -154,7 +138,6 @@ const Profile = () => {
                 >
                   {user.firstName} {user.lastName}
                 </Heading1>
-                <Body1 color="pc">{user.position}</Body1>
               </div>
               <HorizontalGroup
                 margin={2.4}
@@ -169,60 +152,12 @@ const Profile = () => {
                   </Body2>
                   <Body2 color="ps.200">Cards</Body2>
                 </VerticalGroup>
-                <VerticalGroup>
-                  <Body2 color="pc" weight="bold">
-                    {totalCollections}
-                  </Body2>
-                  <Body2 color="ps.200">Collections</Body2>
-                </VerticalGroup>
               </HorizontalGroup>
             </HorizontalGroup>
-            <div
-              css={`
-                margin-left: auto;
-              `}
-            >
-              <Button
-                iconProps={{ type: 'lock' }}
-                css={`
-                  margin-left: auto;
-                `}
-              >
-                Share
-              </Button>
-            </div>
           </HorizontalGroup>
         </div>
       </Hero>
-      <div
-        css={`
-          position: relative;
-        `}
-      >
-        <div
-          css={`
-            position: absolute;
-            top: 123px;
-            background: ${({ theme }) => theme.colors.ps[50]};
-            width: 100%;
-            height: 2px;
-          `}
-        />
-      </div>
-      <div
-        css={`
-          max-width: ${heroContentMaxWidth}px;
-          margin: 0 auto;
-          margin-top: ${({ theme }) => theme.space[4]}px;
-        `}
-      >
-        <TabsNavigation
-          variant="light"
-          size="lg"
-          tabs={tabs}
-          tabPanels={tabPanels}
-        />
-      </div>
+      <h1>Settings</h1>
     </>
   );
 };

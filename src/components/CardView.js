@@ -190,7 +190,7 @@ const CardListItem = React.memo(({ card }) => {
         type: card.isFavorited ? 'heart-filled' : 'heart',
       }}
       avatarProps={{
-        style: { 'margin-right': 0 },
+        style: { marginRight: 0 },
         size: 0,
         firstName: card.user.firstName,
         lastName: card.user.lastName,

@@ -1,15 +1,14 @@
 import React from 'react';
 import {
-  Avatar,
-  VerticalGroup,
-  Heading1,
-  Body2,
+  Heading2,
   HorizontalGroup,
+  Legend,
+  Fieldset,
+  Form,
+  StringFieldForm,
+  Button,
 } from '@trig-app/core-components';
-import Hero from '../components/Hero';
 import Head from '../components/Head';
-import Content from '../components/Content';
-import { heroContentMaxWidth } from '../utils/constants';
 import { useAuth } from '../context/authContext';
 
 const Profile = () => {
@@ -23,71 +22,134 @@ const Profile = () => {
   return (
     <>
       <Head title={title} />
-      <Hero
+      <div
         css={`
-          padding-top: ${({ theme }) => theme.space[5]}px;
-          padding-bottom: 0;
-          margin-bottom: ${({ theme }) => theme.space[6]}px;
+          margin: 0 auto;
+          width: 700px;
+          margin-top: ${({ theme }) => theme.space[6]}px;
+          margin-bottom: ${({ theme }) => theme.space[5]}px;
         `}
       >
+        <Form
+          initialValues={{
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+          }}
+          onSubmit={() => console.log('submitted')}
+        >
+          {({ handleSubmit, dirty, form }) => {
+            return (
+              <form
+                css={`
+                  width: 100%;
+                  margin-bottom: ${({ theme }) => theme.space[5]}px;
+                `}
+                onSubmit={handleSubmit}
+              >
+                <Fieldset width="100%">
+                  <Legend>Personal</Legend>
+                  <HorizontalGroup margin={1.6}>
+                    <StringFieldForm name="first_name" label="First Name" />
+                    <StringFieldForm name="last_name" label="Last Name" />
+                  </HorizontalGroup>
+                  <StringFieldForm name="email" label="Email" />
+                </Fieldset>
+                {dirty && (
+                  <div
+                    css={`
+                      display: flex;
+                      margin-top: ${({ theme }) => theme.space[4]}px;
+                    `}
+                  >
+                    <HorizontalGroup
+                      margin={1.6}
+                      css={`
+                        margin-left: auto;
+                      `}
+                    >
+                      <Button size="lg" type="submit">
+                        Save
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="inverse-pl"
+                        onClick={form.reset}
+                      >
+                        Cancel
+                      </Button>
+                    </HorizontalGroup>
+                  </div>
+                )}
+              </form>
+            );
+          }}
+        </Form>
+        <Form
+          initialValues={{
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+          }}
+          onSubmit={() => console.log('submitted')}
+        >
+          {({ handleSubmit, dirty, form }) => {
+            return (
+              <form
+                css={`
+                  width: 100%;
+                  margin-bottom: ${({ theme }) => theme.space[5]}px;
+                `}
+                onSubmit={handleSubmit}
+              >
+                <Fieldset width="100%">
+                  <Legend>Change Password</Legend>
+                  <HorizontalGroup margin={1.6}>
+                    <StringFieldForm name="old_password" label="Old Password" />
+                    <StringFieldForm name="new_password" label="New Password" />
+                  </HorizontalGroup>
+                </Fieldset>
+                {dirty && (
+                  <div
+                    css={`
+                      display: flex;
+                      margin-top: ${({ theme }) => theme.space[4]}px;
+                    `}
+                  >
+                    <HorizontalGroup
+                      margin={1.6}
+                      css={`
+                        margin-left: auto;
+                      `}
+                    >
+                      <Button size="lg" type="submit">
+                        Save
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="inverse-pl"
+                        onClick={form.reset}
+                      >
+                        Cancel
+                      </Button>
+                    </HorizontalGroup>
+                  </div>
+                )}
+              </form>
+            );
+          }}
+        </Form>
+        <Heading2>Danger Zone</Heading2>
         <div
           css={`
-            margin: 0 auto;
-            max-width: ${heroContentMaxWidth}px;
-            position: relative;
+            margin-top: ${({ theme }) => theme.space[4]}px;
           `}
         >
-          <HorizontalGroup margin={3.2}>
-            <Avatar
-              firstName={user.firstName}
-              lastName={user.lastName}
-              email={user.email}
-              size={15}
-              css={`
-                position: absolute;
-                bottom: -${({ theme }) => theme.space[4]}px;
-                border-radius: 50%;
-                box-shadow: ${({ theme }) => theme.sh};
-              `}
-            />
-            <HorizontalGroup
-              margin={6.4}
-              css={`
-                margin-left: ${({ theme }) => theme.space[4] + 150}px;
-                margin-bottom: ${({ theme }) => theme.space[3]}px;
-              `}
-            >
-              <div>
-                <Heading1
-                  color="pc"
-                  css={`
-                    margin-bottom: ${({ theme }) => theme.space[1]}px;
-                  `}
-                >
-                  {user.firstName} {user.lastName}
-                </Heading1>
-              </div>
-              <HorizontalGroup
-                margin={2.4}
-                css={`
-                  margin-top: ${({ theme }) =>
-                    theme.space[2] + theme.space[1]}px;
-                `}
-              >
-                <VerticalGroup>
-                  <Body2 color="pc" weight="bold">
-                    {user.total_cards}
-                  </Body2>
-                  <Body2 color="ps.200">Cards</Body2>
-                </VerticalGroup>
-              </HorizontalGroup>
-            </HorizontalGroup>
-          </HorizontalGroup>
+          <Button variant="inverse-pl" iconProps={{ type: 'trash' }}>
+            Delete Account
+          </Button>
         </div>
-      </Hero>
-      <Content>
-        <h1>Settings</h1>
-      </Content>
+      </div>
     </>
   );
 };

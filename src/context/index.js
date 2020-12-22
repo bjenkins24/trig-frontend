@@ -3,32 +3,22 @@ import PropTypes from 'prop-types';
 import theme from '@trig-app/themes';
 import { ThemeProvider } from 'styled-components';
 import { BrowserRouter as Router } from 'react-router-dom';
-import {
-  ReactQueryConfigProvider,
-  ReactQueryCacheProvider,
-  QueryCache,
-} from 'react-query';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { AuthProvider } from './authContext';
 import { OpenCardProvider } from './openCardContext';
 
-const queryConfig = {
-  useErrorBoundary: true,
-};
-
-const queryCache = new QueryCache();
+const queryClient = new QueryClient();
 
 const AppProviders = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
-      <ReactQueryCacheProvider queryCache={queryCache}>
-        <ReactQueryConfigProvider config={queryConfig}>
-          <OpenCardProvider>
-            <Router>
-              <AuthProvider>{children}</AuthProvider>
-            </Router>
-          </OpenCardProvider>
-        </ReactQueryConfigProvider>
-      </ReactQueryCacheProvider>
+      <QueryClientProvider client={queryClient}>
+        <OpenCardProvider>
+          <Router>
+            <AuthProvider>{children}</AuthProvider>
+          </Router>
+        </OpenCardProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 };

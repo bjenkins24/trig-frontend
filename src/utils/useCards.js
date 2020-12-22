@@ -5,14 +5,15 @@ import { getCards } from './cardClient';
 export const generalCardQueryKey = 'cards';
 
 const useCards = ({ queryString, queryConfig }) => {
+  const queryKey = `${generalCardQueryKey}?${queryString}`;
   const { data: cards, isLoading, refetch } = useQuery(
-    `${generalCardQueryKey}?${queryString}`,
-    getCards,
+    queryKey,
+    () => getCards(queryKey),
     queryConfig
   );
 
   return {
-    cardQueryKey: generalCardQueryKey,
+    cardQueryKey: `${generalCardQueryKey}?${queryString}`,
     isLoading,
     fetchCards: refetch,
     cards: get(cards, 'data', []),

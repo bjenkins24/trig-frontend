@@ -7,7 +7,7 @@ import useCards from '../utils/useCards';
 
 const Cards = props => {
   const { queryString, filterProps } = useFilters();
-  const { cards, filters, isLoading } = useCards({ queryString });
+  const { cards, filters, isLoading, cardQueryKey } = useCards({ queryString });
 
   return (
     <Content
@@ -18,6 +18,7 @@ const Cards = props => {
     >
       <CardView
         cards={cards}
+        cardQueryKey={cardQueryKey}
         isLoading={isLoading}
         css={`
           margin-right: ${({ theme }) => theme.space[5]}px;

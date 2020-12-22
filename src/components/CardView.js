@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import get from 'lodash/get';
-import { useMutation, useQueryCache } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import {
   ButtonToggle,
   Icon,
@@ -26,11 +26,11 @@ export const saveView = async ({ id, userId }) => {
 };
 
 export const useDelete = cardQueryKey => {
-  const queryCache = useQueryCache();
-  const [mutate] = useMutation(deleteCard, {
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation(deleteCard, {
     onMutate: deletedId => {
-      queryCache.cancelQueries(cardQueryKey);
-      const previousCards = queryCache.getQueryData(cardQueryKey);
+      queryClient.cancelQueries(cardQueryKey);
+      const previousCards = queryClient.getQueryData(cardQueryKey);
       const newCards = get(previousCards, 'data', []).filter(
         previousCard => previousCard.id !== deletedId.id
       );
@@ -39,8 +39,8 @@ export const useDelete = cardQueryKey => {
         data: newCards,
       };
       newData.meta.totalResults = previousCards.meta.totalResults - 1;
-      queryCache.setQueryData(cardQueryKey, () => newData);
-      return () => queryCache.setQueryData(cardQueryKey, previousCards);
+      queryClient.setQueryData(cardQueryKey, () => newData);
+      return () => queryClient.setQueryData(cardQueryKey, previousCards);
     },
     onError: (err, newCard, rollback) => {
       toast({
@@ -49,19 +49,19 @@ export const useDelete = cardQueryKey => {
       });
       rollback();
     },
-    onSettled: () => queryCache.invalidateQueries(cardQueryKey),
+    onSuccess: () => queryClient.invalidateQueries('cards'),
   });
   return mutate;
 };
 
 // For some reason useMutate makes the heart flash a little bit - so we're just doing it manually instead
 export const useFavorite = cardQueryKey => {
-  const queryCache = useQueryCache();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   return async fields => {
-    queryCache.cancelQueries(cardQueryKey);
-    const previousCards = queryCache.getQueryData(cardQueryKey);
+    queryClient.cancelQueries(cardQueryKey);
+    const previousCards = queryClient.getQueryData(cardQueryKey);
     const newCards = get(previousCards, 'data', []).map(previousCard => {
       if (previousCard.id === fields.id) {
         if (fields.isFavorited) {
@@ -79,7 +79,7 @@ export const useFavorite = cardQueryKey => {
       }
       return previousCard;
     });
-    queryCache.setQueryData(cardQueryKey, () => ({
+    queryClient.setQueryData(cardQueryKey, () => ({
       ...previousCards,
       data: newCards,
     }));
@@ -95,7 +95,7 @@ export const useFavorite = cardQueryKey => {
       // We're not going to invalidate the query because it makes the heart flash
     } catch (error) {
       // Rollback
-      queryCache.setQueryData(cardQueryKey, previousCards);
+      queryClient.setQueryData(cardQueryKey, previousCards);
       toast({
         type: 'error',
         message: 'Something went wrong, the card could not be favorited.',
@@ -127,6 +127,7 @@ const CardBase = ({ data }) => {
   const mutateDelete = useDelete(generalCardQueryKey);
   const { user } = useAuth();
 
+  const queryClient = useQueryClient();
   return (
     <Card
       isLoading={!get(data, 'id', false) || !data.lastAttemptedSync}
@@ -217,14 +218,16 @@ const CardListItem = React.memo(({ card }) => {
 const CardViewProps = {
   cards: PropTypes.array,
   isLoading: PropTypes.bool,
+  cardQueryKey: PropTypes.string,
 };
 
 const defaultProps = {
   cards: [],
   isLoading: false,
+  cardQueryKey: 'cards',
 };
 
-const CardView = ({ cards, isLoading, ...restProps }) => {
+const CardView = ({ cards, isLoading, cardQueryKey, ...restProps }) => {
   const location = useLocation();
   const [cardCategory, setCardCategory] = useState('all');
   const [viewType, setViewType] = useLocalStorage(

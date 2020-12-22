@@ -12,7 +12,7 @@ import {
   Heading4,
 } from '@trig-app/core-components';
 import { string } from 'yup';
-import { useMutation, useQueryCache } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import Modal from './Modal';
 import ServiceModal from './ServiceModal';
 import { createCard } from '../utils/cardClient';
@@ -202,34 +202,34 @@ const CreateButtonTypes = {
 const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isConnectAppOpen, setIsConnectAppOpen] = useState(false);
-  const queryCache = useQueryCache();
-  const [createCardMutate, { isLoading: isCreateCardLoading }] = useMutation(
-    createCard,
-    {
-      onMutate: newCard => {
-        queryCache.cancelQueries('cards');
-        const previousCards = queryCache.getQueryData('cards') ?? { data: [] };
-        const newCards = [
-          {
-            url: newCard.url,
-            title: newCard.url,
-            cardType: 'link',
-            user: {
-              email: 'brian@trytrig.com',
-            },
-            createdAt: new Date(),
-            isFavorited: false,
-            totalFavorites: 0,
+  const queryClient = useQueryClient();
+  const {
+    mutate: createCardMutate,
+    isLoading: isCreateCardLoading,
+  } = useMutation(createCard, {
+    onMutate: newCard => {
+      queryClient.cancelQueries('cards');
+      const previousCards = queryClient.getQueryData('cards') ?? { data: [] };
+      const newCards = [
+        {
+          url: newCard.url,
+          title: newCard.url,
+          cardType: 'link',
+          user: {
+            email: 'brian@trytrig.com',
           },
-          ...previousCards.data,
-        ];
+          createdAt: new Date(),
+          isFavorited: false,
+          totalFavorites: 0,
+        },
+        ...previousCards.data,
+      ];
 
-        queryCache.setQueryData('cards', () => ({ data: newCards }));
-        return () => queryCache.setQueryData('cards', previousCards);
-      },
-      onError: (error, newCard, rollback) => rollback(),
-    }
-  );
+      queryClient.setQueryData('cards', () => ({ data: newCards }));
+      return () => queryClient.setQueryData('cards', previousCards);
+    },
+    onError: (error, newCard, rollback) => rollback(),
+  });
 
   return (
     <>

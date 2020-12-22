@@ -8,7 +8,6 @@ import {
   HugeStyles,
   Heading2,
   Heading1,
-  Loading,
 } from '@trig-app/core-components';
 import {
   TabsNavigation,
@@ -115,7 +114,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
     queryConfig: { enabled: false },
   });
 
-  const debouncedFetch = useCallback(debounce(fetchCards, 50), []);
+  const debouncedFetch = useCallback(debounce(fetchCards, 150), []);
 
   useEffect(() => {
     if (!searchInput) return;
@@ -310,7 +309,6 @@ const Search = ({ onRequestClose, defaultInput }) => {
                     {!isLoading && cards.length === 0 && (
                       <Heading1>No results</Heading1>
                     )}
-                    {isLoading && <Loading size={4.8} />}
                     <ul
                       css={`
                         padding: 0;

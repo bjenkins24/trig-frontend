@@ -6,101 +6,28 @@ import {
   Body2,
   HorizontalGroup,
 } from '@trig-app/core-components';
-import { useParams } from 'react-router-dom';
-import faker from 'faker';
 import Hero from '../components/Hero';
 import Head from '../components/Head';
+import Content from '../components/Content';
 import { heroContentMaxWidth } from '../utils/constants';
-
-const data = [
-  {
-    id: 1,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    position: faker.name.jobTitle(),
-    email: faker.internet.email(),
-    profilePicture: faker.image.avatar(),
-  },
-  {
-    id: 2,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    position: faker.name.jobTitle(),
-    email: faker.internet.email(),
-    profilePicture: faker.image.avatar(),
-  },
-  {
-    id: 3,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    position: faker.name.jobTitle(),
-    email: faker.internet.email(),
-    profilePicture: faker.image.avatar(),
-  },
-  {
-    id: 4,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    position: faker.name.jobTitle(),
-    email: faker.internet.email(),
-    profilePicture: faker.image.avatar(),
-  },
-  {
-    id: 5,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    position: faker.name.jobTitle(),
-    email: faker.internet.email(),
-    profilePicture: faker.image.avatar(),
-  },
-  {
-    id: 6,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    position: faker.name.jobTitle(),
-    email: faker.internet.email(),
-    profilePicture: faker.image.avatar(),
-  },
-  {
-    id: 7,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    position: faker.name.jobTitle(),
-    email: faker.internet.email(),
-    profilePicture: faker.image.avatar(),
-  },
-  {
-    id: 8,
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    position: faker.name.jobTitle(),
-    email: faker.internet.email(),
-    profilePicture: faker.image.avatar(),
-  },
-];
-
-const totalCards = 245;
+import { useAuth } from '../context/authContext';
 
 const Profile = () => {
-  const { id } = useParams();
+  const { user } = useAuth();
 
-  let isCurrentUser = false;
-  if (typeof id === 'undefined') {
-    isCurrentUser = true;
-  }
-
-  let user = data[0];
-  if (!isCurrentUser) {
-    [user] = data.filter(person => person.id === parseInt(id, 10));
+  let title = 'Profile';
+  if (user.firstName || user.lastName) {
+    title = `${user?.firstName} ${user?.lastName}`;
   }
 
   return (
     <>
-      <Head title={`${user.firstName} ${user.lastName}`} />
+      <Head title={title} />
       <Hero
         css={`
           padding-top: ${({ theme }) => theme.space[5]}px;
           padding-bottom: 0;
+          margin-bottom: ${({ theme }) => theme.space[6]}px;
         `}
       >
         <div
@@ -119,6 +46,7 @@ const Profile = () => {
               css={`
                 position: absolute;
                 bottom: -${({ theme }) => theme.space[4]}px;
+                border-radius: 50%;
                 box-shadow: ${({ theme }) => theme.sh};
               `}
             />
@@ -148,7 +76,7 @@ const Profile = () => {
               >
                 <VerticalGroup>
                   <Body2 color="pc" weight="bold">
-                    {totalCards}
+                    {user.total_cards}
                   </Body2>
                   <Body2 color="ps.200">Cards</Body2>
                 </VerticalGroup>
@@ -157,7 +85,9 @@ const Profile = () => {
           </HorizontalGroup>
         </div>
       </Hero>
-      <h1>Settings</h1>
+      <Content>
+        <h1>Settings</h1>
+      </Content>
     </>
   );
 };

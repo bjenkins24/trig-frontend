@@ -3,7 +3,7 @@ import Content from './Content';
 import CardView from './CardView';
 import Filters from './Filters';
 import useFilters from '../utils/useFilters';
-import useCards from '../utils/useCards';
+import useCards, { CardQueryContext } from '../utils/useCards';
 
 const Cards = props => {
   const { queryString, filterProps } = useFilters();
@@ -16,15 +16,16 @@ const Cards = props => {
       `}
       {...props}
     >
-      <CardView
-        cards={cards}
-        cardQueryKey={cardQueryKey}
-        isLoading={isLoading}
-        css={`
-          margin-right: ${({ theme }) => theme.space[5]}px;
-        `}
-      />
-      <Filters tags={filters.tags} types={filters.types} {...filterProps} />
+      <CardQueryContext.Provider value={cardQueryKey}>
+        <CardView
+          cards={cards}
+          isLoading={isLoading}
+          css={`
+            margin-right: ${({ theme }) => theme.space[5]}px;
+          `}
+        />
+        <Filters tags={filters.tags} types={filters.types} {...filterProps} />
+      </CardQueryContext.Provider>
     </Content>
   );
 };

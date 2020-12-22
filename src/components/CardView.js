@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import get from 'lodash/get';
@@ -19,7 +19,7 @@ import { MasonryScroller, usePositioner, useResizeObserver } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, deleteCard } from '../utils/cardClient';
 import { useAuth } from '../context/authContext';
-import { generalCardQueryKey } from '../utils/useCards';
+import { CardQueryContext } from '../utils/useCards';
 
 export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewedBy: userId });
@@ -104,11 +104,11 @@ export const useFavorite = cardQueryKey => {
   };
 };
 
-export const makeMoreList = ({ mutate, title, id }) => [
+export const makeMoreList = ({ mutate, id }) => [
   {
     onClick: async () => {
       toast({
-        message: `The card "${title}" was removed from Trig successfully.`,
+        message: `The card was removed from Trig successfully.`,
       });
       await mutate({ id });
     },
@@ -123,8 +123,9 @@ export const makeMoreList = ({ mutate, title, id }) => [
 
 /* eslint-disable */
 const CardBase = ({ data }) => {
-  const mutateFavorite = useFavorite(generalCardQueryKey);
-  const mutateDelete = useDelete(generalCardQueryKey);
+  const cardQueryKey = useContext(CardQueryContext);
+  const mutateFavorite = useFavorite(cardQueryKey);
+  const mutateDelete = useDelete(cardQueryKey);
   const { user } = useAuth();
 
   const queryClient = useQueryClient();
@@ -164,7 +165,6 @@ const CardBase = ({ data }) => {
       navigationList={makeMoreList({
         mutate: mutateDelete,
         id: data.id,
-        title: data.title,
       })}
     />
   );
@@ -176,8 +176,9 @@ const CardRenderer = ({ data }) => {
 };
 
 const CardListItem = React.memo(({ card }) => {
-  const updateFavorite = useFavorite(generalCardQueryKey);
-  const mutateDelete = useDelete(generalCardQueryKey);
+  const cardQueryKey = useContext(CardQueryContext);
+  const updateFavorite = useFavorite(cardQueryKey);
+  const mutateDelete = useDelete(cardQueryKey);
   const { user } = useAuth();
 
   return (
@@ -208,7 +209,6 @@ const CardListItem = React.memo(({ card }) => {
       navigationList={makeMoreList({
         mutate: mutateDelete,
         id: card.id,
-        title: card.title,
       })}
     />
   );
@@ -218,16 +218,14 @@ const CardListItem = React.memo(({ card }) => {
 const CardViewProps = {
   cards: PropTypes.array,
   isLoading: PropTypes.bool,
-  cardQueryKey: PropTypes.string,
 };
 
 const defaultProps = {
   cards: [],
   isLoading: false,
-  cardQueryKey: 'cards',
 };
 
-const CardView = ({ cards, isLoading, cardQueryKey, ...restProps }) => {
+const CardView = ({ cards, isLoading, ...restProps }) => {
   const location = useLocation();
   const [cardCategory, setCardCategory] = useState('all');
   const [viewType, setViewType] = useLocalStorage(

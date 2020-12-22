@@ -1,8 +1,10 @@
 import get from 'lodash/get';
 import { useQuery } from 'react-query';
+import { createContext } from 'react';
 import { getCards } from './cardClient';
 
 export const generalCardQueryKey = 'cards';
+export const CardQueryContext = createContext('cards');
 
 const useCards = ({ queryString, queryConfig }) => {
   const queryKey = `${generalCardQueryKey}?${queryString}`;

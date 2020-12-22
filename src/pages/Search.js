@@ -112,9 +112,10 @@ const Search = ({ onRequestClose, defaultInput }) => {
   const cardQueryKey = `h=1&q=${searchInput}&${queryString}`;
   const { cards, totalResults, fetchCards, isLoading, filters } = useCards({
     queryString: cardQueryKey,
+    queryConfig: { enabled: false },
   });
 
-  const debouncedFetch = useCallback(debounce(fetchCards, 200), []);
+  const debouncedFetch = useCallback(debounce(fetchCards, 50), []);
 
   useEffect(() => {
     if (!searchInput) return;
@@ -322,7 +323,7 @@ const Search = ({ onRequestClose, defaultInput }) => {
                             <CardResult
                               key={card.id}
                               card={card}
-                              cardQueryKey={cardQueryKey}
+                              cardQueryKey={`cards?${cardQueryKey}`}
                             />
                           );
                         })}

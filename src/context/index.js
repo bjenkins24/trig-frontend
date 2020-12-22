@@ -7,7 +7,13 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { AuthProvider } from './authContext';
 import { OpenCardProvider } from './openCardContext';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      keepPreviousData: true,
+    },
+  },
+});
 
 const AppProviders = ({ children }) => {
   return (

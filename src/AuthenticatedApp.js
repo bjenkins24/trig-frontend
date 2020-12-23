@@ -8,8 +8,7 @@ import Header from './components/Header';
 import OpenCard from './components/OpenCard';
 import Collection from './pages/Collection';
 import OauthConnect from './pages/OauthConnect';
-import Profile from './pages/Profile';
-import People from './pages/People';
+import AccountSettings from './pages/AccountSettings';
 import useSearch from './utils/useSearch';
 
 const AuthenticatedApp = () => {
@@ -58,13 +57,7 @@ const AuthenticatedApp = () => {
           <Collection />
         </Route>
         <Route path="/account">
-          <Profile />
-        </Route>
-        <Route path="/people/:id">
-          <Profile />
-        </Route>
-        <Route path="/people">
-          <People />
+          <AccountSettings />
         </Route>
         <Route path="/card/:id">
           <OpenCard />

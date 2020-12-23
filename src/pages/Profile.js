@@ -9,12 +9,30 @@ import {
   Button,
   toast,
 } from '@trig-app/core-components';
+import { useMutation, useQueryClient } from 'react-query';
+import { object, string } from 'yup';
 import Head from '../components/Head';
 import useUser from '../utils/useUser';
 import { updateUser } from '../utils/authClient';
 
 const Profile = () => {
-  const { user } = useUser();
+  const { user, queryKey } = useUser();
+  const queryClient = useQueryClient();
+  const { mutate, isLoading } = useMutation(updateUser, {
+    onMutate: async fields => {
+      await queryClient.cancelQueries(queryKey);
+      const previousUser = queryClient.getQueryData(queryKey);
+      queryClient.setQueryData(queryKey, () => {
+        return {
+          data: {
+            ...previousUser.user,
+            ...fields,
+          },
+        };
+      });
+      return () => queryClient.setQueryData(queryKey, previousUser);
+    },
+  });
 
   let title = 'Profile';
   if (user.firstName || user.lastName) {
@@ -38,11 +56,34 @@ const Profile = () => {
             last_name: user.last_name,
             email: user.email,
           }}
-          onSubmit={async fields => {
-            toast({
-              message: 'Your account settings have been saved successfuly.',
+          validationSchema={object().shape({
+            email: string()
+              .required('You must enter a valid email address.')
+              .email('You must enter a valid email address.'),
+          })}
+          onSubmit={fields => {
+            mutate(fields, {
+              onError: error => {
+                if (error.error === 'email_exists') {
+                  toast({
+                    type: 'error',
+                    message:
+                      "There's another account already using the email you entered. Please try again.",
+                  });
+                } else {
+                  toast({
+                    type: 'error',
+                    message: 'Something went wrong. Please try again.',
+                  });
+                }
+              },
+              onSuccess: () => {
+                toast({
+                  message:
+                    'You account settings have been updated successfully.',
+                });
+              },
             });
-            await updateUser(fields);
           }}
         >
           {({ handleSubmit, dirty, form }) => {
@@ -62,7 +103,7 @@ const Profile = () => {
                   </HorizontalGroup>
                   <StringFieldForm name="email" label="Email" />
                 </Fieldset>
-                {dirty && (
+                {(dirty || isLoading) && (
                   <div
                     css={`
                       display: flex;
@@ -75,7 +116,7 @@ const Profile = () => {
                         margin-left: auto;
                       `}
                     >
-                      <Button size="lg" type="submit">
+                      <Button size="lg" type="submit" loading={isLoading}>
                         Save
                       </Button>
                       <Button
@@ -94,16 +135,14 @@ const Profile = () => {
         </Form>
         <Form
           initialValues={{
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
+            old_password: '',
+            new_password: '',
           }}
           onSubmit={async fields => {
-            toast({ message: 'Your password was saved successfully.' });
-            await updateUser(fields);
+            await mutate(fields);
           }}
         >
-          {({ handleSubmit, dirty, form }) => {
+          {({ handleSubmit, dirty, form, submitting }) => {
             return (
               <form
                 css={`
@@ -140,7 +179,7 @@ const Profile = () => {
                         margin-left: auto;
                       `}
                     >
-                      <Button size="lg" type="submit">
+                      <Button size="lg" type="submit" loading={submitting}>
                         Save
                       </Button>
                       <Button

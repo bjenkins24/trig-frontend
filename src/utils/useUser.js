@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from 'react-query';
+import get from 'lodash/get';
 import * as authClient from './authClient';
 import { getUser } from './authClient';
 
@@ -12,22 +13,22 @@ const useUser = () => {
 
   const login = async params => {
     const result = await authClient.login(params);
-    queryClient.setQueryData(queryKey, result);
+    queryClient.setQueryData(queryKey, { data: result });
   };
 
   const register = async params => {
     const result = await authClient.register(params);
-    queryClient.setQueryData(queryKey, result);
+    queryClient.setQueryData(queryKey, { data: result });
   };
 
   const resetPassword = async params => {
     const result = await authClient.resetPassword(params);
-    queryClient.setQueryData(queryKey, result);
+    queryClient.setQueryData(queryKey, { data: result });
   };
 
   const googleSSO = async params => {
     const result = await authClient.googleSSO(params);
-    queryClient.setQueryData(queryKey, result);
+    queryClient.setQueryData(queryKey, { data: result });
   };
 
   const logout = () => {
@@ -37,8 +38,9 @@ const useUser = () => {
   };
 
   return {
-    user,
+    user: get(user, 'data', null),
     isLoading,
+    queryKey,
     login,
     register,
     resetPassword,

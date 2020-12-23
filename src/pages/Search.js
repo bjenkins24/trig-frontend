@@ -16,7 +16,7 @@ import {
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import Filters from '../components/Filters';
-import { useAuth } from '../context/authContext';
+import useUser from '../utils/useUser';
 import {
   makeMoreList,
   saveView,
@@ -56,7 +56,7 @@ const defaultProps = {
 
 /* eslint-disable react/prop-types */
 const CardResult = React.memo(({ card, cardQueryKey }) => {
-  const { user } = useAuth();
+  const { user } = useUser();
   const mutateFavorite = useFavorite(cardQueryKey);
   const mutateDelete = useDelete(cardQueryKey);
 

@@ -15,7 +15,7 @@ import { device } from '@trig-app/constants';
 import Layout from '../components/Layout';
 import FullPageSpinner from '../components/FullPageSpinner';
 import AuthBox from '../components/AuthBox';
-import { useAuth } from '../context/authContext';
+import useUser from '../utils/useUser';
 import { validateResetUrl } from '../utils/authClient';
 import useSafeSetState from '../utils/useSafeSetState';
 
@@ -43,7 +43,7 @@ const ResetPassword = () => {
   const [isValidatingToken, setIsValidatingToken] = useState(true);
   const [isValidToken, setIsValidToken] = useState(false);
   const { token, emailHash } = useParams();
-  const { resetPassword } = useAuth();
+  const { resetPassword } = useUser();
   const history = useHistory();
   const safeSetIsValidatingToken = useSafeSetState(setIsValidatingToken);
   const safeSetIsValidToken = useSafeSetState(setIsValidToken);

@@ -10,11 +10,11 @@ import {
   toast,
 } from '@trig-app/core-components';
 import Head from '../components/Head';
-import { useAuth } from '../context/authContext';
+import useUser from '../utils/useUser';
 import { updateUser } from '../utils/authClient';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user } = useUser();
 
   let title = 'Profile';
   if (user.firstName || user.lastName) {
@@ -40,7 +40,7 @@ const Profile = () => {
           }}
           onSubmit={async fields => {
             toast({
-              message: 'Your contact info has been saved successfuly.',
+              message: 'Your account settings have been saved successfuly.',
             });
             await updateUser(fields);
           }}

@@ -13,7 +13,7 @@ import {
   toast,
 } from '@trig-app/core-components';
 import { device } from '@trig-app/constants/src';
-import { useAuth } from '../context/authContext';
+import useUser from '../utils/useUser';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
 import GoogleSSOButton from '../components/GoogleSSOButton';
@@ -41,7 +41,7 @@ const Or = styled.p`
 
 const Register = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const { register } = useAuth();
+  const { register } = useUser();
   const history = useHistory();
 
   if (isLoggingIn) {

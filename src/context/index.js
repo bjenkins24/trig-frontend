@@ -4,7 +4,6 @@ import theme from '@trig-app/themes';
 import { ThemeProvider } from 'styled-components';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { AuthProvider } from './authContext';
 import { OpenCardProvider } from './openCardContext';
 
 const queryClient = new QueryClient({
@@ -20,9 +19,7 @@ const AppProviders = ({ children }) => {
     <ThemeProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <OpenCardProvider>
-          <Router>
-            <AuthProvider>{children}</AuthProvider>
-          </Router>
+          <Router>{children}</Router>
         </OpenCardProvider>
       </QueryClientProvider>
     </ThemeProvider>

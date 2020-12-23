@@ -17,7 +17,7 @@ import { CardItem } from '@trig-app/core-components/dist/compositions';
 import { MasonryScroller, usePositioner, useResizeObserver } from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, deleteCard } from '../utils/cardClient';
-import { useAuth } from '../context/authContext';
+import useUser from '../utils/useUser';
 import { CardQueryContext } from '../utils/useCards';
 
 export const saveView = async ({ id, userId }) => {
@@ -56,7 +56,7 @@ export const useDelete = cardQueryKey => {
 // For some reason useMutate makes the heart flash a little bit - so we're just doing it manually instead
 export const useFavorite = cardQueryKey => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user } = useUser();
 
   return async fields => {
     queryClient.cancelQueries(cardQueryKey);
@@ -125,7 +125,7 @@ const CardBase = ({ data }) => {
   const cardQueryKey = useContext(CardQueryContext);
   const mutateFavorite = useFavorite(cardQueryKey);
   const mutateDelete = useDelete(cardQueryKey);
-  const { user } = useAuth();
+  const { user } = useUser();
 
   const queryClient = useQueryClient();
   return (
@@ -170,7 +170,7 @@ const CardListItem = React.memo(({ card }) => {
   const cardQueryKey = useContext(CardQueryContext);
   const updateFavorite = useFavorite(cardQueryKey);
   const mutateDelete = useDelete(cardQueryKey);
-  const { user } = useAuth();
+  const { user } = useUser();
 
   return (
     <CardItem

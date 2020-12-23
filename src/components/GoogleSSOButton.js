@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 import GoogleLogin from 'react-google-login';
 import { toast, Button } from '@trig-app/core-components';
-import { useAuth } from '../context/authContext';
+import useUser from '../utils/useUser';
 
 const GoogleSSOButton = ({ children, onSuccess, ...restProps }) => {
-  const { googleSSO } = useAuth();
+  const { googleSSO } = useUser();
   const history = useHistory();
 
   return (

@@ -12,7 +12,7 @@ import {
 import { TabsNavigation } from '@trig-app/core-components/dist/compositions';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { VerticalGroup } from '@trig-app/core-components/src/Groups';
-import { useAuth } from '../context/authContext';
+import useUser from '../utils/useUser';
 import ServiceModal from './ServiceModal';
 import { useOpenCard } from '../context/openCardContext';
 
@@ -27,7 +27,7 @@ const HeaderProps = {
 };
 
 const Header = ({ links, openSearch, ...restProps }) => {
-  const { logout } = useAuth();
+  const { logout } = useUser();
   const [isConnectedServicesOpen, setIsConnectedServicesOpen] = useState(false);
   const history = useHistory();
   const location = useLocation();

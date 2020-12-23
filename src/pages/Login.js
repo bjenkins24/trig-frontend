@@ -15,7 +15,7 @@ import {
 import { device } from '@trig-app/constants/src';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
-import { useAuth } from '../context/authContext';
+import useUser from '../utils/useUser';
 import GoogleSSOButton from '../components/GoogleSSOButton';
 import FullPageSpinner from '../components/FullPageSpinner';
 
@@ -57,7 +57,7 @@ const Or = styled.p`
 
 const Login = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const { login } = useAuth();
+  const { login } = useUser();
   const history = useHistory();
 
   if (isLoggingIn) {

@@ -19,6 +19,10 @@ const getUser = async () => {
   return client('me');
 };
 
+const updateUser = async fields => {
+  return client('me', { method: 'PATCH', body: { ...fields } });
+};
+
 const login = async ({ email, password }) => {
   const result = await client('login', { body: { email, password } });
   return handleUserResponse(result);
@@ -78,5 +82,7 @@ export {
   getUser,
   googleSSO,
   isLoggedIn,
+  updateUser,
 };
+
 export { logout } from './apiClient';

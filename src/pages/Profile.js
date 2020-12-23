@@ -7,9 +7,11 @@ import {
   Form,
   StringFieldForm,
   Button,
+  toast,
 } from '@trig-app/core-components';
 import Head from '../components/Head';
 import { useAuth } from '../context/authContext';
+import { updateUser } from '../utils/authClient';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -36,7 +38,12 @@ const Profile = () => {
             last_name: user.last_name,
             email: user.email,
           }}
-          onSubmit={() => console.log('submitted')}
+          onSubmit={async fields => {
+            toast({
+              message: 'Your contact info has been saved successfuly.',
+            });
+            await updateUser(fields);
+          }}
         >
           {({ handleSubmit, dirty, form }) => {
             return (
@@ -91,7 +98,10 @@ const Profile = () => {
             last_name: user.last_name,
             email: user.email,
           }}
-          onSubmit={() => console.log('submitted')}
+          onSubmit={async fields => {
+            toast({ message: 'Your password was saved successfully.' });
+            await updateUser(fields);
+          }}
         >
           {({ handleSubmit, dirty, form }) => {
             return (
@@ -105,8 +115,16 @@ const Profile = () => {
                 <Fieldset width="100%">
                   <Legend>Change Password</Legend>
                   <HorizontalGroup margin={1.6}>
-                    <StringFieldForm name="old_password" label="Old Password" />
-                    <StringFieldForm name="new_password" label="New Password" />
+                    <StringFieldForm
+                      type="password"
+                      name="old_password"
+                      label="Old Password"
+                    />
+                    <StringFieldForm
+                      type="password"
+                      name="new_password"
+                      label="New Password"
+                    />
                   </HorizontalGroup>
                 </Fieldset>
                 {dirty && (

@@ -57,7 +57,7 @@ const AuthenticatedApp = () => {
         <Route path="/collection/:id">
           <Collection />
         </Route>
-        <Route path="/profile">
+        <Route path="/account">
           <Profile />
         </Route>
         <Route path="/people/:id">

@@ -125,13 +125,9 @@ const Header = ({ links, openSearch, ...restProps }) => {
                 `}
                 navigationList={[
                   {
-                    item: 'Profile',
-                    onClick: () => history.push('/profile'),
+                    item: 'Account Settings',
+                    onClick: () => history.push('/account'),
                   },
-                  // {
-                  //   item: 'Connected Services',
-                  //   onClick: () => setIsConnectedServicesOpen(true),
-                  // },
                   { item: 'Logout', onClick: logout },
                 ]}
               >

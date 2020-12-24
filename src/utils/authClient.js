@@ -19,6 +19,10 @@ const getUser = async () => {
   return client('me');
 };
 
+const deleteUser = async () => {
+  return client('me', { method: 'DELETE' });
+};
+
 const updateUser = async fields => {
   return client('me', { method: 'PATCH', body: { ...fields } });
 };
@@ -83,6 +87,7 @@ export {
   googleSSO,
   isLoggedIn,
   updateUser,
+  deleteUser,
 };
 
 export { logout } from './apiClient';

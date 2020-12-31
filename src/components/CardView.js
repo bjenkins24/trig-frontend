@@ -61,23 +61,30 @@ export const useFavorite = cardQueryKey => {
   return async fields => {
     await queryClient.cancelQueries(cardQueryKey);
     const previousCards = queryClient.getQueryData(cardQueryKey);
-    const newCards = get(previousCards, 'data', []).map(previousCard => {
-      if (previousCard.id === fields.id) {
-        if (fields.isFavorited) {
+    let newCards = [];
+    if (cardQueryKey.includes('favorites')) {
+      newCards = get(previousCards, 'data', []).filter(
+        card => card.id !== fields.id
+      );
+    } else {
+      newCards = get(previousCards, 'data', []).map(previousCard => {
+        if (previousCard.id === fields.id) {
+          if (fields.isFavorited) {
+            return {
+              ...previousCard,
+              totalFavorites: previousCard.totalFavorites + 1,
+              isFavorited: true,
+            };
+          }
           return {
             ...previousCard,
-            totalFavorites: previousCard.totalFavorites + 1,
-            isFavorited: true,
+            totalFavorites: previousCard.totalFavorites - 1,
+            isFavorited: false,
           };
         }
-        return {
-          ...previousCard,
-          totalFavorites: previousCard.totalFavorites - 1,
-          isFavorited: false,
-        };
-      }
-      return previousCard;
-    });
+        return previousCard;
+      });
+    }
     queryClient.setQueryData(cardQueryKey, () => ({
       ...previousCards,
       data: newCards,
@@ -91,8 +98,6 @@ export const useFavorite = cardQueryKey => {
       }
       delete newFields.isFavorited;
       await updateCard(newFields);
-      // We're not going to invalidate the query because it makes the heart flash
-      await queryClient.invalidateQueries(cardQueryKey);
     } catch (error) {
       // Rollback
       queryClient.setQueryData(cardQueryKey, previousCards);

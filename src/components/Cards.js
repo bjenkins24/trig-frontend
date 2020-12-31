@@ -6,7 +6,7 @@ import useFilters from '../utils/useFilters';
 import useCards, { CardQueryContext } from '../utils/useCards';
 
 const Cards = props => {
-  const { queryString, filterProps } = useFilters();
+  const { queryString, filterProps, cardViewProps } = useFilters();
   const { cards, filters, isLoading, cardQueryKey } = useCards({ queryString });
 
   return (
@@ -23,6 +23,7 @@ const Cards = props => {
           css={`
             margin-right: ${({ theme }) => theme.space[5]}px;
           `}
+          {...cardViewProps}
         />
         <Filters tags={filters.tags} types={filters.types} {...filterProps} />
       </CardQueryContext.Provider>

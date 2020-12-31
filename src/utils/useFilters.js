@@ -5,6 +5,10 @@ const useFilters = () => {
   const [endDate, setEndDate] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
+  const [cardCohort, setCardCohort] = useState({
+    value: 'all',
+    label: 'All Cards',
+  });
 
   const dateAdjust = ({ date, type }) => {
     if (!date) return null;
@@ -28,6 +32,7 @@ const useFilters = () => {
       e: dateAdjust({ date: endDate, type: 'end' }),
       t: selectedTags.join(',') || null,
       ty: selectedTypes.join(',') || null,
+      c: cardCohort.value || null,
     });
 
     // remove null values
@@ -58,6 +63,10 @@ const useFilters = () => {
       setSelectedTypes,
     },
     queryString: createQueryString(),
+    cardViewProps: {
+      setCardCohort,
+      cardCohort,
+    },
   };
 };
 

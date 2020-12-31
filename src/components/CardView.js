@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import get from 'lodash/get';
@@ -210,6 +210,8 @@ const CardListItem = React.memo(({ card }) => {
 
 const CardViewProps = {
   cards: PropTypes.array,
+  cardCohort: PropTypes.string.isRequired,
+  setCardCohort: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
 };
 
@@ -218,9 +220,14 @@ const defaultProps = {
   isLoading: false,
 };
 
-const CardView = ({ cards, isLoading, ...restProps }) => {
+const CardView = ({
+  cards,
+  cardCohort,
+  setCardCohort,
+  isLoading,
+  ...restProps
+}) => {
   const location = useLocation();
-  const [cardCategory, setCardCategory] = useState('all');
   const [viewType, setViewType] = useLocalStorage(
     `card-view-location:${location.pathname}`,
     'thumbnail'
@@ -266,12 +273,11 @@ const CardView = ({ cards, isLoading, ...restProps }) => {
           css={`
             margin-left: auto;
           `}
-          value={cardCategory}
-          onChange={value => setCardCategory(value)}
+          value={cardCohort}
+          onChange={value => setCardCohort(value)}
           options={[
             { value: 'all', label: 'All Cards' },
-            { value: 'recent', label: 'Recently Viewed' },
-            { value: 'most-viewed', label: 'Most Viewed' },
+            { value: 'recently-viewed', label: 'Recently Viewed' },
             { value: 'favorites', label: 'Favorites' },
           ]}
         />

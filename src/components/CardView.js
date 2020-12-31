@@ -59,7 +59,7 @@ export const useFavorite = cardQueryKey => {
   const { user } = useUser();
 
   return async fields => {
-    queryClient.cancelQueries(cardQueryKey);
+    await queryClient.cancelQueries(cardQueryKey);
     const previousCards = queryClient.getQueryData(cardQueryKey);
     const newCards = get(previousCards, 'data', []).map(previousCard => {
       if (previousCard.id === fields.id) {
@@ -92,6 +92,7 @@ export const useFavorite = cardQueryKey => {
       delete newFields.isFavorited;
       await updateCard(newFields);
       // We're not going to invalidate the query because it makes the heart flash
+      await queryClient.invalidateQueries(cardQueryKey);
     } catch (error) {
       // Rollback
       queryClient.setQueryData(cardQueryKey, previousCards);

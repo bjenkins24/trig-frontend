@@ -6,25 +6,139 @@ import {
   Checkbox,
   Body3,
   DateRangeField,
+  SelectField,
 } from '@trig-app/core-components';
 
-// eslint-disable-next-line
-const Item = ({ label, ...restProps }) => {
+const filterCategoryProps = {
+  categoryName: PropTypes.string.isRequired,
+  items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  selectedItems: PropTypes.arrayOf(PropTypes.string).isRequired,
+  setSelectedItems: PropTypes.func.isRequired,
+};
+
+export const FilterCategory = ({
+  categoryName,
+  items,
+  selectedItems,
+  setSelectedItems,
+}) => {
+  const [isMoreExpanded, setIsMoreExpanded] = useState(false);
+
+  const totalItems = items.length;
+  if (totalItems <= 1 && selectedItems.length === 0) {
+    return null;
+  }
+
+  const maxDefaultFilters = 5;
+  const maxWithSearchFilters = 10;
+  const maxWithoutSearchFilters = 14;
+
+  let slicedItems = items;
+  let searchItems = [];
+
+  if (!isMoreExpanded) {
+    if (totalItems < maxWithSearchFilters) {
+      slicedItems = items;
+    } else {
+      slicedItems = items.slice(0, maxDefaultFilters);
+    }
+  }
+
+  if (isMoreExpanded) {
+    if (totalItems <= maxWithoutSearchFilters) {
+      slicedItems = items;
+    } else {
+      slicedItems = items.slice(0, maxWithSearchFilters);
+      searchItems = items.slice(maxWithSearchFilters - 1);
+    }
+  }
+
   return (
-    <Checkbox
-      width="100%"
-      labelProps={{
-        color: 'p',
-        style: { fontSize: '14px', marginTop: '2px' },
-      }}
-      label={label}
-      css={`
-        margin-bottom: ${({ theme }) => theme.space[2]}px;
-      `}
-      {...restProps}
-    />
+    <div>
+      <Body1
+        separator
+        color="ps.200"
+        css={`
+          margin-bottom: ${({ theme }) => theme.space[3]}px;
+        `}
+      >
+        {categoryName}
+      </Body1>
+      {slicedItems.map(item => (
+        <Checkbox
+          key={item.name}
+          width="100%"
+          labelProps={{
+            color: 'p',
+            style: { fontSize: '14px', marginTop: '2px' },
+          }}
+          label={`${item.name} (${item.count})`}
+          onChange={() => {
+            if (selectedItems.includes(item.name)) {
+              setSelectedItems(selectedItems.filter(i => i !== item.name));
+            } else {
+              setSelectedItems([...selectedItems, item.name]);
+            }
+          }}
+          checked={selectedItems.includes(item.name)}
+          css={`
+            margin-bottom: ${({ theme }) => theme.space[2]}px;
+          `}
+        />
+      ))}
+      {searchItems.length > 0 && (
+        <SelectField
+          placeholder="Search..."
+          width="100%"
+          value={1}
+          size="sm"
+          css={`
+            margin-top: ${({ theme }) => theme.space[3]}px;
+            margin-bottom: ${({ theme }) => theme.space[3]}px;
+          `}
+          onChange={() => null}
+          options={[
+            { value: 1, label: 'First one' },
+            { value: 2, label: 'Second one' },
+            { value: 3, label: 'Third one' },
+            { value: 4, label: 'Fourth one' },
+            { value: 5, label: 'Fifth one' },
+            { value: 6, label: 'Sixth one' },
+            { value: 7, label: 'Seventh one' },
+          ]}
+        />
+      )}
+      {items.length >= maxWithSearchFilters && (
+        <Body3
+          tabIndex="0"
+          role="button"
+          onClick={() => {
+            if (!isMoreExpanded) {
+              setIsMoreExpanded(true);
+            } else {
+              setIsMoreExpanded(false);
+            }
+          }}
+          color="ps.200"
+          css={`
+            &:hover,
+            &:focus {
+              color: ${({ theme }) => theme.colors.p};
+            }
+            cursor: pointer;
+            outline: none;
+            display: block;
+            margin-bottom: ${({ theme }) => theme.space[4]}px;
+          `}
+        >
+          {!isMoreExpanded ? 'More...' : 'Less...'}
+        </Body3>
+      )}
+    </div>
   );
 };
+
+FilterCategory.propTypes = filterCategoryProps;
 
 const FiltersProps = {
   startDate: PropTypes.instanceOf(Date),
@@ -46,9 +160,6 @@ const defaultProps = {
   types: [],
 };
 
-const maxTypes = 5;
-const maxTags = 5;
-
 const Filters = ({
   startDate,
   setStartDate,
@@ -62,10 +173,6 @@ const Filters = ({
   types,
   ...restProps
 }) => {
-  const [moreTags, setMoreTags] = useState(false);
-  const [moreTypes, setMoreTypes] = useState(false);
-  let totalTags = 0;
-  let totalTypes = 0;
   return (
     <div
       css={`
@@ -106,114 +213,18 @@ const Filters = ({
         />
       </div>
       <div>
-        {(tags.length > 0 || selectedTags.length > 0) && (
-          <div>
-            <Body1
-              separator
-              color="ps.200"
-              css={`
-                margin-bottom: ${({ theme }) => theme.space[3]}px;
-              `}
-            >
-              Topics
-            </Body1>
-            <>
-              {tags.map(tag => {
-                totalTags += 1;
-                if (totalTags > maxTags && !moreTags) return null;
-                return (
-                  <Item
-                    key={tag.tag}
-                    label={`${tag.tag} (${tag.count})`}
-                    onChange={() => {
-                      if (selectedTags.includes(tag.tag)) {
-                        setSelectedTags(
-                          selectedTags.filter(item => item !== tag.tag)
-                        );
-                      } else {
-                        setSelectedTags([...selectedTags, tag.tag]);
-                      }
-                    }}
-                    checked={selectedTags.includes(tag.tag)}
-                  />
-                );
-              })}
-            </>
-            {tags.length > maxTags && (
-              <Body3
-                onClick={() => {
-                  if (!moreTags) {
-                    setMoreTags(true);
-                  } else {
-                    setMoreTags(false);
-                  }
-                }}
-                color="ps.200"
-                css={`
-                  cursor: pointer;
-                  display: block;
-                  margin-bottom: ${({ theme }) => theme.space[4]}px;
-                `}
-              >
-                {!moreTags ? 'More...' : 'Less...'}
-              </Body3>
-            )}
-          </div>
-        )}
-        {(types.length > 1 || selectedTypes.length > 0) && (
-          <div>
-            <Body1
-              separator
-              color="ps.200"
-              css={`
-                margin-bottom: ${({ theme }) => theme.space[3]}px;
-              `}
-            >
-              Card Types
-            </Body1>
-            <>
-              {types.map(type => {
-                totalTypes += 1;
-                if (totalTypes > maxTypes && !moreTypes) return null;
-                return (
-                  <Item
-                    key={type.type}
-                    label={`${type.type} (${type.count})`}
-                    onChange={() => {
-                      if (selectedTypes.includes(type.type)) {
-                        setSelectedTypes(
-                          selectedTypes.filter(item => item !== type.type)
-                        );
-                      } else {
-                        setSelectedTypes([...selectedTypes, type.type]);
-                      }
-                    }}
-                    checked={selectedTypes.includes(type.type)}
-                  />
-                );
-              })}
-            </>
-            {types.length > maxTypes && (
-              <Body3
-                color="ps.200"
-                onClick={() => {
-                  if (!moreTypes) {
-                    setMoreTypes(true);
-                  } else {
-                    setMoreTypes(false);
-                  }
-                }}
-                css={`
-                  cursor: pointer;
-                  display: block;
-                  margin-bottom: ${({ theme }) => theme.space[4]}px;
-                `}
-              >
-                {!moreTypes ? 'More...' : 'Less...'}
-              </Body3>
-            )}
-          </div>
-        )}
+        <FilterCategory
+          categoryName="Topics"
+          items={tags}
+          setSelectedItems={setSelectedTags}
+          selectedItems={selectedTags}
+        />
+        <FilterCategory
+          categoryName="Card Types"
+          items={types}
+          setSelectedItems={setSelectedTypes}
+          selectedItems={selectedTypes}
+        />
       </div>
     </div>
   );

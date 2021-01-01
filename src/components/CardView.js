@@ -60,35 +60,45 @@ export const useFavorite = cardQueryKey => {
 
   return async fields => {
     await queryClient.cancelQueries(cardQueryKey);
-    const previousCards = queryClient.getQueryData(cardQueryKey);
     let newCards = [];
-    if (cardQueryKey.includes('favorites')) {
-      newCards = get(previousCards, 'data', []).filter(
-        card => card.id !== fields.id
-      );
-    } else {
-      newCards = get(previousCards, 'data', []).map(previousCard => {
-        if (previousCard.id === fields.id) {
-          if (fields.isFavorited) {
-            return {
-              ...previousCard,
-              totalFavorites: previousCard.totalFavorites + 1,
-              isFavorited: true,
-            };
-          }
-          return {
-            ...previousCard,
-            totalFavorites: previousCard.totalFavorites - 1,
-            isFavorited: false,
-          };
+
+    const previousCardsByQuery = {};
+    const queries = queryClient.getQueryCache().getAll();
+    queries.forEach(query => {
+      const { queryKey } = query;
+      if (queryKey.includes('cards')) {
+        const previousCards = queryClient.getQueryData(queryKey);
+        previousCardsByQuery[queryKey] = previousCards;
+        if (cardQueryKey.includes('favorites')) {
+          newCards = get(previousCards, 'data', []).filter(
+            card => card.id !== fields.id
+          );
+        } else {
+          newCards = get(previousCards, 'data', []).map(previousCard => {
+            if (previousCard.id === fields.id) {
+              if (fields.isFavorited) {
+                return {
+                  ...previousCard,
+                  totalFavorites: previousCard.totalFavorites + 1,
+                  isFavorited: true,
+                };
+              }
+              return {
+                ...previousCard,
+                totalFavorites: previousCard.totalFavorites - 1,
+                isFavorited: false,
+              };
+            }
+            return previousCard;
+          });
         }
-        return previousCard;
-      });
-    }
-    queryClient.setQueryData(cardQueryKey, () => ({
-      ...previousCards,
-      data: newCards,
-    }));
+        queryClient.setQueryData(queryKey, () => ({
+          ...previousCards,
+          data: newCards,
+        }));
+      }
+    });
+
     try {
       let newFields = fields;
       if (fields.isFavorited) {
@@ -100,7 +110,12 @@ export const useFavorite = cardQueryKey => {
       await updateCard(newFields);
     } catch (error) {
       // Rollback
-      queryClient.setQueryData(cardQueryKey, previousCards);
+      queries.forEach(query => {
+        const { queryKey } = query;
+        if (queryKey.includes('cards')) {
+          queryClient.setQueryData(queryKey, previousCardsByQuery[queryKey]);
+        }
+      });
       toast({
         type: 'error',
         message: 'Something went wrong, the card could not be favorited.',

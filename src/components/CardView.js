@@ -27,8 +27,8 @@ export const saveView = async ({ id, userId }) => {
 export const useDelete = cardQueryKey => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation(deleteCard, {
-    onMutate: deletedId => {
-      queryClient.cancelQueries(cardQueryKey);
+    onMutate: async deletedId => {
+      await queryClient.cancelQueries(cardQueryKey);
       const previousCards = queryClient.getQueryData(cardQueryKey);
       const newCards = get(previousCards, 'data', []).filter(
         previousCard => previousCard.id !== deletedId.id

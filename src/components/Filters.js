@@ -46,7 +46,11 @@ export const FilterCategory = ({
   });
 
   return (
-    <div>
+    <div
+      css={`
+        margin-bottom: ${({ theme }) => theme.space[4]}px;
+      `}
+    >
       <Body1
         separator
         color="ps.200"

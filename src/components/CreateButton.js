@@ -205,28 +205,8 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
     mutate: createCardMutate,
     isLoading: isCreateCardLoading,
   } = useMutation(createCard, {
-    onMutate: newCard => {
-      queryClient.cancelQueries('cards');
-      const previousCards = queryClient.getQueryData('cards') ?? { data: [] };
-      const newCards = [
-        {
-          url: newCard.url,
-          title: newCard.url,
-          cardType: 'link',
-          user: {
-            email: 'brian@trytrig.com',
-          },
-          createdAt: new Date(),
-          isFavorited: false,
-          totalFavorites: 0,
-        },
-        ...previousCards.data,
-      ];
-
-      queryClient.setQueryData('cards', () => ({ data: newCards }));
-      return () => queryClient.setQueryData('cards', previousCards);
-    },
     onError: (error, newCard, rollback) => rollback(),
+    onSuccess: () => queryClient.invalidateQueries('cards'),
   });
 
   return (

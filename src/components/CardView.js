@@ -24,22 +24,36 @@ export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewedBy: userId });
 };
 
-export const useDelete = cardQueryKey => {
+export const useDelete = () => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation(deleteCard, {
     onMutate: async deletedId => {
-      await queryClient.cancelQueries(cardQueryKey);
-      const previousCards = queryClient.getQueryData(cardQueryKey);
-      const newCards = get(previousCards, 'data', []).filter(
-        previousCard => previousCard.id !== deletedId.id
-      );
-      const newData = {
-        ...previousCards,
-        data: newCards,
-      };
-      newData.meta.totalResults = previousCards.meta.totalResults - 1;
-      queryClient.setQueryData(cardQueryKey, () => newData);
-      return () => queryClient.setQueryData(cardQueryKey, previousCards);
+      const previousCardsByQuery = {};
+      const queries = queryClient.getQueryCache().getAll();
+      queries.forEach(query => {
+        const { queryKey } = query;
+        if (!queryKey.includes('cards')) return;
+        queryClient.cancelQueries(queryKey);
+        const previousCards = queryClient.getQueryData(queryKey);
+        if (!previousCards) return;
+        previousCardsByQuery[queryKey] = previousCards;
+        const newCards = get(previousCards, 'data', []).filter(
+          previousCard => previousCard.id !== deletedId.id
+        );
+        const newData = {
+          ...previousCards,
+          data: newCards,
+        };
+        newData.meta.totalResults = previousCards.meta.totalResults - 1;
+        queryClient.setQueryData(queryKey, () => newData);
+      });
+
+      return () =>
+        queries.forEach(query => {
+          const { queryKey } = query;
+          if (!queryKey.includes('cards')) return;
+          queryClient.setQueryData(queryKey, previousCardsByQuery[queryKey]);
+        });
     },
     onError: (err, newCard, rollback) => {
       toast({
@@ -148,10 +162,8 @@ const CardBase = ({ data }) => {
   const mutateDelete = useDelete(cardQueryKey);
   const { user } = useUser();
 
-  const queryClient = useQueryClient();
   return (
     <Card
-      isLoading={!get(data, 'id', false) || !data.lastAttemptedSync}
       key={data.id}
       onClick={async () => {
         if (get(data, 'id', false)) {
@@ -169,10 +181,10 @@ const CardBase = ({ data }) => {
       openInNewTab
       title={data.title}
       href={data.url}
-      type={data.cardType}
-      image={data.image}
-      imageWidth={data.imageWidth}
-      imageHeight={data.imageHeight}
+      type={data.type}
+      image={data.thumbnail.path}
+      imageWidth={data.thumbnail.width}
+      imageHeight={data.thumbnail.height}
       renderAvatar={() => null}
       navigationList={makeMoreList({
         mutate: mutateDelete,
@@ -195,7 +207,6 @@ const CardListItem = React.memo(({ card }) => {
 
   return (
     <CardItem
-      isLoading={!get(card, 'id', false) || !card.lastAttemptedSync}
       href={card.url}
       onClick={async () => {
         if (get(card, 'id', false)) {
@@ -217,9 +228,8 @@ const CardListItem = React.memo(({ card }) => {
         lastName: card.user.lastName,
         email: card.user.email,
       }}
-      cardType={card.cardType}
+      cardType={card.type}
       title={card.title}
-      moreProps={{}}
       navigationList={makeMoreList({
         mutate: mutateDelete,
         id: card.id,

@@ -27,7 +27,7 @@ export const saveView = async ({ id, userId }) => {
 export const useDelete = () => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation(deleteCard, {
-    onMutate: async deletedId => {
+    onMutate: async ({ id: deletedId }) => {
       const previousCardsByQuery = {};
       const queries = queryClient.getQueryCache().getAll();
       queries.forEach(query => {
@@ -37,13 +37,45 @@ export const useDelete = () => {
         const previousCards = queryClient.getQueryData(queryKey);
         if (!previousCards) return;
         previousCardsByQuery[queryKey] = previousCards;
-        const newCards = get(previousCards, 'data', []).filter(
-          previousCard => previousCard.id !== deletedId.id
+
+        // Remove the tags for the card optimistically as well
+        const tagsToRemove = get(previousCards, 'data', []).reduce(
+          (accumulator, previousCard) => {
+            if (
+              previousCard.id !== deletedId ||
+              typeof previousCard.tags === 'undefined'
+            ) {
+              return accumulator;
+            }
+
+            return previousCard.tags;
+          },
+          []
         );
+
+        const newTags = get(previousCards, 'filters.tags', [])
+          .map(tag => {
+            const newTag = tag;
+            if (tagsToRemove.includes(tag.name)) {
+              newTag.count -= 1;
+            }
+            return newTag;
+          })
+          .reduce((accumulator, tag) => {
+            if (tag.count === 0) return accumulator;
+            return [...accumulator, tag];
+          }, []);
+
+        const newCards = get(previousCards, 'data', []).filter(
+          previousCard => previousCard.id !== deletedId
+        );
+
         const newData = {
           ...previousCards,
           data: newCards,
         };
+
+        newData.filters.tags = newTags;
         newData.meta.totalResults = previousCards.meta.totalResults - 1;
         queryClient.setQueryData(queryKey, () => newData);
       });
@@ -241,7 +273,10 @@ const CardListItem = React.memo(({ card }) => {
 
 const CardViewProps = {
   cards: PropTypes.array,
-  cardCohort: PropTypes.string.isRequired,
+  cardCohort: PropTypes.shape({
+    value: PropTypes.string,
+    label: PropTypes.string,
+  }).isRequired,
   setCardCohort: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
 };

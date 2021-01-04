@@ -13,8 +13,7 @@ const useUser = () => {
 
   const login = async params => {
     const result = await authClient.login(params);
-    const hasError = Boolean(get(result, 'error', null));
-    if (!hasError) {
+    if (!result?.error) {
       queryClient.setQueryData(queryKey, { data: result });
     }
     return result;
@@ -22,19 +21,25 @@ const useUser = () => {
 
   const register = async params => {
     const result = await authClient.register(params);
-    queryClient.setQueryData(queryKey, { data: result });
+    if (!result?.error) {
+      queryClient.setQueryData(queryKey, { data: result });
+    }
     return result;
   };
 
   const resetPassword = async params => {
     const result = await authClient.resetPassword(params);
-    queryClient.setQueryData(queryKey, { data: result });
+    if (!result?.error) {
+      queryClient.setQueryData(queryKey, { data: result });
+    }
     return result;
   };
 
   const googleSSO = async params => {
     const result = await authClient.googleSSO(params);
-    queryClient.setQueryData(queryKey, { data: result });
+    if (!result?.error) {
+      queryClient.setQueryData(queryKey, { data: result });
+    }
     return result;
   };
 

@@ -21,7 +21,7 @@ const useCards = ({ queryString, queryConfig }) => {
     cards: get(cards, 'data', []),
     filters: get(cards, 'filters', { tags: [], types: [] }),
     meta: get(cards, 'meta', {}),
-    totalResults: parseInt(get(cards, 'meta.totalResults', 0), 10),
+    totalResults: parseInt(get(cards, 'meta.total_results', 0), 10),
   };
 };
 

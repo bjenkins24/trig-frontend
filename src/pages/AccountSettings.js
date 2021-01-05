@@ -40,8 +40,8 @@ const Personal = ({ user, queryKey }) => {
   return (
     <Form
       initialValues={{
-        firstName: user.first_name,
-        lastName: user.last_name,
+        first_name: user.first_name,
+        last_name: user.last_name,
         email: user.email,
       }}
       validationSchema={object().shape({
@@ -85,8 +85,8 @@ const Personal = ({ user, queryKey }) => {
             <Fieldset width="100%">
               <Legend>Personal</Legend>
               <HorizontalGroup margin={1.6}>
-                <StringFieldForm name="firstName" label="First Name" />
-                <StringFieldForm name="lastName" label="Last Name" />
+                <StringFieldForm name="first_name" label="First Name" />
+                <StringFieldForm name="last_name" label="Last Name" />
               </HorizontalGroup>
               <StringFieldForm name="email" label="Email" />
             </Fieldset>
@@ -248,8 +248,8 @@ const AccountSettings = () => {
   }, [isDeleteAccountModalOpen]);
 
   let title = 'Profile';
-  if (user.firstName || user.lastName) {
-    title = `${user?.firstName} ${user?.lastName}`;
+  if (user.first_name || user.last_name) {
+    title = `${user?.first_name} ${user?.last_name}`;
   }
 
   const handleSubmit = async () => {

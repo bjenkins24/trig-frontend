@@ -204,10 +204,7 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
   const {
     mutate: createCardMutate,
     isLoading: isCreateCardLoading,
-  } = useMutation(createCard, {
-    onError: (error, newCard, rollback) => rollback(),
-    onSuccess: () => queryClient.invalidateQueries('cards'),
-  });
+  } = useMutation(createCard);
 
   return (
     <>
@@ -258,10 +255,6 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
                   "It looks like you didn't enter a valid url. Please try again."
                 )}
               onSubmit={async ({ value, resetForm }) => {
-                toast({
-                  timeout: 2500,
-                  message: 'Your card was created successfully.',
-                });
                 resetForm();
                 await createCardMutate(
                   { url: value },
@@ -280,6 +273,19 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
                         message:
                           'There was a problem submitting the url. Please try again.',
                         type: 'error',
+                      });
+                    },
+                    onSuccess: () => {
+                      const queries = queryClient.getQueryCache().getAll();
+                      queries.forEach(query => {
+                        const { queryKey } = query;
+                        if (!queryKey || !queryKey.includes('cards')) return;
+                        setTimeout(() => {
+                          queryClient.invalidateQueries(queryKey);
+                        }, 1000);
+                      });
+                      return toast({
+                        message: 'The card was added successfully.',
                       });
                     },
                   }

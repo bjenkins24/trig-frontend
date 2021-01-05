@@ -12,7 +12,10 @@ const CardProps = {
 
 const Cards = ({ setIsCreateLinkOpen, ...restProps }) => {
   const { queryString, filterProps, cardViewProps } = useFilters();
-  const { cards, filters, isLoading, cardQueryKey } = useCards({ queryString });
+  const { cards, filters, isLoading, cardQueryKey } = useCards({
+    queryString,
+    queryConfig: { refetchInterval: 5000 },
+  });
 
   return (
     <Content

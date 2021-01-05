@@ -19,6 +19,7 @@ import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, deleteCard } from '../utils/cardClient';
 import useUser from '../utils/useUser';
 import { CardQueryContext } from '../utils/useCards';
+import EmptyState from './EmptyState';
 
 export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewedBy: userId });
@@ -370,6 +371,12 @@ const CardView = ({
         `}
       >
         {isLoading && <Loading size={4.8} />}
+        {cards.length === 0 && (
+          <EmptyState
+            heading="No results"
+            content="Looks like nothing was found with the filters you used. Try something else."
+          />
+        )}
         {viewType === 'thumbnail' && !isLoading && cards && (
           <MasonryScroller
             // Provides the data for our grid items

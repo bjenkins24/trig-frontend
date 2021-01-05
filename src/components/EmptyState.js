@@ -210,7 +210,7 @@ const EmptyState = ({ heading, content, buttonProps }) => {
   return (
     <div
       css={`
-        margin-top: ${({ theme }) => theme.space[5]}px;
+        margin-top: ${({ theme }) => theme.space[6]}px;
         text-align: center;
       `}
     >
@@ -222,7 +222,7 @@ const EmptyState = ({ heading, content, buttonProps }) => {
       >
         <div
           css={`
-            margin-bottom: ${({ theme }) => theme.space[4]}px;
+            margin-bottom: ${({ theme }) => theme.space[5]}px;
           `}
         >
           <EmptyStateIcon />
@@ -233,7 +233,7 @@ const EmptyState = ({ heading, content, buttonProps }) => {
           <Button
             css={`
               display: block;
-              margin: ${({ theme }) => theme.space[3]}px auto 0;
+              margin: ${({ theme }) => theme.space[4]}px auto 0;
             `}
             size="lg"
             {...buttonProps}

@@ -22,7 +22,7 @@ import { CardQueryContext } from '../utils/useCards';
 import EmptyState from './EmptyState';
 
 export const saveView = async ({ id, userId }) => {
-  await updateCard({ id, viewedBy: userId });
+  await updateCard({ id, viewed_by: userId });
 };
 
 const removeTags = ({ previousCards, cardId }) => {
@@ -136,17 +136,17 @@ export const useFavorite = cardQueryKey => {
         } else {
           newCards = get(previousCards, 'data', []).map(previousCard => {
             if (previousCard.id === fields.id) {
-              if (fields.isFavorited) {
+              if (fields.is_favorited) {
                 return {
                   ...previousCard,
-                  totalFavorites: previousCard.totalFavorites + 1,
-                  isFavorited: true,
+                  total_favorites: previousCard.total_favorites + 1,
+                  is_favorited: true,
                 };
               }
               return {
                 ...previousCard,
-                totalFavorites: previousCard.totalFavorites - 1,
-                isFavorited: false,
+                total_favorites: previousCard.total_favorites - 1,
+                is_favorited: false,
               };
             }
             return previousCard;
@@ -162,12 +162,12 @@ export const useFavorite = cardQueryKey => {
 
     try {
       let newFields = fields;
-      if (fields.isFavorited) {
-        newFields = { ...fields, favoritedBy: user.id };
+      if (fields.is_favorited) {
+        newFields = { ...fields, favorited_by: user.id };
       } else {
-        newFields = { ...fields, unfavoritedBy: user.id };
+        newFields = { ...fields, unfavorited_by: user.id };
       }
-      delete newFields.isFavorited;
+      delete newFields.is_favorited;
       await updateCard(newFields);
     } catch (error) {
       // Rollback
@@ -218,11 +218,11 @@ const CardBase = ({ data }) => {
         }
       }}
       showTotalFavorites={false}
-      dateTime={new Date(data.createdAt)}
-      isFavorited={data.isFavorited}
-      totalFavorites={data.totalFavorites}
+      dateTime={new Date(data.created_at)}
+      isFavorited={data.is_favorited}
+      totalFavorites={data.total_favorites}
       onClickFavorite={async () => {
-        await mutateFavorite({ isFavorited: !data.isFavorited, id: data.id });
+        await mutateFavorite({ is_favorited: !data.is_favorited, id: data.id });
       }}
       description={data.description}
       openInNewTab
@@ -261,18 +261,21 @@ const CardListItem = React.memo(({ card }) => {
         }
       }}
       openInNewTab
-      dateTime={new Date(card.createdAt)}
+      dateTime={new Date(card.created_at)}
       favoriteProps={{
         onClick: async () => {
-          await updateFavorite({ isFavorited: !card.isFavorited, id: card.id });
+          await updateFavorite({
+            is_favorited: !card.is_favorited,
+            id: card.id,
+          });
         },
-        type: card.isFavorited ? 'heart-filled' : 'heart',
+        type: card.is_favorited ? 'heart-filled' : 'heart',
       }}
       avatarProps={{
         style: { marginRight: 0 },
         size: 0,
-        firstName: card.user.firstName,
-        lastName: card.user.lastName,
+        firstName: card.user.first_name,
+        lastName: card.user.last_name,
         email: card.user.email,
       }}
       cardType={card.type}

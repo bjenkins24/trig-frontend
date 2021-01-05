@@ -145,9 +145,9 @@ const People = () => {
                     href={`/people/${person.id}`}
                     renderItem={() => (
                       <Avatar
-                        firstName={person.firstName}
-                        lastName={person.lastName}
-                        image={person.profilePicture}
+                        firstName={person.first_name}
+                        lastName={person.last_name}
+                        image={person.profile_picture}
                         size={4}
                         imageHeight={40}
                         imageWidth={40}
@@ -155,7 +155,7 @@ const People = () => {
                     )}
                     renderContent={() => (
                       <ListItemContent
-                        primary={`${person.firstName} ${person.lastName}`}
+                        primary={`${person.first_name} ${person.last_name}`}
                         secondary={person.position}
                       />
                     )}

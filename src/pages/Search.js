@@ -78,21 +78,21 @@ const CardResult = React.memo(({ card, cardQueryKey }) => {
           size: 0,
           style: { marginRight: 0 },
           email: card.user.email,
-          firstName: card.user.firstName,
-          lastName: card.user.lastName,
+          firstName: card.user.first_name,
+          lastName: card.user.last_name,
         }}
         favoriteProps={{
           onClick: async () => {
             await mutateFavorite({
-              isFavorited: !card.isFavorited,
+              is_favorited: !card.is_favorited,
               id: card.id,
             });
           },
-          type: card.isFavorited ? 'heart-filled' : 'heart',
+          type: card.is_favorited ? 'heart-filled' : 'heart',
         }}
         cardType={card.type}
         title={get(card, 'highlights.title', card.title)}
-        dateTime={new Date(card.createdAt)}
+        dateTime={new Date(card.created_at)}
         content={get(card, 'highlights.content', '')}
         navigationList={makeMoreList({
           mutate: mutateDelete,

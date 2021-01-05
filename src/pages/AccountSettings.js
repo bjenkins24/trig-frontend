@@ -40,8 +40,8 @@ const Personal = ({ user, queryKey }) => {
   return (
     <Form
       initialValues={{
-        first_name: user.first_name,
-        last_name: user.last_name,
+        firstName: user.first_name,
+        lastName: user.last_name,
         email: user.email,
       }}
       validationSchema={object().shape({
@@ -85,8 +85,8 @@ const Personal = ({ user, queryKey }) => {
             <Fieldset width="100%">
               <Legend>Personal</Legend>
               <HorizontalGroup margin={1.6}>
-                <StringFieldForm name="first_name" label="First Name" />
-                <StringFieldForm name="last_name" label="Last Name" />
+                <StringFieldForm name="firstName" label="First Name" />
+                <StringFieldForm name="lastName" label="Last Name" />
               </HorizontalGroup>
               <StringFieldForm name="email" label="Email" />
             </Fieldset>

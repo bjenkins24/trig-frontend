@@ -24,6 +24,36 @@ export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewedBy: userId });
 };
 
+const removeTags = ({ previousCards, cardId }) => {
+  // Remove the tags for the card optimistically as well
+  const tagsToRemove = get(previousCards, 'data', []).reduce(
+    (accumulator, previousCard) => {
+      if (
+        previousCard.id !== cardId ||
+        typeof previousCard.tags === 'undefined'
+      ) {
+        return accumulator;
+      }
+
+      return previousCard.tags;
+    },
+    []
+  );
+
+  return get(previousCards, 'filters.tags', [])
+    .map(tag => {
+      const newTag = tag;
+      if (tagsToRemove.includes(tag.name)) {
+        newTag.count -= 1;
+      }
+      return newTag;
+    })
+    .reduce((accumulator, tag) => {
+      if (tag.count === 0) return accumulator;
+      return [...accumulator, tag];
+    }, []);
+};
+
 export const useDelete = () => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation(deleteCard, {
@@ -38,33 +68,7 @@ export const useDelete = () => {
         if (!previousCards) return;
         previousCardsByQuery[queryKey] = previousCards;
 
-        // Remove the tags for the card optimistically as well
-        const tagsToRemove = get(previousCards, 'data', []).reduce(
-          (accumulator, previousCard) => {
-            if (
-              previousCard.id !== deletedId ||
-              typeof previousCard.tags === 'undefined'
-            ) {
-              return accumulator;
-            }
-
-            return previousCard.tags;
-          },
-          []
-        );
-
-        const newTags = get(previousCards, 'filters.tags', [])
-          .map(tag => {
-            const newTag = tag;
-            if (tagsToRemove.includes(tag.name)) {
-              newTag.count -= 1;
-            }
-            return newTag;
-          })
-          .reduce((accumulator, tag) => {
-            if (tag.count === 0) return accumulator;
-            return [...accumulator, tag];
-          }, []);
+        const newTags = removeTags({ previousCards, cardId: deletedId });
 
         const newCards = get(previousCards, 'data', []).filter(
           previousCard => previousCard.id !== deletedId
@@ -115,10 +119,19 @@ export const useFavorite = cardQueryKey => {
       if (queryKey.includes('cards')) {
         const previousCards = queryClient.getQueryData(queryKey);
         previousCardsByQuery[queryKey] = previousCards;
+        let newData = {};
         if (cardQueryKey.includes('favorites')) {
           newCards = get(previousCards, 'data', []).filter(
             card => card.id !== fields.id
           );
+          newData = {
+            ...previousCards,
+            data: newCards,
+          };
+          newData.filters.tags = removeTags({
+            previousCards,
+            cardId: fields.id,
+          });
         } else {
           newCards = get(previousCards, 'data', []).map(previousCard => {
             if (previousCard.id === fields.id) {
@@ -137,11 +150,12 @@ export const useFavorite = cardQueryKey => {
             }
             return previousCard;
           });
+          newData = {
+            ...previousCards,
+            data: newCards,
+          };
         }
-        queryClient.setQueryData(queryKey, () => ({
-          ...previousCards,
-          data: newCards,
-        }));
+        queryClient.setQueryData(queryKey, () => newData);
       }
     });
 

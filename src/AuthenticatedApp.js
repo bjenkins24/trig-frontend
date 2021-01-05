@@ -63,7 +63,7 @@ const AuthenticatedApp = () => {
           <OpenCard />
         </Route>
         <Route path="/">
-          <Home />
+          <Home setIsCreateLinkOpen={setIsCreateLinkOpen} />
         </Route>
       </Switch>
     </div>

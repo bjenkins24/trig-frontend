@@ -61,11 +61,26 @@ export const useDelete = () => {
     onMutate: async ({ id: deletedId }) => {
       const previousCardsByQuery = {};
       const queries = queryClient.getQueryCache().getAll();
+      const me = queryClient.getQueryData('me');
+      let removedCardFromUser = false;
       queries.forEach(query => {
         const { queryKey } = query;
-        if (!queryKey.includes('cards')) return;
+        if (!queryKey || !queryKey.includes('cards')) return;
         queryClient.cancelQueries(queryKey);
         const previousCards = queryClient.getQueryData(queryKey);
+        const cardBelongsToUser = previousCards.data.some(card => {
+          return card.user.id === me.data.id;
+        });
+        if (cardBelongsToUser && !removedCardFromUser) {
+          queryClient.setQueryData('me', {
+            data: {
+              ...me.data,
+              total_cards: me.data.total_cards - 1,
+            },
+          });
+
+          removedCardFromUser = true;
+        }
         if (!previousCards) return;
         previousCardsByQuery[queryKey] = previousCards;
 
@@ -296,6 +311,7 @@ const CardViewProps = {
     label: PropTypes.string,
   }).isRequired,
   setCardCohort: PropTypes.func.isRequired,
+  setIsCreateLinkOpen: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
 };
 
@@ -308,6 +324,7 @@ const CardView = ({
   cards,
   cardCohort,
   setCardCohort,
+  setIsCreateLinkOpen,
   isLoading,
   ...restProps
 }) => {
@@ -316,6 +333,7 @@ const CardView = ({
     `card-view-location:${location.pathname}`,
     'thumbnail'
   );
+  const { user } = useUser();
 
   const positioner = usePositioner(
     { width: 780, columnWidth: 251, columnGutter: 6 },
@@ -374,10 +392,20 @@ const CardView = ({
         `}
       >
         {isLoading && <Loading size={4.8} />}
-        {cards.length === 0 && (
+        {cards.length === 0 && user.total_cards !== 0 && (
           <EmptyState
             heading="No results"
-            content="Looks like nothing was found with the filters you used. Try something else."
+            content="Looks like no cards were found for the filters you used"
+          />
+        )}
+        {cards.length === 0 && user.total_cards === 0 && (
+          <EmptyState
+            heading="You Have No Cards!"
+            content="Get started by adding a card to Trig and see your content automatically organized."
+            buttonProps={{
+              children: 'Add Your First Card',
+              onClick: () => setIsCreateLinkOpen(true),
+            }}
           />
         )}
         {viewType === 'thumbnail' && !isLoading && cards && (

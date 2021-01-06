@@ -95,7 +95,9 @@ export const useDelete = () => {
           data: newCards,
         };
 
-        newData.filters.tags = newTags;
+        if (get(newData, 'filters.tags', false)) {
+          newData.filters.tags = newTags;
+        }
         newData.meta.totalResults = previousCards.meta.totalResults - 1;
         queryClient.setQueryData(queryKey, () => newData);
       });

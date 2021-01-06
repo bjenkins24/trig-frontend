@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Link, useHistory } from 'react-router-dom';
 import { object, string, bool } from 'yup';
@@ -16,8 +16,6 @@ import { device } from '@trig-app/constants/src';
 import useUser from '../utils/useUser';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
-import GoogleSSOButton from '../components/GoogleSSOButton';
-import FullPageSpinner from '../components/FullPageSpinner';
 
 const SignIn = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
   margin-bottom: ${({ theme }) => theme.space[3]}px;
@@ -35,18 +33,9 @@ const FormContainer = styled.div`
   }
 `;
 
-const Or = styled.p`
-  text-align: center;
-`;
-
 const Register = () => {
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { register } = useUser();
   const history = useHistory();
-
-  if (isLoggingIn) {
-    return <FullPageSpinner />;
-  }
 
   return (
     <Layout title="Create Account">
@@ -116,12 +105,6 @@ const Register = () => {
               );
             }}
           </Form>
-          <Or>
-            <Body1 color="pc">or</Body1>
-          </Or>
-          <GoogleSSOButton onSuccess={() => setIsLoggingIn(true)}>
-            Sign up with Google
-          </GoogleSSOButton>
         </FormContainer>
       </AuthBox>
     </Layout>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Link, useHistory } from 'react-router-dom';
 import { object, string } from 'yup';
@@ -16,8 +16,6 @@ import { device } from '@trig-app/constants/src';
 import Layout from '../components/Layout';
 import AuthBox from '../components/AuthBox';
 import useUser from '../utils/useUser';
-import GoogleSSOButton from '../components/GoogleSSOButton';
-import FullPageSpinner from '../components/FullPageSpinner';
 
 const CreateAccount = styled(Body1).attrs({ color: 'pc', forwardedAs: 'p' })`
   margin-bottom: ${({ theme }) => theme.space[3]}px;
@@ -51,18 +49,9 @@ const Lock = styled(Icon).attrs({
   transform: translateY(0.1rem);
 `;
 
-const Or = styled.p`
-  text-align: center;
-`;
-
 const Login = () => {
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { login } = useUser();
   const history = useHistory();
-
-  if (isLoggingIn) {
-    return <FullPageSpinner />;
-  }
 
   return (
     <Layout title="Login">
@@ -131,12 +120,6 @@ const Login = () => {
               );
             }}
           </Form>
-          <Or>
-            <Body1 color="pc">or</Body1>
-          </Or>
-          <GoogleSSOButton onSuccess={() => setIsLoggingIn(true)}>
-            Sign in with Google
-          </GoogleSSOButton>
           <ForgotPassword forwardedAs={Link} to="/forgot-password">
             <Lock /> Forgot your password?
           </ForgotPassword>

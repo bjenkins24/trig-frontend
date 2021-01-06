@@ -230,17 +230,16 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
         header="Create Link Cards"
         renderHeader={() => (
           <>
-            <ModalHeader>Create a Link Card</ModalHeader>
+            <ModalHeader>Create a Card</ModalHeader>
             <Body1Component
               as="p"
               css={`
                 margin-bottom: ${({ theme }) => theme.space[4]}px;
               `}
             >
-              Create a card by entering a URL for an online resource below. If
-              the link is publicly accessible, the content will be archived and
-              accessible in Trig even if the original resource is removed from
-              the internet.
+              Create a card by entering a URL for an online resource below. The
+              content of the link will be automatically organized for search and
+              discovery.
             </Body1Component>
             <StringFieldWithButtonForm
               autoFocus

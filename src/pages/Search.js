@@ -90,7 +90,6 @@ const CardResult = React.memo(({ card, cardQueryKey }) => {
           },
           type: card.is_favorited ? 'heart-filled' : 'heart',
         }}
-        cardType={card.type}
         title={get(card, 'highlights.title', card.title)}
         dateTime={new Date(card.created_at)}
         content={get(card, 'highlights.content', '')}

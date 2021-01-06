@@ -144,10 +144,12 @@ export const useFavorite = cardQueryKey => {
             ...previousCards,
             data: newCards,
           };
-          newData.filters.tags = removeTags({
-            previousCards,
-            cardId: fields.id,
-          });
+          if (get(newData, 'filters.tags', false)) {
+            newData.filters.tags = removeTags({
+              previousCards,
+              cardId: fields.id,
+            });
+          }
         } else {
           newCards = get(previousCards, 'data', []).map(previousCard => {
             if (previousCard.id === fields.id) {
@@ -243,7 +245,6 @@ const CardBase = ({ data }) => {
       openInNewTab
       title={data.title}
       href={data.url}
-      type={data.type}
       image={data.thumbnail.path}
       imageWidth={data.thumbnail.width}
       imageHeight={data.thumbnail.height}
@@ -293,7 +294,6 @@ const CardListItem = React.memo(({ card }) => {
         lastName: card.user.last_name,
         email: card.user.email,
       }}
-      cardType={card.type}
       title={card.title}
       navigationList={makeMoreList({
         mutate: mutateDelete,

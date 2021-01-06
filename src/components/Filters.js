@@ -29,7 +29,10 @@ export const FilterCategory = ({
   setSelectedItems,
 }) => {
   const totalItems = items.length;
-  if (totalItems <= 1 && selectedItems.length === 0) {
+  if (
+    (totalItems < 1 || (totalItems <= 1 && categoryName === 'Card Types')) &&
+    selectedItems.length === 0
+  ) {
     return null;
   }
 

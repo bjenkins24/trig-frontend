@@ -8,6 +8,7 @@ import {
   Body1,
   Body3,
   Icon,
+  toast,
 } from '@trig-app/core-components';
 import { TabsNavigation } from '@trig-app/core-components/dist/compositions';
 import { Link, useHistory, useLocation } from 'react-router-dom';
@@ -128,7 +129,15 @@ const Header = ({ links, openSearch, ...restProps }) => {
                     item: 'Account Settings',
                     onClick: () => history.push('/account'),
                   },
-                  { item: 'Logout', onClick: logout },
+                  {
+                    item: 'Logout',
+                    onClick: () => {
+                      toast({
+                        message: 'You have been successfully logged out.',
+                      });
+                      logout();
+                    },
+                  },
                 ]}
               >
                 <Avatar

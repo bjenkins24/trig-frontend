@@ -10,7 +10,6 @@ import {
   List,
   Card,
   HorizontalGroup,
-  Loading,
   toast,
 } from '@trig-app/core-components';
 import { CardItem } from '@trig-app/core-components/dist/compositions';
@@ -394,7 +393,6 @@ const CardView = ({
           }
         `}
       >
-        {isLoading && <Loading size={4.8} />}
         {cards.length === 0 && user.total_cards !== 0 && (
           <EmptyState
             heading="No results"

@@ -68,6 +68,7 @@ export const useDelete = () => {
         if (!queryKey || !queryKey.includes('cards')) return;
         queryClient.cancelQueries(queryKey);
         const previousCards = queryClient.getQueryData(queryKey);
+        if (!previousCards) return;
         const cardBelongsToUser = previousCards.data.some(card => {
           return card.user.id === me.data.id;
         });
@@ -98,7 +99,7 @@ export const useDelete = () => {
         if (get(newData, 'filters.tags', false)) {
           newData.filters.tags = newTags;
         }
-        newData.meta.totalResults = previousCards.meta.totalResults - 1;
+        newData.meta.total_results = previousCards.meta.total_results - 1;
         queryClient.setQueryData(queryKey, () => newData);
       });
 

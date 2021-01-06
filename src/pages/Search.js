@@ -3,12 +3,7 @@ import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
-import {
-  Icon,
-  HugeStyles,
-  Heading2,
-  Heading1,
-} from '@trig-app/core-components';
+import { Icon, HugeStyles, Heading2 } from '@trig-app/core-components';
 import {
   TabsNavigation,
   CardItem,
@@ -25,6 +20,7 @@ import {
 } from '../components/CardView';
 import useFilters from '../utils/useFilters';
 import useCards from '../utils/useCards';
+import EmptyState from '../components/EmptyState';
 
 const Separator = styled.div`
   height: 3px;
@@ -303,7 +299,14 @@ const Search = ({ onRequestClose, defaultInput }) => {
                       Results
                     </Heading2>
                     {!isLoading && cards.length === 0 && (
-                      <Heading1>No results</Heading1>
+                      <EmptyState
+                        css={`
+                          margin-top: -${({ theme }) => theme.space[2]}px;
+                        `}
+                        hasImage={false}
+                        heading="No Results"
+                        content="Your search found no cards."
+                      />
                     )}
                     <ul
                       css={`

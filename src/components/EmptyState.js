@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Heading2, Body1, Button } from '@trig-app/core-components';
 
-const EmptyStateIcon = () => {
+const EmptyStateImage = () => {
   return (
     <svg
       width="334"
@@ -200,19 +200,28 @@ const EmptyStateProps = {
   heading: PropTypes.string.isRequired,
   buttonProps: PropTypes.object,
   content: PropTypes.string.isRequired,
+  hasImage: PropTypes.bool,
 };
 
 const defaultProps = {
   buttonProps: {},
+  hasImage: true,
 };
 
-const EmptyState = ({ heading, content, buttonProps }) => {
+const EmptyState = ({
+  heading,
+  content,
+  buttonProps,
+  hasImage,
+  ...restProps
+}) => {
   return (
     <div
       css={`
         margin-top: ${({ theme }) => theme.space[6]}px;
         text-align: center;
       `}
+      {...restProps}
     >
       <div
         css={`
@@ -225,7 +234,7 @@ const EmptyState = ({ heading, content, buttonProps }) => {
             margin-bottom: ${({ theme }) => theme.space[5]}px;
           `}
         >
-          <EmptyStateIcon />
+          {hasImage && <EmptyStateImage />}
         </div>
         <Heading2>{heading}</Heading2>
         <Body1>{content}</Body1>

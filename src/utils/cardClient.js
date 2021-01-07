@@ -19,8 +19,8 @@ const deleteCard = ({ id }) => {
   });
 };
 
-const getCards = queryKey => {
-  return client(queryKey);
+const getCards = ({ queryKey, pageParam = 0 }) => {
+  return client(`${queryKey}&p=${pageParam}`);
 };
 
 export { createCard, updateCard, getCards, deleteCard };

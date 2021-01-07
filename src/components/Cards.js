@@ -12,31 +12,42 @@ const CardProps = {
 
 const Cards = ({ setIsCreateLinkOpen, ...restProps }) => {
   const { queryString, filterProps, cardViewProps } = useFilters();
-  const { cards, filters, isLoading, cardQueryKey } = useCards({
+  const {
+    cards,
+    filters,
+    isLoading,
+    cardQueryKey,
+    fetchNextPage,
+    totalResults,
+  } = useCards({
     queryString,
-    queryConfig: { refetchInterval: 5000 },
+    // queryConfig: { refetchInterval: 5000 },
   });
 
   return (
-    <Content
-      css={`
-        margin-top: ${({ theme }) => theme.space[5]}px;
-      `}
-      {...restProps}
-    >
-      <CardQueryContext.Provider value={cardQueryKey}>
-        <CardView
-          setIsCreateLinkOpen={setIsCreateLinkOpen}
-          cards={cards}
-          isLoading={isLoading}
-          css={`
-            margin-right: ${({ theme }) => theme.space[5]}px;
-          `}
-          {...cardViewProps}
-        />
-        <Filters tags={filters.tags} types={filters.types} {...filterProps} />
-      </CardQueryContext.Provider>
-    </Content>
+    <>
+      <Content
+        css={`
+          margin-top: ${({ theme }) => theme.space[5]}px;
+        `}
+        {...restProps}
+      >
+        <CardQueryContext.Provider value={cardQueryKey}>
+          <CardView
+            setIsCreateLinkOpen={setIsCreateLinkOpen}
+            cards={cards}
+            totalResults={totalResults}
+            fetchNextPage={fetchNextPage}
+            isLoading={isLoading}
+            css={`
+              margin-right: ${({ theme }) => theme.space[5]}px;
+            `}
+            {...cardViewProps}
+          />
+          <Filters tags={filters.tags} types={filters.types} {...filterProps} />
+        </CardQueryContext.Provider>
+      </Content>
+    </>
   );
 };
 

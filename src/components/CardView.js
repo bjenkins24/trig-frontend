@@ -13,7 +13,12 @@ import {
   toast,
 } from '@trig-app/core-components';
 import { CardItem } from '@trig-app/core-components/dist/compositions';
-import { MasonryScroller, usePositioner, useResizeObserver } from 'masonic';
+import {
+  MasonryScroller,
+  usePositioner,
+  useResizeObserver,
+  useInfiniteLoader,
+} from 'masonic';
 import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, deleteCard } from '../utils/cardClient';
 import useUser from '../utils/useUser';
@@ -312,22 +317,27 @@ const CardViewProps = {
     value: PropTypes.string,
     label: PropTypes.string,
   }).isRequired,
+  fetchNextPage: PropTypes.func.isRequired,
   setCardCohort: PropTypes.func.isRequired,
   setIsCreateLinkOpen: PropTypes.func.isRequired,
+  totalResults: PropTypes.number,
   isLoading: PropTypes.bool,
 };
 
 const defaultProps = {
   cards: [],
   isLoading: false,
+  totalResults: 0,
 };
 
 const CardView = ({
   cards,
   cardCohort,
+  fetchNextPage,
   setCardCohort,
   setIsCreateLinkOpen,
   isLoading,
+  totalResults,
   ...restProps
 }) => {
   const location = useLocation();
@@ -336,6 +346,15 @@ const CardView = ({
     'thumbnail'
   );
   const { user } = useUser();
+
+  const maybeLoadMore = useInfiniteLoader(fetchNextPage, {
+    minimumBatchSize: 20,
+    isItemLoaded: (index, items) => {
+      return !!items[index];
+    },
+    threshold: 1,
+    totalItems: totalResults,
+  });
 
   const positioner = usePositioner(
     { width: 780, columnWidth: 251, columnGutter: 6 },
@@ -422,6 +441,7 @@ const CardView = ({
             overscanBy={5}
             // This is the grid item component
             render={CardRenderer}
+            onRender={maybeLoadMore}
           />
         )}
         {viewType === 'row' && !isLoading && cards && (

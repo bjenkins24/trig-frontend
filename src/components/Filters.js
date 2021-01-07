@@ -19,8 +19,8 @@ const makeLabel = ({ name, count }) => {
   return `${name} (${count})`;
 };
 
-export const maxDefaultFilters = 10;
-export const maxWithoutSearchFilters = 14;
+export const maxDefaultFilters = 5;
+export const maxWithoutSearchFilters = 9;
 
 export const FilterCategory = ({
   categoryName,

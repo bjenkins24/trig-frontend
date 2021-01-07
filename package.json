@@ -35,7 +35,7 @@
     "@trig-app/constants": "^0.1.4",
     "@trig-app/core-components": "^0.1.135",
     "@trig-app/themes": "^0.1.3",
-    "copy-webpack-plugin": "^7.0.0",
+    "copy-webpack-plugin": "^6.0.3",
     "disable-scroll": "^0.5.1",
     "dotenv-webpack": "^1.7.0",
     "html-webpack-plugin": "^4.5.1",

@@ -252,7 +252,11 @@ const CardBase = ({ data }) => {
       openInNewTab
       title={data.title}
       href={data.url}
-      image={`${process.env.CDN_URL}${data.thumbnail.path}`}
+      image={
+        data.thumbnail.path
+          ? `${process.env.CDN_URL}${data.thumbnail.path}`
+          : null
+      }
       imageWidth={data.thumbnail.width}
       imageHeight={data.thumbnail.height}
       renderAvatar={() => null}

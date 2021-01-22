@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import get from 'lodash/get';
@@ -326,12 +326,14 @@ const CardViewProps = {
   setIsCreateLinkOpen: PropTypes.func.isRequired,
   totalResults: PropTypes.number,
   isLoading: PropTypes.bool,
+  isFetchingNextPage: PropTypes.bool,
 };
 
 const defaultProps = {
   cards: [],
   isLoading: false,
   totalResults: 0,
+  isFetchingNextPage: false,
 };
 
 const CardView = ({
@@ -340,6 +342,7 @@ const CardView = ({
   fetchNextPage,
   setCardCohort,
   setIsCreateLinkOpen,
+  isFetchingNextPage,
   isLoading,
   totalResults,
   ...restProps
@@ -351,11 +354,17 @@ const CardView = ({
   );
   const { user } = useUser();
 
-  const maybeLoadMore = useInfiniteLoader(fetchNextPage, {
-    minimumBatchSize: 20,
+  const memoizedCallback = useCallback(async () => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [isFetchingNextPage]);
+
+  const maybeLoadMore = useInfiniteLoader(memoizedCallback, {
     isItemLoaded: (index, items) => {
       return !!items[index];
     },
+    minimumBatchSize: 20,
     threshold: 1,
     totalItems: totalResults,
   });

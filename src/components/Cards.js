@@ -18,6 +18,7 @@ const Cards = ({ setIsCreateLinkOpen, ...restProps }) => {
     isLoading,
     cardQueryKey,
     fetchNextPage,
+    isFetchingNextPage,
     totalResults,
   } = useCards({
     queryString,
@@ -38,6 +39,7 @@ const Cards = ({ setIsCreateLinkOpen, ...restProps }) => {
             cards={cards}
             totalResults={totalResults}
             fetchNextPage={fetchNextPage}
+            isFetchingNextPage={isFetchingNextPage}
             isLoading={isLoading}
             css={`
               margin-right: ${({ theme }) => theme.space[5]}px;

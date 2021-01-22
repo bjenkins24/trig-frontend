@@ -8,7 +8,13 @@ export const CardQueryContext = createContext('cards');
 
 const useCards = ({ queryString, queryConfig }) => {
   const queryKey = `${generalCardQueryKey}?${queryString}`;
-  const { data: cards, isLoading, refetch, fetchNextPage } = useInfiniteQuery(
+  const {
+    data: cards,
+    isLoading,
+    refetch,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
     queryKey,
     ({ pageParam }) => getCards({ queryKey, pageParam }),
     {
@@ -28,6 +34,7 @@ const useCards = ({ queryString, queryConfig }) => {
     meta: get(cards, `pages.${get(cards, 'pages', []).length - 1}`, []),
     totalResults: parseInt(get(cards, 'pages.0.meta.total_results', 0), 10),
     fetchNextPage,
+    isFetchingNextPage,
   };
 };
 

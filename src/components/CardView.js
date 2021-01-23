@@ -24,9 +24,9 @@ export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewed_by: userId });
 };
 
-const removeTags = ({ previousCards, cardId }) => {
+const removeTags = ({ previousPage, cardId }) => {
   // Remove the tags for the card optimistically as well
-  const tagsToRemove = get(previousCards, 'data', []).reduce(
+  const tagsToRemove = get(previousPage, 'data', []).reduce(
     (accumulator, previousCard) => {
       if (
         previousCard.id !== cardId ||
@@ -40,7 +40,7 @@ const removeTags = ({ previousCards, cardId }) => {
     []
   );
 
-  return get(previousCards, 'filters.tags', [])
+  return get(previousPage, 'filters.tags', [])
     .map(tag => {
       const newTag = tag;
       if (tagsToRemove.includes(tag.name)) {
@@ -128,54 +128,64 @@ export const useFavorite = cardQueryKey => {
 
   return async fields => {
     await queryClient.cancelQueries(cardQueryKey);
-    let newCards = [];
+    let newPages = [];
 
-    const previousCardsByQuery = {};
+    const previousResponseByQuery = {};
     const queries = queryClient.getQueryCache().getAll();
     queries.forEach(query => {
       const { queryKey } = query;
       if (queryKey.includes('cards')) {
-        const previousCards = queryClient.getQueryData(queryKey);
-        previousCardsByQuery[queryKey] = previousCards;
-        let newData = {};
-        if (cardQueryKey.includes('favorites')) {
-          newCards = get(previousCards, 'data', []).filter(
-            card => card.id !== fields.id
-          );
-          newData = {
-            ...previousCards,
-            data: newCards,
-          };
-          if (get(newData, 'filters.tags', false)) {
-            newData.filters.tags = removeTags({
-              previousCards,
-              cardId: fields.id,
-            });
-          }
-        } else {
-          newCards = get(previousCards, 'data', []).map(previousCard => {
-            if (previousCard.id === fields.id) {
-              if (fields.is_favorited) {
-                return {
-                  ...previousCard,
-                  total_favorites: previousCard.total_favorites + 1,
-                  is_favorited: true,
-                };
-              }
-              return {
-                ...previousCard,
-                total_favorites: previousCard.total_favorites - 1,
-                is_favorited: false,
-              };
+        const previousResponse = queryClient.getQueryData(queryKey);
+        previousResponseByQuery[queryKey] = previousResponse;
+        let newResponse = {};
+        if (queryKey.includes('favorites')) {
+          newPages = get(previousResponse, 'pages', []).map(page => {
+            const newFilters = get(page, 'filters', { tags: [], types: [] });
+            if (get(newFilters, 'filters.tags', [])) {
+              newFilters.tags = removeTags({
+                previousPage: page,
+                cardId: fields.id,
+              });
             }
-            return previousCard;
+            return {
+              ...page,
+              filters: newFilters,
+              data: get(page, 'data', []).filter(card => card.id !== fields.id),
+            };
           });
-          newData = {
-            ...previousCards,
-            data: newCards,
+          newResponse = {
+            ...previousResponse,
+            pages: newPages,
+          };
+        } else {
+          newPages = get(previousResponse, 'pages', []).map(page => {
+            return {
+              ...page,
+              data: get(page, 'data', []).map(previousCard => {
+                if (previousCard.id === fields.id) {
+                  if (fields.is_favorited) {
+                    return {
+                      ...previousCard,
+                      total_favorites: previousCard.total_favorites + 1,
+                      is_favorited: true,
+                    };
+                  }
+                  return {
+                    ...previousCard,
+                    total_favorites: previousCard.total_favorites - 1,
+                    is_favorited: false,
+                  };
+                }
+                return previousCard;
+              }),
+            };
+          });
+          newResponse = {
+            ...previousResponse,
+            pages: newPages,
           };
         }
-        queryClient.setQueryData(queryKey, () => newData);
+        queryClient.setQueryData(queryKey, () => newResponse);
       }
     });
 
@@ -193,7 +203,7 @@ export const useFavorite = cardQueryKey => {
       queries.forEach(query => {
         const { queryKey } = query;
         if (queryKey.includes('cards')) {
-          queryClient.setQueryData(queryKey, previousCardsByQuery[queryKey]);
+          queryClient.setQueryData(queryKey, previousResponseByQuery[queryKey]);
         }
       });
       toast({

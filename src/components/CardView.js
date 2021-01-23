@@ -1,25 +1,20 @@
 import React, { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { useLocation } from 'react-router-dom';
 import get from 'lodash/get';
 import { useMutation, useQueryClient } from 'react-query';
 import {
-  ButtonToggle,
   Icon,
   SelectField,
-  List,
   Card,
   HorizontalGroup,
   toast,
 } from '@trig-app/core-components';
-import { CardItem } from '@trig-app/core-components/dist/compositions';
 import {
   MasonryScroller,
   usePositioner,
   useResizeObserver,
   useInfiniteLoader,
 } from 'masonic';
-import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, deleteCard } from '../utils/cardClient';
 import useUser from '../utils/useUser';
 import { CardQueryContext } from '../utils/useCards';
@@ -273,48 +268,6 @@ const CardRenderer = ({ data }) => {
   return <CardBase data={data} />;
 };
 
-const CardListItem = React.memo(({ card }) => {
-  const cardQueryKey = useContext(CardQueryContext);
-  const updateFavorite = useFavorite(cardQueryKey);
-  const mutateDelete = useDelete(cardQueryKey);
-  const { user } = useUser();
-
-  return (
-    <CardItem
-      href={card.url}
-      onClick={async () => {
-        if (get(card, 'id', false)) {
-          await saveView({ id: card.id, userId: user.id });
-        }
-      }}
-      openInNewTab
-      dateTime={new Date(card.created_at)}
-      favoriteProps={{
-        onClick: async () => {
-          await updateFavorite({
-            is_favorited: !card.is_favorited,
-            id: card.id,
-          });
-        },
-        type: card.is_favorited ? 'heart-filled' : 'heart',
-      }}
-      avatarProps={{
-        style: { marginRight: 0 },
-        size: 0,
-        firstName: card.user.first_name,
-        lastName: card.user.last_name,
-        email: card.user.email,
-      }}
-      title={card.title}
-      navigationList={makeMoreList({
-        mutate: mutateDelete,
-        id: card.id,
-      })}
-    />
-  );
-});
-/* eslint-enable */
-
 const CardViewProps = {
   cards: PropTypes.array,
   cardCohort: PropTypes.shape({
@@ -347,11 +300,6 @@ const CardView = ({
   totalResults,
   ...restProps
 }) => {
-  const location = useLocation();
-  const [viewType, setViewType] = useLocalStorage(
-    `card-view-location:${location.pathname}`,
-    'thumbnail'
-  );
   const { user } = useUser();
 
   const memoizedCallback = useCallback(async () => {
@@ -392,19 +340,6 @@ const CardView = ({
           margin-bottom: ${({ theme }) => theme.space[4]}px;
         `}
       >
-        <ButtonToggle
-          css={`
-            margin-top: 2px;
-          `}
-          defaultSelectedIndex={viewType === 'thumbnail' ? 0 : 1}
-        >
-          <Icon
-            type="thumbnail-view"
-            onClick={() => setViewType('thumbnail')}
-            size={1.6}
-          />
-          <Icon type="row-view" onClick={() => setViewType('row')} size={1.6} />
-        </ButtonToggle>
         <SelectField
           css={`
             margin-left: auto;
@@ -441,7 +376,7 @@ const CardView = ({
             }}
           />
         )}
-        {viewType === 'thumbnail' && !isLoading && cards && (
+        {!isLoading && cards && (
           <MasonryScroller
             // Provides the data for our grid items
             items={cards}
@@ -456,13 +391,6 @@ const CardView = ({
             render={CardRenderer}
             onRender={maybeLoadMore}
           />
-        )}
-        {viewType === 'row' && !isLoading && cards && (
-          <List>
-            {cards.map(card => {
-              return <CardListItem card={card} key={card.id} />;
-            })}
-          </List>
         )}
       </div>
     </div>

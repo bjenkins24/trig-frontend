@@ -1,25 +1,20 @@
 import React, { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { useLocation } from 'react-router-dom';
 import get from 'lodash/get';
 import { useMutation, useQueryClient } from 'react-query';
 import {
-  ButtonToggle,
   Icon,
   SelectField,
-  List,
   Card,
   HorizontalGroup,
   toast,
 } from '@trig-app/core-components';
-import { CardItem } from '@trig-app/core-components/dist/compositions';
 import {
   MasonryScroller,
   usePositioner,
   useResizeObserver,
   useInfiniteLoader,
 } from 'masonic';
-import useLocalStorage from '../utils/useLocalStorage';
 import { updateCard, deleteCard } from '../utils/cardClient';
 import useUser from '../utils/useUser';
 import { CardQueryContext } from '../utils/useCards';
@@ -29,9 +24,9 @@ export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewed_by: userId });
 };
 
-const removeTags = ({ previousCards, cardId }) => {
+const removeTags = ({ previousPage, cardId }) => {
   // Remove the tags for the card optimistically as well
-  const tagsToRemove = get(previousCards, 'data', []).reduce(
+  const tagsToRemove = get(previousPage, 'data', []).reduce(
     (accumulator, previousCard) => {
       if (
         previousCard.id !== cardId ||
@@ -45,7 +40,7 @@ const removeTags = ({ previousCards, cardId }) => {
     []
   );
 
-  return get(previousCards, 'filters.tags', [])
+  return get(previousPage, 'filters.tags', [])
     .map(tag => {
       const newTag = tag;
       if (tagsToRemove.includes(tag.name)) {
@@ -63,7 +58,7 @@ export const useDelete = () => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation(deleteCard, {
     onMutate: async ({ id: deletedId }) => {
-      const previousCardsByQuery = {};
+      const previousResponseByQuery = {};
       const queries = queryClient.getQueryCache().getAll();
       const me = queryClient.getQueryData('me');
       let removedCardFromUser = false;
@@ -71,47 +66,54 @@ export const useDelete = () => {
         const { queryKey } = query;
         if (!queryKey || !queryKey.includes('cards')) return;
         queryClient.cancelQueries(queryKey);
-        const previousCards = queryClient.getQueryData(queryKey);
-        if (!previousCards) return;
-        const cardBelongsToUser = previousCards.data.some(card => {
-          return card.user.id === me.data.id;
-        });
-        if (cardBelongsToUser && !removedCardFromUser) {
-          queryClient.setQueryData('me', {
-            data: {
-              ...me.data,
-              total_cards: me.data.total_cards - 1,
-            },
+        const previousResponse = queryClient.getQueryData(queryKey);
+        if (!previousResponse) return;
+        const newPages = get(previousResponse, 'pages', []).map(page => {
+          // Remove the card from total_cards on the user as well
+          const cardBelongsToUser = page.data.some(card => {
+            return card.user.id === me.data.id;
           });
+          if (cardBelongsToUser && !removedCardFromUser) {
+            queryClient.setQueryData('me', {
+              data: {
+                ...me.data,
+                total_cards: me.data.total_cards - 1,
+              },
+            });
 
-          removedCardFromUser = true;
-        }
-        if (!previousCards) return;
-        previousCardsByQuery[queryKey] = previousCards;
+            removedCardFromUser = true;
+          }
 
-        const newTags = removeTags({ previousCards, cardId: deletedId });
+          const newTags = removeTags({ previousPage: page, cardId: deletedId });
 
-        const newCards = get(previousCards, 'data', []).filter(
-          previousCard => previousCard.id !== deletedId
-        );
+          const newCards = get(page, 'data', []).filter(
+            previousCard => previousCard.id !== deletedId
+          );
 
-        const newData = {
-          ...previousCards,
-          data: newCards,
-        };
+          const newPage = {
+            ...page,
+            data: newCards,
+          };
 
-        if (get(newData, 'filters.tags', false)) {
-          newData.filters.tags = newTags;
-        }
-        newData.meta.total_results = previousCards.meta.total_results - 1;
-        queryClient.setQueryData(queryKey, () => newData);
+          if (get(page, 'filters.tags', false)) {
+            newPage.filters.tags = newTags;
+          }
+          newPage.meta.total_results = page.meta.total_results - 1;
+          return newPage;
+        });
+
+        previousResponseByQuery[queryKey] = previousResponse;
+        queryClient.setQueryData(queryKey, () => ({
+          ...previousResponse,
+          pages: newPages,
+        }));
       });
 
       return () =>
         queries.forEach(query => {
           const { queryKey } = query;
           if (!queryKey.includes('cards')) return;
-          queryClient.setQueryData(queryKey, previousCardsByQuery[queryKey]);
+          queryClient.setQueryData(queryKey, previousResponseByQuery[queryKey]);
         });
     },
     onError: (err, newCard, rollback) => {
@@ -133,54 +135,64 @@ export const useFavorite = cardQueryKey => {
 
   return async fields => {
     await queryClient.cancelQueries(cardQueryKey);
-    let newCards = [];
+    let newPages = [];
 
-    const previousCardsByQuery = {};
+    const previousResponseByQuery = {};
     const queries = queryClient.getQueryCache().getAll();
     queries.forEach(query => {
       const { queryKey } = query;
       if (queryKey.includes('cards')) {
-        const previousCards = queryClient.getQueryData(queryKey);
-        previousCardsByQuery[queryKey] = previousCards;
-        let newData = {};
-        if (cardQueryKey.includes('favorites')) {
-          newCards = get(previousCards, 'data', []).filter(
-            card => card.id !== fields.id
-          );
-          newData = {
-            ...previousCards,
-            data: newCards,
-          };
-          if (get(newData, 'filters.tags', false)) {
-            newData.filters.tags = removeTags({
-              previousCards,
-              cardId: fields.id,
-            });
-          }
-        } else {
-          newCards = get(previousCards, 'data', []).map(previousCard => {
-            if (previousCard.id === fields.id) {
-              if (fields.is_favorited) {
-                return {
-                  ...previousCard,
-                  total_favorites: previousCard.total_favorites + 1,
-                  is_favorited: true,
-                };
-              }
-              return {
-                ...previousCard,
-                total_favorites: previousCard.total_favorites - 1,
-                is_favorited: false,
-              };
+        const previousResponse = queryClient.getQueryData(queryKey);
+        previousResponseByQuery[queryKey] = previousResponse;
+        let newResponse = {};
+        if (queryKey.includes('favorites')) {
+          newPages = get(previousResponse, 'pages', []).map(page => {
+            const newFilters = get(page, 'filters', { tags: [], types: [] });
+            if (get(newFilters, 'filters.tags', [])) {
+              newFilters.tags = removeTags({
+                previousPage: page,
+                cardId: fields.id,
+              });
             }
-            return previousCard;
+            return {
+              ...page,
+              filters: newFilters,
+              data: get(page, 'data', []).filter(card => card.id !== fields.id),
+            };
           });
-          newData = {
-            ...previousCards,
-            data: newCards,
+          newResponse = {
+            ...previousResponse,
+            pages: newPages,
+          };
+        } else {
+          newPages = get(previousResponse, 'pages', []).map(page => {
+            return {
+              ...page,
+              data: get(page, 'data', []).map(previousCard => {
+                if (previousCard.id === fields.id) {
+                  if (fields.is_favorited) {
+                    return {
+                      ...previousCard,
+                      total_favorites: previousCard.total_favorites + 1,
+                      is_favorited: true,
+                    };
+                  }
+                  return {
+                    ...previousCard,
+                    total_favorites: previousCard.total_favorites - 1,
+                    is_favorited: false,
+                  };
+                }
+                return previousCard;
+              }),
+            };
+          });
+          newResponse = {
+            ...previousResponse,
+            pages: newPages,
           };
         }
-        queryClient.setQueryData(queryKey, () => newData);
+        queryClient.setQueryData(queryKey, () => newResponse);
       }
     });
 
@@ -198,7 +210,7 @@ export const useFavorite = cardQueryKey => {
       queries.forEach(query => {
         const { queryKey } = query;
         if (queryKey.includes('cards')) {
-          queryClient.setQueryData(queryKey, previousCardsByQuery[queryKey]);
+          queryClient.setQueryData(queryKey, previousResponseByQuery[queryKey]);
         }
       });
       toast({
@@ -273,48 +285,6 @@ const CardRenderer = ({ data }) => {
   return <CardBase data={data} />;
 };
 
-const CardListItem = React.memo(({ card }) => {
-  const cardQueryKey = useContext(CardQueryContext);
-  const updateFavorite = useFavorite(cardQueryKey);
-  const mutateDelete = useDelete(cardQueryKey);
-  const { user } = useUser();
-
-  return (
-    <CardItem
-      href={card.url}
-      onClick={async () => {
-        if (get(card, 'id', false)) {
-          await saveView({ id: card.id, userId: user.id });
-        }
-      }}
-      openInNewTab
-      dateTime={new Date(card.created_at)}
-      favoriteProps={{
-        onClick: async () => {
-          await updateFavorite({
-            is_favorited: !card.is_favorited,
-            id: card.id,
-          });
-        },
-        type: card.is_favorited ? 'heart-filled' : 'heart',
-      }}
-      avatarProps={{
-        style: { marginRight: 0 },
-        size: 0,
-        firstName: card.user.first_name,
-        lastName: card.user.last_name,
-        email: card.user.email,
-      }}
-      title={card.title}
-      navigationList={makeMoreList({
-        mutate: mutateDelete,
-        id: card.id,
-      })}
-    />
-  );
-});
-/* eslint-enable */
-
 const CardViewProps = {
   cards: PropTypes.array,
   cardCohort: PropTypes.shape({
@@ -347,11 +317,6 @@ const CardView = ({
   totalResults,
   ...restProps
 }) => {
-  const location = useLocation();
-  const [viewType, setViewType] = useLocalStorage(
-    `card-view-location:${location.pathname}`,
-    'thumbnail'
-  );
   const { user } = useUser();
 
   const memoizedCallback = useCallback(async () => {
@@ -392,19 +357,6 @@ const CardView = ({
           margin-bottom: ${({ theme }) => theme.space[4]}px;
         `}
       >
-        <ButtonToggle
-          css={`
-            margin-top: 2px;
-          `}
-          defaultSelectedIndex={viewType === 'thumbnail' ? 0 : 1}
-        >
-          <Icon
-            type="thumbnail-view"
-            onClick={() => setViewType('thumbnail')}
-            size={1.6}
-          />
-          <Icon type="row-view" onClick={() => setViewType('row')} size={1.6} />
-        </ButtonToggle>
         <SelectField
           css={`
             margin-left: auto;
@@ -441,7 +393,7 @@ const CardView = ({
             }}
           />
         )}
-        {viewType === 'thumbnail' && !isLoading && cards && (
+        {!isLoading && cards && (
           <MasonryScroller
             // Provides the data for our grid items
             items={cards}
@@ -456,13 +408,6 @@ const CardView = ({
             render={CardRenderer}
             onRender={maybeLoadMore}
           />
-        )}
-        {viewType === 'row' && !isLoading && cards && (
-          <List>
-            {cards.map(card => {
-              return <CardListItem card={card} key={card.id} />;
-            })}
-          </List>
         )}
       </div>
     </div>

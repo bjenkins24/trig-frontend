@@ -58,7 +58,7 @@ export const useDelete = () => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation(deleteCard, {
     onMutate: async ({ id: deletedId }) => {
-      const previousCardsByQuery = {};
+      const previousResponseByQuery = {};
       const queries = queryClient.getQueryCache().getAll();
       const me = queryClient.getQueryData('me');
       let removedCardFromUser = false;
@@ -66,47 +66,54 @@ export const useDelete = () => {
         const { queryKey } = query;
         if (!queryKey || !queryKey.includes('cards')) return;
         queryClient.cancelQueries(queryKey);
-        const previousCards = queryClient.getQueryData(queryKey);
-        if (!previousCards) return;
-        const cardBelongsToUser = previousCards.data.some(card => {
-          return card.user.id === me.data.id;
-        });
-        if (cardBelongsToUser && !removedCardFromUser) {
-          queryClient.setQueryData('me', {
-            data: {
-              ...me.data,
-              total_cards: me.data.total_cards - 1,
-            },
+        const previousResponse = queryClient.getQueryData(queryKey);
+        if (!previousResponse) return;
+        const newPages = get(previousResponse, 'pages', []).map(page => {
+          // Remove the card from total_cards on the user as well
+          const cardBelongsToUser = page.data.some(card => {
+            return card.user.id === me.data.id;
           });
+          if (cardBelongsToUser && !removedCardFromUser) {
+            queryClient.setQueryData('me', {
+              data: {
+                ...me.data,
+                total_cards: me.data.total_cards - 1,
+              },
+            });
 
-          removedCardFromUser = true;
-        }
-        if (!previousCards) return;
-        previousCardsByQuery[queryKey] = previousCards;
+            removedCardFromUser = true;
+          }
 
-        const newTags = removeTags({ previousCards, cardId: deletedId });
+          const newTags = removeTags({ previousPage: page, cardId: deletedId });
 
-        const newCards = get(previousCards, 'data', []).filter(
-          previousCard => previousCard.id !== deletedId
-        );
+          const newCards = get(page, 'data', []).filter(
+            previousCard => previousCard.id !== deletedId
+          );
 
-        const newData = {
-          ...previousCards,
-          data: newCards,
-        };
+          const newPage = {
+            ...page,
+            data: newCards,
+          };
 
-        if (get(newData, 'filters.tags', false)) {
-          newData.filters.tags = newTags;
-        }
-        newData.meta.total_results = previousCards.meta.total_results - 1;
-        queryClient.setQueryData(queryKey, () => newData);
+          if (get(page, 'filters.tags', false)) {
+            newPage.filters.tags = newTags;
+          }
+          newPage.meta.total_results = page.meta.total_results - 1;
+          return newPage;
+        });
+
+        previousResponseByQuery[queryKey] = previousResponse;
+        queryClient.setQueryData(queryKey, () => ({
+          ...previousResponse,
+          pages: newPages,
+        }));
       });
 
       return () =>
         queries.forEach(query => {
           const { queryKey } = query;
           if (!queryKey.includes('cards')) return;
-          queryClient.setQueryData(queryKey, previousCardsByQuery[queryKey]);
+          queryClient.setQueryData(queryKey, previousResponseByQuery[queryKey]);
         });
     },
     onError: (err, newCard, rollback) => {

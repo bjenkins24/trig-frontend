@@ -218,7 +218,7 @@ const EmptyState = ({
   return (
     <div
       css={`
-        margin-top: ${({ theme }) => theme.space[6]}px;
+        margin-top: ${({ theme }) => theme.space[5] + theme.space[4]}px;
         text-align: center;
       `}
       {...restProps}

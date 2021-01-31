@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from 'react-query';
 import get from 'lodash/get';
 import * as authClient from './authClient';
-import { getUser } from './authClient';
+import { getUser, setToken } from './authClient';
 
 const useUser = () => {
   const queryKey = 'me';
@@ -58,6 +58,7 @@ const useUser = () => {
     resetPassword,
     googleSSO,
     logout,
+    setToken,
   };
 };
 

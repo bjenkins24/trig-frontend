@@ -1,9 +1,13 @@
 import { client, localStorageKey } from './apiClient';
 
+const setToken = token => {
+  window.localStorage.setItem(localStorageKey, token);
+};
+
 const handleUserResponse = data => {
   if (data?.error) return data;
   const token = data.data.authToken.access_token;
-  window.localStorage.setItem(localStorageKey, token);
+  setToken(token);
   return data.data.user;
 };
 
@@ -88,6 +92,7 @@ export {
   isLoggedIn,
   updateUser,
   deleteUser,
+  setToken,
 };
 
 export { logout } from './apiClient';

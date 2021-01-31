@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Impersonation from './pages/Impersonation';
 
 const UnauthenticatedApp = () => {
   return (
@@ -16,6 +17,9 @@ const UnauthenticatedApp = () => {
       </Route>
       <Route path="/forgot-password">
         <ForgotPassword />
+      </Route>
+      <Route path="/impersonate">
+        <Impersonation />
       </Route>
       <Route path={['/', '/login']}>
         <Login />

@@ -32,7 +32,10 @@ const updateUser = async fields => {
 };
 
 const login = async ({ email, password }) => {
-  const result = await client('login', { body: { email, password } });
+  const result = await client('login', {
+    body: { email, password },
+    credentials: 'include',
+  });
   return handleUserResponse(result);
 };
 

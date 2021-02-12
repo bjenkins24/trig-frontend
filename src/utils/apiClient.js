@@ -54,7 +54,7 @@ const client = async (endpoint, { body, method, ...customConfig } = {}) => {
 
 const logout = async () => {
   window.localStorage.removeItem(localStorageKey);
-  await client('logout', { method: 'post' });
+  await client('logout', { method: 'post', credentials: 'include' });
 };
 
 export { client, localStorageKey, logout };

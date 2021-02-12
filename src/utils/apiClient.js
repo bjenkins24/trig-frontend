@@ -1,9 +1,5 @@
 const localStorageKey = '__trig_token__';
 
-const logout = () => {
-  window.localStorage.removeItem(localStorageKey);
-};
-
 const client = async (endpoint, { body, method, ...customConfig } = {}) => {
   const token = window.localStorage.getItem(localStorageKey);
   const headers = {
@@ -37,7 +33,8 @@ const client = async (endpoint, { body, method, ...customConfig } = {}) => {
   );
 
   if (result.status === 401) {
-    logout();
+    // eslint-disable-next-line no-use-before-define
+    await logout();
     // refresh the page for them
     window.location.assign(window.location);
     return false;
@@ -53,6 +50,11 @@ const client = async (endpoint, { body, method, ...customConfig } = {}) => {
   }
 
   return Promise.reject(data);
+};
+
+const logout = async () => {
+  window.localStorage.removeItem(localStorageKey);
+  await client('logout', { method: 'post' });
 };
 
 export { client, localStorageKey, logout };

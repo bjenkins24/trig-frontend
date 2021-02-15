@@ -5,6 +5,7 @@ import {
   Body1,
   Checkbox,
   DateRangeField,
+  Icon,
   SelectField,
 } from '@trig-app/core-components';
 
@@ -61,7 +62,21 @@ export const FilterCategory = ({
           margin-bottom: ${({ theme }) => theme.space[3]}px;
         `}
       >
-        {categoryName}
+        <div
+          css={`
+            display: flex;
+          `}
+        >
+          <Icon
+            type="tags"
+            size={2}
+            css={`
+              margin-top: 3px;
+              margin-right: ${({ theme }) => theme.space[2]}px;
+            `}
+          />
+          {categoryName}
+        </div>
       </Body1>
       {slicedItems.map(item => (
         <Checkbox
@@ -169,7 +184,21 @@ const Filters = ({
             margin-bottom: ${({ theme }) => theme.space[3]}px;
           `}
         >
-          Date
+          <div
+            css={`
+              display: flex;
+            `}
+          >
+            <Icon
+              type="calendar"
+              size={1.6}
+              css={`
+                margin-top: 5px;
+                margin-right: ${({ theme }) => theme.space[2]}px;
+              `}
+            />
+            Date
+          </div>
         </Body1>
         <DateRangeField
           startDate={startDate}
@@ -182,7 +211,7 @@ const Filters = ({
       </div>
       <div>
         <FilterCategory
-          categoryName="Topics"
+          categoryName="Tags"
           items={tags}
           setSelectedItems={setSelectedTags}
           selectedItems={selectedTags}

@@ -40,7 +40,10 @@ const login = async ({ email, password }) => {
 };
 
 const register = async ({ email, password, terms }) => {
-  const result = await client('register', { body: { email, password, terms } });
+  const result = await client('register', {
+    body: { email, password, terms },
+    credentials: 'include',
+  });
   return handleUserResponse(result);
 };
 

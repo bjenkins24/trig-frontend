@@ -19,6 +19,7 @@ import { updateCard, deleteCard } from '../utils/cardClient';
 import useUser from '../utils/useUser';
 import { CardQueryContext } from '../utils/useCards';
 import EmptyState from './EmptyState';
+import { DEFAULT_TO_SCREENSHOTS } from '../constants/defaultToScreenshots';
 
 export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewed_by: userId });
@@ -238,12 +239,31 @@ export const makeMoreList = ({ mutate, id }) => [
   },
 ];
 
+const getImage = data => {
+  const shouldShowScreenshot = DEFAULT_TO_SCREENSHOTS.includes(
+    new URL(data.url).host
+  );
+  if (data.image.path && !shouldShowScreenshot) {
+    return data.image;
+  }
+  if (data.screenshot.path) {
+    return data.screenshot;
+  }
+  return {
+    path: null,
+    width: null,
+    height: null,
+  };
+};
+
 /* eslint-disable */
 const CardBase = ({ data }) => {
   const cardQueryKey = useContext(CardQueryContext);
   const mutateFavorite = useFavorite(cardQueryKey);
   const mutateDelete = useDelete(cardQueryKey);
   const { user } = useUser();
+
+  const image = getImage(data);
 
   return (
     <Card
@@ -264,13 +284,9 @@ const CardBase = ({ data }) => {
       openInNewTab
       title={data.title}
       href={data.url}
-      image={
-        data.thumbnail.path
-          ? `${process.env.CDN_URL}${data.thumbnail.path}`
-          : null
-      }
-      imageWidth={data.thumbnail.width}
-      imageHeight={data.thumbnail.height}
+      image={image.path ? `${process.env.CDN_URL}${image.path}` : null}
+      imageWidth={image.width}
+      imageHeight={image.height}
       renderAvatar={() => null}
       navigationList={makeMoreList({
         mutate: mutateDelete,

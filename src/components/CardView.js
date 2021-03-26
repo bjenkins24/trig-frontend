@@ -19,6 +19,7 @@ import { updateCard, deleteCard } from '../utils/cardClient';
 import useUser from '../utils/useUser';
 import { CardQueryContext } from '../utils/useCards';
 import EmptyState from './EmptyState';
+import { DEFAULT_TO_SCREENSHOTS } from '../constants/defaultToScreenshots';
 
 export const saveView = async ({ id, userId }) => {
   await updateCard({ id, viewed_by: userId });
@@ -239,7 +240,10 @@ export const makeMoreList = ({ mutate, id }) => [
 ];
 
 const getImage = data => {
-  if (data.image.path) {
+  const shouldShowScreenshot = DEFAULT_TO_SCREENSHOTS.includes(
+    new URL(data.url).host
+  );
+  if (data.image.path && !shouldShowScreenshot) {
     return data.image;
   }
   if (data.screenshot.path) {

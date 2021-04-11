@@ -68,7 +68,7 @@ const Register = () => {
               ),
               terms: bool().oneOf(
                 [true],
-                'You must agree to our terms to continue.'
+                'You must agree to our terms and privacy policy to continue.'
               ),
             })}
           >
@@ -90,7 +90,26 @@ const Register = () => {
                       name="terms"
                       labelPosition="right"
                       labelProps={{ color: 'pc' }}
-                      label="I agree to the Terms of Service and Privacy Policy"
+                      label={
+                        <span>
+                          I agree to the{' '}
+                          <a
+                            href="https://trytrig.com/terms-of-service"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Terms of Service
+                          </a>{' '}
+                          and{' '}
+                          <a
+                            href="https://trytrig.com/privacy-policy"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Privacy Policy
+                          </a>
+                        </span>
+                      }
                     />
                     <Button
                       type="submit"

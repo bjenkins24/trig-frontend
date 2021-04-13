@@ -5,6 +5,7 @@ import {
   Icon,
   ListItemContent,
   Body1Component,
+  Body2Component,
   StringFieldWithButtonForm,
   ModalHeader,
   toast,
@@ -292,8 +293,26 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
               }}
               css={`
                 width: 100%;
+                margin-bottom: ${({ theme }) => theme.space[4]}px;
               `}
             />
+            <Body2Component
+              as="p"
+              css={`
+                margin-bottom: 0;
+              `}
+            >
+              *Consider using our{' '}
+              <a
+                href={process.env.CHROME_EXTENSION_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Chrome Extension
+              </a>{' '}
+              instead. The Chrome Extension will work on sites that require you
+              to log in. This form will not.
+            </Body2Component>
           </>
         )}
       />

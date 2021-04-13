@@ -69,7 +69,13 @@ const Extension = ({ isOpen, setIsOpen }) => {
           text-align: center;
         `}
       >
-        <Button as="a" size="hg" href="https://hello.com" target="_blank">
+        <Button
+          as="a"
+          size="hg"
+          href={process.env.CHROME_EXTENSION_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
           Get the Chrome Extension
         </Button>
       </div>

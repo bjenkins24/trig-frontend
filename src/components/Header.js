@@ -25,9 +25,10 @@ const HeaderProps = {
     })
   ).isRequired,
   openSearch: PropTypes.func.isRequired,
+  setIsExtensionOpen: PropTypes.func.isRequired,
 };
 
-const Header = ({ links, openSearch, ...restProps }) => {
+const Header = ({ links, openSearch, setIsExtensionOpen, ...restProps }) => {
   const { logout } = useUser();
   const [isConnectedServicesOpen, setIsConnectedServicesOpen] = useState(false);
   const history = useHistory();
@@ -128,6 +129,10 @@ const Header = ({ links, openSearch, ...restProps }) => {
                   {
                     item: 'Account Settings',
                     onClick: () => history.push('/account'),
+                  },
+                  {
+                    item: 'Get Chrome Extension',
+                    onClick: () => setIsExtensionOpen(true),
                   },
                   {
                     item: 'Logout',

@@ -14,12 +14,12 @@ const queryClient = new QueryClient({
   },
 });
 
-const AppProviders = ({ children }) => {
+const AppProviders = ({ children, history }) => {
   return (
     <ThemeProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <OpenCardProvider>
-          <Router>{children}</Router>
+          <Router history={history}>{children}</Router>
         </OpenCardProvider>
       </QueryClientProvider>
     </ThemeProvider>
@@ -28,6 +28,7 @@ const AppProviders = ({ children }) => {
 
 AppProviders.propTypes = {
   children: PropTypes.node.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 export default AppProviders;

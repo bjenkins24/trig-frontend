@@ -10,11 +10,18 @@ import Collection from './pages/Collection';
 import OauthConnect from './pages/OauthConnect';
 import AccountSettings from './pages/AccountSettings';
 import useSearch from './utils/useSearch';
+import useUser from './utils/useUser';
+import Extension from './components/Extension';
 
 const AuthenticatedApp = () => {
   const history = useHistory();
   const { isSearchOpen, openSearch, closeSearch, searchKey } = useSearch();
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false);
+  const { user } = useUser();
+  const onboardingClosed = user?.properties?.onboarding_closed;
+  const shouldOpenOnboarding =
+    typeof onboardingClosed === 'undefined' || onboardingClosed !== true;
+  const [isExtensionOpen, setIsExtensionOpen] = useState(shouldOpenOnboarding);
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -36,12 +43,14 @@ const AuthenticatedApp = () => {
       {isSearchOpen && (
         <Search defaultInput={searchKey} onRequestClose={closeSearch} />
       )}
+      <Extension setIsOpen={setIsExtensionOpen} isOpen={isExtensionOpen} />
       <CreateButton
         isCreateLinkOpen={isCreateLinkOpen}
         setIsCreateLinkOpen={setIsCreateLinkOpen}
       />
       <Header
         openSearch={openSearch}
+        setIsExtensionOpen={setIsExtensionOpen}
         links={[
           {
             onClick: () => history.push('/'),

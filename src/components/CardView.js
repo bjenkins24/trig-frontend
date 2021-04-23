@@ -284,6 +284,7 @@ const CardBase = ({ data }) => {
       openInNewTab
       title={data.title}
       href={data.url}
+      type={data.type}
       image={image.path ? `${process.env.CDN_URL}${image.path}` : null}
       imageWidth={image.width}
       imageHeight={image.height}

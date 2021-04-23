@@ -9,13 +9,6 @@ import {
   SelectField,
 } from '@trig-app/core-components';
 
-const filterCategoryProps = {
-  categoryName: PropTypes.string.isRequired,
-  items: PropTypes.arrayOf(PropTypes.object).isRequired,
-  selectedItems: PropTypes.arrayOf(PropTypes.string).isRequired,
-  setSelectedItems: PropTypes.func.isRequired,
-};
-
 const makeLabel = ({ name, count }) => {
   return `${name} (${count})`;
 };
@@ -23,9 +16,18 @@ const makeLabel = ({ name, count }) => {
 export const maxDefaultFilters = 5;
 export const maxWithoutSearchFilters = 9;
 
+const filterCategoryProps = {
+  categoryName: PropTypes.string.isRequired,
+  items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  selectedItems: PropTypes.arrayOf(PropTypes.string).isRequired,
+  setSelectedItems: PropTypes.func.isRequired,
+  icon: PropTypes.string.isRequired,
+};
+
 export const FilterCategory = ({
   categoryName,
   items,
+  icon,
   selectedItems,
   setSelectedItems,
 }) => {
@@ -68,7 +70,7 @@ export const FilterCategory = ({
           `}
         >
           <Icon
-            type="tags"
+            type={icon}
             size={2}
             css={`
               margin-top: 3px;
@@ -213,12 +215,14 @@ const Filters = ({
         <FilterCategory
           categoryName="Tags"
           items={tags}
+          icon="tags"
           setSelectedItems={setSelectedTags}
           selectedItems={selectedTags}
         />
         <FilterCategory
-          categoryName="Card Types"
+          categoryName="Types"
           items={types}
+          icon="cards"
           setSelectedItems={setSelectedTypes}
           selectedItems={selectedTypes}
         />

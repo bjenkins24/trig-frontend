@@ -34,7 +34,7 @@ const Layout = ({ children, title }) => {
       <GlobalStyles />
       <Head title={title} />
       <Header>
-        <a href="https://trytrig.com">
+        <a href={process.env.MARKETING_URL}>
           <Logo />
         </a>
       </Header>

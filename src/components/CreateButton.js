@@ -4,6 +4,7 @@ import {
   Fab,
   Icon,
   ListItemContent,
+  Popover,
   Body1Component,
   StringFieldWithButtonForm,
   ModalHeader,
@@ -13,7 +14,7 @@ import {
 import { string } from 'yup';
 import { useMutation, useQueryClient } from 'react-query';
 import Modal from './Modal';
-import ServiceModal from './ServiceModal';
+import CollectionModal from './CollectionModal';
 import { createCard } from '../utils/cardClient';
 
 const CreateItemProps = {
@@ -83,7 +84,7 @@ const PopoverContentProps = {
   isOpen: PropTypes.bool.isRequired,
   closePopover: PropTypes.func.isRequired,
   setIsCreateOpen: PropTypes.func.isRequired,
-  setIsConnectAppOpen: PropTypes.func.isRequired,
+  setIsCreateCollectionOpen: PropTypes.func.isRequired,
   setIsCreateLinkOpen: PropTypes.func.isRequired,
 };
 
@@ -91,7 +92,7 @@ const PopoverContent = ({
   isOpen,
   closePopover,
   setIsCreateOpen,
-  setIsConnectAppOpen,
+  setIsCreateCollectionOpen,
   setIsCreateLinkOpen,
 }) => {
   useEffect(() => {
@@ -111,27 +112,8 @@ const PopoverContent = ({
       `}
     >
       <CreateItem
-        title="Connect a Service"
+        title="Create a Card"
         iconType="cards"
-        iconBackgroundColor="a2"
-        description="Create cards with data from other services"
-        onClick={() => {
-          close();
-          setIsConnectAppOpen(true);
-        }}
-        onKeyPress={e => {
-          if (e.key === 'Enter') {
-            close();
-          }
-        }}
-        css={`
-          border-top-right-radius: ${({ theme }) => theme.br};
-          border-top-left-radius: ${({ theme }) => theme.br};
-        `}
-      />
-      <CreateItem
-        title="Create a Link Card"
-        iconType="link"
         iconBackgroundColor="a1"
         description={
           /* eslint-disable react/jsx-wrap-multilines */
@@ -182,6 +164,25 @@ const PopoverContent = ({
           }
         }}
         css={`
+          border-top-right-radius: ${({ theme }) => theme.br};
+          border-top-left-radius: ${({ theme }) => theme.br};
+        `}
+      />
+      <CreateItem
+        title="Create a Collection"
+        iconType="collection"
+        iconBackgroundColor="a2"
+        description="A shareable collection of cards"
+        onClick={() => {
+          close();
+          setIsCreateCollectionOpen(true);
+        }}
+        onKeyPress={e => {
+          if (e.key === 'Enter') {
+            close();
+          }
+        }}
+        css={`
           border-bottom: 0;
           border-bottom-left-radius: ${({ theme }) => theme.br};
           border-bottom-right-radius: ${({ theme }) => theme.br};
@@ -199,28 +200,74 @@ const CreateButtonTypes = {
 };
 
 const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
-  const [isConnectAppOpen, setIsConnectAppOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
   const queryClient = useQueryClient();
   const {
     mutate: createCardMutate,
     isLoading: isCreateCardLoading,
-  } = useMutation(createCard);
+  } = useMutation(createCard, {
+    onMutate: newCard => {
+      queryClient.cancelQueries('cards');
+      const previousCards = queryClient.getQueryData('cards') ?? { data: [] };
+      const newCards = [
+        {
+          url: newCard.url,
+          title: newCard.url,
+          cardType: 'link',
+          user: {
+            email: 'brian@trytrig.com',
+          },
+          createdAt: new Date(),
+          isFavorited: false,
+          totalFavorites: 0,
+        },
+        ...previousCards.data,
+      ];
+
+      queryClient.setQueryData('cards', () => ({ data: newCards }));
+      return () => queryClient.setQueryData('cards', previousCards);
+    },
+    onError: (error, newCard, rollback) => rollback(),
+  });
 
   return (
     <>
-      <div
-        css={`
-          position: fixed;
-          bottom: ${({ theme }) => theme.space[4]}px;
-          right: ${({ theme }) => theme.space[4]}px;
-          padding-top: ${({ theme }) => theme.space[3]}px;
-          z-index: 3;
-        `}
+      <Popover
+        placement="top-end"
+        variant="light"
+        renderPopover={({ isOpen, closePopover }) => (
+          <PopoverContent
+            isOpen={isOpen}
+            closePopover={closePopover}
+            setIsCreateOpen={setIsCreateOpen}
+            setIsCreateCollectionOpen={setIsCreateCollectionOpen}
+            setIsCreateLinkOpen={setIsCreateLinkOpen}
+          />
+        )}
       >
-        <Fab onClick={() => setIsCreateLinkOpen(true)}>
-          <Icon type="plus" color="sc" size={2.8} />
-        </Fab>
-      </div>
+        <div
+          css={`
+            position: fixed;
+            bottom: ${({ theme }) => theme.space[4]}px;
+            right: ${({ theme }) => theme.space[4]}px;
+            padding-top: ${({ theme }) => theme.space[3]}px;
+            z-index: 3;
+          `}
+        >
+          <Fab>
+            <Icon
+              type="plus"
+              color="sc"
+              size={2.8}
+              css={`
+                transition: transform 200ms;
+                transform: ${isCreateOpen ? 'rotate(45deg)' : 'none'};
+              `}
+            />
+          </Fab>
+        </div>
+      </Popover>
       <Modal
         onRequestClose={() => {
           setIsCreateLinkOpen(false);
@@ -230,7 +277,7 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
         header="Create Link Cards"
         renderHeader={() => (
           <>
-            <ModalHeader>Create a Card</ModalHeader>
+            <ModalHeader>Create a Link Card</ModalHeader>
             <Body1Component
               as="p"
               css={`
@@ -261,6 +308,10 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
                   "It looks like you didn't enter a valid url. Please try again."
                 )}
               onSubmit={async ({ value, resetForm }) => {
+                toast({
+                  timeout: 2500,
+                  message: 'Your card was created successfully.',
+                });
                 resetForm();
                 await createCardMutate(
                   { url: value },
@@ -281,19 +332,6 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
                         type: 'error',
                       });
                     },
-                    onSuccess: () => {
-                      const queries = queryClient.getQueryCache().getAll();
-                      queries.forEach(query => {
-                        const { queryKey } = query;
-                        if (!queryKey || !queryKey.includes('cards')) return;
-                        setTimeout(() => {
-                          queryClient.invalidateQueries(queryKey);
-                        }, 1000);
-                      });
-                      return toast({
-                        message: 'The card was added successfully.',
-                      });
-                    },
                   }
                 );
               }}
@@ -304,9 +342,9 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
           </>
         )}
       />
-      <ServiceModal
-        isOpen={isConnectAppOpen}
-        onRequestClose={() => setIsConnectAppOpen(false)}
+      <CollectionModal
+        isOpen={isCreateCollectionOpen}
+        onRequestClose={() => setIsCreateCollectionOpen(false)}
       />
     </>
   );

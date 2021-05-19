@@ -62,8 +62,8 @@ const AuthenticatedApp = () => {
         <Route path="/oauth/slack-connect">
           <OauthConnect />
         </Route>
-        <Route path="/collection/:id">
-          <Collection />
+        <Route path="/collection/:token">
+          <Collection setIsCreateLinkOpen={setIsCreateLinkOpen} />
         </Route>
         <Route path="/account">
           <AccountSettings />

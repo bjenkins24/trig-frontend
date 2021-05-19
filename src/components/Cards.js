@@ -8,10 +8,23 @@ import useCards, { CardQueryContext } from '../utils/useCards';
 
 const CardProps = {
   setIsCreateLinkOpen: PropTypes.func.isRequired,
+  collectionId: PropTypes.string,
 };
 
-const Cards = ({ setIsCreateLinkOpen, ...restProps }) => {
+const defaultProps = {
+  collectionId: null,
+};
+
+const Cards = ({ setIsCreateLinkOpen, collectionId, ...restProps }) => {
   const { queryString, filterProps, cardViewProps } = useFilters();
+  let finalQueryString = queryString;
+  if (collectionId) {
+    if (finalQueryString) {
+      finalQueryString = `col=${collectionId}&${queryString}`;
+    } else {
+      finalQueryString = `col=${collectionId}`;
+    }
+  }
   const {
     cards,
     filters,
@@ -21,7 +34,7 @@ const Cards = ({ setIsCreateLinkOpen, ...restProps }) => {
     isFetchingNextPage,
     totalResults,
   } = useCards({
-    queryString,
+    queryString: finalQueryString,
     // queryConfig: { refetchInterval: 5000 },
   });
 
@@ -54,5 +67,6 @@ const Cards = ({ setIsCreateLinkOpen, ...restProps }) => {
 };
 
 Cards.propTypes = CardProps;
+Cards.defaultProps = defaultProps;
 
 export default Cards;

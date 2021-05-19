@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import {
   Heading1,
   Body1,
@@ -11,20 +13,30 @@ import {
   ListItemContent,
   Checkbox,
   SelectField,
+  Loading,
 } from '@trig-app/core-components';
 import faker from 'faker';
 import Head from '../components/Head';
 import Hero from '../components/Hero';
 import Modal from '../components/Modal';
 import Cards from '../components/Cards';
+import { getCollection } from '../utils/collectionClient';
 
 const organization = 'On Deck Community';
 
-const Collection = () => {
-  const { id } = useParams();
+const CollectionProps = {
+  setIsCreateLinkOpen: PropTypes.func.isRequired,
+};
+
+const Collection = ({ setIsCreateLinkOpen }) => {
+  const { token } = useParams();
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
   const [isShareOpen, setIsShareOpen] = useState(false);
+
+  const { data: collection, isLoading } = useQuery(`collection/${token}`, () =>
+    getCollection({ token })
+  );
 
   const data = useMemo(
     () => ({
@@ -42,9 +54,13 @@ const Collection = () => {
     []
   );
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <>
-      <Head title={`Collection ${id}`} />
+      <Head title={collection.data.title} />
       <Hero
         css={`
           margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;
@@ -66,7 +82,7 @@ const Collection = () => {
           >
             <Image
               src={data.image}
-              alt={data.title}
+              alt={collection.data.title}
               css={`
                 max-width: 830px;
                 border: 1px solid ${({ theme }) => theme.colors.ps[300]};
@@ -80,9 +96,9 @@ const Collection = () => {
                 height: calc(100% - 137px);
               `}
             >
-              <Heading1 color="pc">{data.title}</Heading1>
+              <Heading1 color="pc">{collection.data.title}</Heading1>
               <Body1 as="p" color="pc">
-                {data.description}
+                {collection.data.description}
               </Body1>
             </div>
             <div
@@ -213,9 +229,14 @@ const Collection = () => {
           </div>
         </div>
       </Hero>
-      <Cards location={`/collection/${id}`} />
+      <Cards
+        setIsCreateLinkOpen={setIsCreateLinkOpen}
+        collectionId={collection.data.id}
+      />
     </>
   );
 };
+
+Collection.propTypes = CollectionProps;
 
 export default Collection;

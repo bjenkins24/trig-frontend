@@ -91,7 +91,7 @@ const Header = ({ links, openSearch, setIsExtensionOpen, ...restProps }) => {
               `}
             >
               <Link to="/">
-                <Logo title="Trig" />
+                <Logo title="Trig" width={100} />
               </Link>
             </div>
             <Button

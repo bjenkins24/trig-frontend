@@ -343,8 +343,11 @@ const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
         )}
       />
       <CollectionModal
+        heading="Create a New Collection"
+        description="Once you create a collection you can add cards to it and share it publicly."
         isOpen={isCreateCollectionOpen}
         onRequestClose={() => setIsCreateCollectionOpen(false)}
+        submitContent="Create"
       />
     </>
   );

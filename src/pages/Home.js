@@ -53,36 +53,38 @@ const Home = ({ setIsCreateLinkOpen }) => {
           margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;
         `}
       >
-        <Carousel
-          slidesPerPage={getSlidesPerPage({ width })}
-          defaultSlidesToScroll={getSlidesPerPage({ width })}
-        >
-          {collections.data.map(data => {
-            return (
-              <div
-                css={`
-                  height: 204px;
-                  width: 100%;
-                `}
-              >
-                <Collection
-                  onClick={() => {
-                    history.push(`/collection/${data.token}`);
-                  }}
-                  href={`/collection/${data.token}`}
-                  totalCards={data.totalCards}
-                  title={data.title}
-                  permission={
-                    typeof data.permissions !== 'undefined' &&
-                    data.permissions.length === 0
-                      ? 'private'
-                      : 'public'
-                  }
-                />
-              </div>
-            );
-          })}
-        </Carousel>
+        {typeof collections !== 'undefined' && (
+          <Carousel
+            slidesPerPage={getSlidesPerPage({ width })}
+            defaultSlidesToScroll={getSlidesPerPage({ width })}
+          >
+            {collections.data.map(data => {
+              return (
+                <div
+                  css={`
+                    height: 204px;
+                    width: 100%;
+                  `}
+                >
+                  <Collection
+                    onClick={() => {
+                      history.push(`/collection/${data.token}`);
+                    }}
+                    href={`/collection/${data.token}`}
+                    totalCards={data.totalCards}
+                    title={data.title}
+                    permission={
+                      typeof data.permissions !== 'undefined' &&
+                      data.permissions.length === 0
+                        ? 'private'
+                        : 'public'
+                    }
+                  />
+                </div>
+              );
+            })}
+          </Carousel>
+        )}
       </Hero>
 
       <Cards setIsCreateLinkOpen={setIsCreateLinkOpen} />

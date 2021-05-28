@@ -1,11 +1,5 @@
 import { client } from './apiClient';
 
-const createCollection = fields => {
-  return client('collection', {
-    body: { ...fields },
-  });
-};
-
 const updateCollection = fields => {
   if (typeof fields.id === 'undefined') {
     // eslint-disable-next-line no-console
@@ -15,6 +9,15 @@ const updateCollection = fields => {
   }
   return client(`collection/${fields.id}`, {
     method: 'PATCH',
+    body: { ...fields },
+  });
+};
+
+const upsertCollection = fields => {
+  if (typeof fields.id !== 'undefined' && fields.id) {
+    return updateCollection(fields);
+  }
+  return client('collection', {
     body: { ...fields },
   });
 };
@@ -34,7 +37,7 @@ const getCollections = () => {
 };
 
 export {
-  createCollection,
+  upsertCollection,
   updateCollection,
   getCollection,
   getCollections,

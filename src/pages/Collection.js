@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
@@ -13,6 +13,7 @@ import Head from '../components/Head';
 import Hero from '../components/Hero';
 import Cards from '../components/Cards';
 import { getCollection } from '../utils/collectionClient';
+import CollectionModal from '../components/CollectionModal';
 
 const CollectionProps = {
   setIsCreateLinkOpen: PropTypes.func.isRequired,
@@ -20,6 +21,7 @@ const CollectionProps = {
 
 const Collection = ({ setIsCreateLinkOpen }) => {
   const { token } = useParams();
+  const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
 
   const { data: collection, isLoading } = useQuery(`collection/${token}`, () =>
     getCollection({ token })
@@ -31,6 +33,15 @@ const Collection = ({ setIsCreateLinkOpen }) => {
 
   return (
     <>
+      <CollectionModal
+        heading="Edit Collection"
+        description="You can edit your collection and add cards to it and share it publicly."
+        isOpen={isCollectionModalOpen}
+        onRequestClose={() => setIsCollectionModalOpen(false)}
+        defaultTitle={collection.data.title}
+        submitContent="Save"
+        id={collection.data.id}
+      />
       <Head title={collection.data.title} />
       <Hero
         css={`
@@ -81,8 +92,12 @@ const Collection = ({ setIsCreateLinkOpen }) => {
             <Button
               css={`
                 margin-left: auto;
+                margin-right: ${({ theme }) => theme.space[4]}px;
               `}
               iconProps={{ type: 'edit' }}
+              onClick={() => {
+                setIsCollectionModalOpen(true);
+              }}
             >
               Edit
             </Button>

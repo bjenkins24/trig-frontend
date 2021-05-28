@@ -7,9 +7,8 @@ import {
   SelectField,
   Fieldset,
 } from '@trig-app/core-components';
-import { useMutation, useQueryClient } from 'react-query';
 import Modal from './Modal';
-import { createCollection } from '../utils/collectionClient';
+import useCollections from '../utils/useCollections';
 
 const CollectionButtonProps = {
   connected: PropTypes.bool,
@@ -42,65 +41,73 @@ CollectionButton.defaultProps = CollectionButtonDefaultProps;
 const CollectionModalProps = {
   isOpen: PropTypes.bool.isRequired,
   onRequestClose: PropTypes.func.isRequired,
+  defaultTitle: PropTypes.func,
+  defaultSharing: PropTypes.oneOf(['private', 'public']),
+  heading: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  submitContent: PropTypes.string.isRequired,
+  id: PropTypes.number,
 };
 
-const CollectionModal = ({ isOpen, onRequestClose }) => {
-  const [errorTitle, setErrorTitle] = useState('');
-  const [sharing, setSharing] = useState({
-    label: 'Private',
-    value: 'private',
-  });
-  const [title, setTitle] = useState('');
-  const queryClient = useQueryClient();
-  const {
-    mutate: createCollectionMutate,
-    isLoading: isCreateCollectionLoading,
-  } = useMutation(createCollection, {
-    onMutate: async newCollection => {
-      await queryClient.cancelQueries('collections');
-      const previousCollections = queryClient.getQueryData('collections') ?? {
-        data: [],
-      };
-      const newCollections = [
-        {
-          description: '',
-          title: newCollection.title,
-          id: newCollection.id,
-        },
-        ...previousCollections.data,
-      ];
+const CollectionModalDefaultProps = {
+  defaultTitle: '',
+  defaultSharing: 'private',
+  description: '',
+  id: null,
+};
 
-      queryClient.setQueryData('collections', () => ({ data: newCollections }));
-      return () => queryClient.setQueryData('collections', previousCollections);
-    },
-    onError: (error, newCollection, rollback) => rollback(),
-  });
+const getSharing = sharing => {
+  if (sharing === 'private') {
+    return { label: 'Private', value: 'private' };
+  }
+  if (sharing === 'public') {
+    return { label: 'Public', value: 'public' };
+  }
+  return {};
+};
+
+const CollectionModal = ({
+  id,
+  isOpen,
+  heading,
+  description,
+  onRequestClose,
+  defaultTitle,
+  defaultSharing,
+  submitContent,
+}) => {
+  const defaultSharingType = getSharing(defaultSharing);
+  const [errorTitle, setErrorTitle] = useState('');
+  const [sharing, setSharing] = useState(defaultSharingType);
+  const [title, setTitle] = useState(defaultTitle);
+  const { collectionMutate, collectionIsLoading } = useCollections();
 
   return (
     <Modal
       onRequestClose={onRequestClose}
       width={60}
       isOpen={isOpen}
-      submitContent="Create"
+      submitContent={submitContent}
       cancelContent="Cancel"
       submitProps={{
-        isLoading: isCreateCollectionLoading ?? null,
+        isLoading: collectionIsLoading ?? null,
         onClick: () => {
           if (!title) {
             return setErrorTitle('Please add a title');
           }
           if (sharing.value === 'public') {
-            createCollectionMutate({
+            collectionMutate({
+              id,
               title,
               permissions: [{ type: 'public', capability: 'reader' }],
             });
           } else {
-            createCollectionMutate({ title });
+            collectionMutate({ title, id });
           }
           return false;
         },
       }}
-      header="Create a Collection"
+      header={heading}
     >
       <Body1Component
         as="p"
@@ -109,50 +116,56 @@ const CollectionModal = ({ isOpen, onRequestClose }) => {
           margin-bottom: ${({ theme }) => theme.space[4]}px;
         `}
       >
-        Once you create a collection you can add cards to it and share it
-        publicly.
+        {description}
       </Body1Component>
-      <Fieldset
+      <div
         css={`
           width: 100%;
-          margin-bottom: ${({ theme }) => theme.space[4]}px;
         `}
       >
-        <StringField
-          autoFocus
-          label="Collection Title"
-          onChange={event => {
-            if (errorTitle) {
-              setErrorTitle('');
-            }
-            setTitle(event.target.value);
-          }}
-          error={errorTitle}
-          value={title}
-          placeholder="Enter a title..."
+        <Fieldset
           css={`
             width: 100%;
+            margin-bottom: ${({ theme }) => theme.space[4]}px;
           `}
-        />
-        <SelectField
-          label="Sharing"
-          onChange={option => {
-            setSharing(option);
-          }}
-          value={sharing}
-          options={[
-            { label: 'Private', value: 'private' },
-            { label: 'Public', value: 'public' },
-          ]}
-          css={`
-            width: 100%;
-          `}
-        />
-      </Fieldset>
+        >
+          <StringField
+            autoFocus
+            label="Collection Title"
+            onChange={event => {
+              if (errorTitle) {
+                setErrorTitle('');
+              }
+              setTitle(event.target.value);
+            }}
+            error={errorTitle}
+            value={title}
+            placeholder="Enter a title..."
+            css={`
+              width: 100%;
+            `}
+          />
+          <SelectField
+            label="Sharing"
+            onChange={option => {
+              setSharing(option);
+            }}
+            value={sharing}
+            options={[
+              { label: 'Private', value: 'private' },
+              { label: 'Public', value: 'public' },
+            ]}
+            css={`
+              width: 100%;
+            `}
+          />
+        </Fieldset>
+      </div>
     </Modal>
   );
 };
 
 CollectionModal.propTypes = CollectionModalProps;
+CollectionModal.defaultProps = CollectionModalDefaultProps;
 
 export default CollectionModal;

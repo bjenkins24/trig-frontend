@@ -6,6 +6,7 @@ import {
   StringField,
   SelectField,
   Fieldset,
+  toast,
 } from '@trig-app/core-components';
 import Modal from './Modal';
 import useCollections from '../utils/useCollections';
@@ -47,6 +48,7 @@ const CollectionModalProps = {
   description: PropTypes.string,
   submitContent: PropTypes.string.isRequired,
   id: PropTypes.number,
+  successMessage: PropTypes.string.isRequired,
 };
 
 const CollectionModalDefaultProps = {
@@ -75,37 +77,56 @@ const CollectionModal = ({
   defaultTitle,
   defaultSharing,
   submitContent,
+  successMessage,
 }) => {
   const defaultSharingType = getSharing(defaultSharing);
   const [errorTitle, setErrorTitle] = useState('');
   const [sharing, setSharing] = useState(defaultSharingType);
   const [title, setTitle] = useState(defaultTitle);
-  const { collectionMutate, collectionIsLoading } = useCollections();
+  const close = () => {
+    onRequestClose();
+    setTitle(defaultTitle);
+    setSharing(defaultSharingType);
+  };
+  const {
+    collectionMutate,
+    collectionDelete,
+    collectionIsLoading,
+  } = useCollections({
+    onSuccess: () => {
+      onRequestClose();
+      return toast({
+        message: successMessage,
+      });
+    },
+  });
+
+  const submit = () => {
+    if (!title) {
+      return setErrorTitle('Please add a title');
+    }
+    if (sharing.value === 'public') {
+      collectionMutate({
+        id,
+        title,
+        permissions: [{ type: 'public', capability: 'reader' }],
+      });
+    } else {
+      collectionMutate({ title, id });
+    }
+    return false;
+  };
 
   return (
     <Modal
-      onRequestClose={onRequestClose}
+      onRequestClose={close}
       width={60}
       isOpen={isOpen}
       submitContent={submitContent}
       cancelContent="Cancel"
       submitProps={{
-        isLoading: collectionIsLoading ?? null,
-        onClick: () => {
-          if (!title) {
-            return setErrorTitle('Please add a title');
-          }
-          if (sharing.value === 'public') {
-            collectionMutate({
-              id,
-              title,
-              permissions: [{ type: 'public', capability: 'reader' }],
-            });
-          } else {
-            collectionMutate({ title, id });
-          }
-          return false;
-        },
+        loading: collectionIsLoading ?? null,
+        onClick: submit,
       }}
       header={heading}
     >
@@ -132,6 +153,11 @@ const CollectionModal = ({
           <StringField
             autoFocus
             label="Collection Title"
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                submit();
+              }
+            }}
             onChange={event => {
               if (errorTitle) {
                 setErrorTitle('');
@@ -160,6 +186,11 @@ const CollectionModal = ({
             `}
           />
         </Fieldset>
+        {id && (
+          <Button variant="inverse-s" onClick={() => collectionDelete({ id })}>
+            Delete Collection
+          </Button>
+        )}
       </div>
     </Modal>
   );

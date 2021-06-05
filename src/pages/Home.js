@@ -50,6 +50,8 @@ const Home = ({ setIsCreateLinkOpen }) => {
       <Head title="Dashboard" />
       <Hero
         css={`
+          padding-left: 0;
+          padding-right: 0;
           margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;
         `}
       >

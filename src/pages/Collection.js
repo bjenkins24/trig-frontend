@@ -40,6 +40,7 @@ const Collection = ({ setIsCreateLinkOpen }) => {
         onRequestClose={() => setIsCollectionModalOpen(false)}
         defaultTitle={collection.data.title}
         submitContent="Save"
+        successMessage="Your collection was saved successfully."
         id={collection.data.id}
       />
       <Head title={collection.data.title} />

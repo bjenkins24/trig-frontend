@@ -7,7 +7,7 @@ import {
 
 export const generalCardQueryKey = 'cards';
 
-const useCollections = ({ onSuccess } = {}) => {
+const useCollections = ({ onSuccess, onSuccessDelete } = {}) => {
   const queryClient = useQueryClient();
   const {
     mutate: collectionMutate,
@@ -27,7 +27,7 @@ const useCollections = ({ onSuccess } = {}) => {
     onError: (error, newCollection, rollback) => rollback(),
     onSuccess: () => {
       queryClient.invalidateQueries('collections');
-      onSuccess();
+      onSuccessDelete();
     },
   });
 

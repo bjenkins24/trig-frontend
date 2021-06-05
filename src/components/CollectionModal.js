@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
   Body1Component,
@@ -79,6 +80,7 @@ const CollectionModal = ({
   submitContent,
   successMessage,
 }) => {
+  const history = useHistory();
   const defaultSharingType = getSharing(defaultSharing);
   const [errorTitle, setErrorTitle] = useState('');
   const [sharing, setSharing] = useState(defaultSharingType);
@@ -97,6 +99,12 @@ const CollectionModal = ({
       onRequestClose();
       return toast({
         message: successMessage,
+      });
+    },
+    onSuccessDelete: () => {
+      history.push('/');
+      return toast({
+        message: `The collection ${title} was deleted successfully.`,
       });
     },
   });
@@ -187,7 +195,13 @@ const CollectionModal = ({
           />
         </Fieldset>
         {id && (
-          <Button variant="inverse-s" onClick={() => collectionDelete({ id })}>
+          <Button
+            variant="inverse-s"
+            type="button"
+            onClick={() => {
+              collectionDelete({ id });
+            }}
+          >
             Delete Collection
           </Button>
         )}

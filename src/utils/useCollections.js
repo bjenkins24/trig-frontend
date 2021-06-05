@@ -1,9 +1,13 @@
-import { useMutation, useQueryClient } from 'react-query';
-import { deleteCollection, upsertCollection } from './collectionClient';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  deleteCollection,
+  getCollections,
+  upsertCollection,
+} from './collectionClient';
 
 export const generalCardQueryKey = 'cards';
 
-const useCollections = ({ onSuccess }) => {
+const useCollections = ({ onSuccess } = {}) => {
   const queryClient = useQueryClient();
   const {
     mutate: collectionMutate,
@@ -27,7 +31,14 @@ const useCollections = ({ onSuccess }) => {
     },
   });
 
+  const {
+    data: collections,
+    isLoading: isLoadingCollections,
+  } = useQuery(`collections`, () => getCollections());
+
   return {
+    collections,
+    isLoadingCollections,
     collectionMutate,
     collectionIsLoading,
     collectionDelete,

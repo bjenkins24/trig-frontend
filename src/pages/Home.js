@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useWindowWidth } from '@react-hook/window-size/throttled';
 import { Carousel, Loading, Collection } from '@trig-app/core-components';
-import { useQuery } from 'react-query';
 import { breakpoints } from '@trig-app/constants';
 import { useHistory } from 'react-router-dom';
 import Head from '../components/Head';
 import Hero from '../components/Hero';
 import Cards from '../components/Cards';
-import { getCollections } from '../utils/collectionClient';
+import useCollections from '../utils/useCollections';
 
 const getSlidesPerPage = ({ width }) => {
   if (width <= breakpoints.sm) {
@@ -37,11 +36,9 @@ const Home = ({ setIsCreateLinkOpen }) => {
   const width = useWindowWidth();
   const history = useHistory();
 
-  const { data: collections, isLoading } = useQuery(`collections`, () =>
-    getCollections()
-  );
+  const { collections, isLoadingCollections } = useCollections();
 
-  if (isLoading) {
+  if (isLoadingCollections) {
     return <Loading />;
   }
 
@@ -67,6 +64,7 @@ const Home = ({ setIsCreateLinkOpen }) => {
                     height: 204px;
                     width: 100%;
                   `}
+                  key={data.token}
                 >
                   <Collection
                     onClick={() => {

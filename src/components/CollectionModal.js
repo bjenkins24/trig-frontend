@@ -42,7 +42,7 @@ CollectionButton.defaultProps = CollectionButtonDefaultProps;
 const CollectionModalProps = {
   isOpen: PropTypes.bool.isRequired,
   onRequestClose: PropTypes.func.isRequired,
-  defaultTitle: PropTypes.func,
+  defaultTitle: PropTypes.string,
   defaultSharing: PropTypes.oneOf(['private', 'public']),
   heading: PropTypes.string.isRequired,
   description: PropTypes.string,

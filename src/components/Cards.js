@@ -8,7 +8,7 @@ import useCards, { CardQueryContext } from '../utils/useCards';
 
 const CardProps = {
   setIsCreateLinkOpen: PropTypes.func.isRequired,
-  collectionId: PropTypes.string,
+  collectionId: PropTypes.number,
 };
 
 const defaultProps = {

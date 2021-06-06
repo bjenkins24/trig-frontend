@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Body1Component,
   ModalHeader,
-  StringFieldWithButtonForm,
+  SelectField,
+  StringField,
   toast,
 } from '@trig-app/core-components';
-import { string } from 'yup';
 import { useMutation, useQueryClient } from 'react-query';
 import Modal from './Modal';
 import { createCard } from '../utils/cardClient';
+import useCollections from '../utils/useCollections';
 
 const CardModalTypes = {
   setIsCreateLinkOpen: PropTypes.func.isRequired,
@@ -17,6 +18,13 @@ const CardModalTypes = {
 };
 
 const CardModal = ({ setIsCreateLinkOpen, isCreateLinkOpen }) => {
+  const [selectedCollection, setSelectedCollection] = useState({
+    label: 'None',
+    value: '',
+  });
+
+  const [url, setUrl] = useState('');
+
   const queryClient = useQueryClient();
   const {
     mutate: createCardMutate,
@@ -45,6 +53,29 @@ const CardModal = ({ setIsCreateLinkOpen, isCreateLinkOpen }) => {
     },
     onError: (error, newCard, rollback) => rollback(),
   });
+
+  const { collections, isLoadingCollections } = useCollections();
+
+  let collectionOptions = [];
+  if (!isLoadingCollections && collections) {
+    collectionOptions = collections.data.map(collection => ({
+      label: collection.title,
+      value: collection.id,
+    }));
+    collectionOptions.unshift({
+      label: 'None',
+      value: '',
+    });
+  }
+
+  const resetForm = () => {
+    setUrl('');
+    setSelectedCollection({
+      label: 'None',
+      value: '',
+    });
+  };
+
   return (
     <Modal
       onRequestClose={() => {
@@ -54,7 +85,42 @@ const CardModal = ({ setIsCreateLinkOpen, isCreateLinkOpen }) => {
       isOpen={isCreateLinkOpen}
       submitContent="Create"
       cancelContent="Cancel"
-      submitProps={{}}
+      submitProps={{
+        isLoading: isCreateCardLoading,
+        onClick: async () => {
+          toast({
+            timeout: 2500,
+            message: 'Your card was created successfully.',
+          });
+          resetForm();
+          const collectionsPayload = [];
+          if (selectedCollection.value) {
+            collectionsPayload.push(selectedCollection.value);
+          }
+
+          await createCardMutate(
+            { url, collections: collectionsPayload },
+            {
+              onError: error => {
+                if (typeof error.error !== 'undefined') {
+                  if (error.error === 'exists') {
+                    return toast({
+                      message:
+                        'You already have a card created for the submitted link. You cannot have duplicate cards. The card was not created.',
+                      type: 'error',
+                    });
+                  }
+                }
+                return toast({
+                  message:
+                    'There was a problem submitting the url. Please try again.',
+                  type: 'error',
+                });
+              },
+            }
+          );
+        },
+      }}
       header="Create Link Cards"
       renderHeader={() => (
         <>
@@ -76,50 +142,32 @@ const CardModal = ({ setIsCreateLinkOpen, isCreateLinkOpen }) => {
             </a>{' '}
             instead.
           </Body1Component>
-          <StringFieldWithButtonForm
+          <StringField
+            value={url}
+            onChange={event => {
+              setUrl(event.target.value);
+            }}
             autoFocus
             placeholder="Enter a url..."
-            buttonContent="Add"
-            buttonProps={{ loading: isCreateCardLoading }}
             disabled={isCreateCardLoading}
-            validate={string()
-              .required('This field is required.')
-              .matches(
-                /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/,
-                "It looks like you didn't enter a valid url. Please try again."
-              )}
-            onSubmit={async ({ value, resetForm }) => {
-              toast({
-                timeout: 2500,
-                message: 'Your card was created successfully.',
-              });
-              resetForm();
-              await createCardMutate(
-                { url: value },
-                {
-                  onError: error => {
-                    if (typeof error.error !== 'undefined') {
-                      if (error.error === 'exists') {
-                        return toast({
-                          message:
-                            'You already have a card created for the submitted link. You cannot have duplicate cards. The card was not created.',
-                          type: 'error',
-                        });
-                      }
-                    }
-                    return toast({
-                      message:
-                        'There was a problem submitting the url. Please try again.',
-                      type: 'error',
-                    });
-                  },
-                }
-              );
-            }}
             css={`
               width: 100%;
+              margin-bottom: ${({ theme }) => theme.space[3]}px;
             `}
           />
+          {collectionOptions && (
+            <SelectField
+              label="Collection"
+              onChange={option => {
+                setSelectedCollection(option);
+              }}
+              value={selectedCollection}
+              options={collectionOptions}
+              css={`
+                width: 100%;
+              `}
+            />
+          )}
         </>
       )}
     />

@@ -11,17 +11,27 @@ import {
 } from '@trig-app/core-components';
 import Head from '../components/Head';
 import Hero from '../components/Hero';
+import Header from '../components/Header';
 import Cards from '../components/Cards';
 import { getCollection } from '../utils/collectionClient';
 import CollectionModal from '../components/CollectionModal';
+import Search from './Search';
+import useSearch from '../utils/useSearch';
 
 const CollectionProps = {
-  setIsCreateLinkOpen: PropTypes.func.isRequired,
+  setIsCreateLinkOpen: PropTypes.func,
+  isPublic: PropTypes.bool,
 };
 
-const Collection = ({ setIsCreateLinkOpen }) => {
+const defaultProps = {
+  setIsCreateLinkOpen: () => null,
+  isPublic: false,
+};
+
+const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
   const { token } = useParams();
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
+  const { isSearchOpen, openSearch, closeSearch, searchKey } = useSearch();
 
   const { data: collection, isLoading } = useQuery(`collection/${token}`, () =>
     getCollection({ token })
@@ -33,17 +43,23 @@ const Collection = ({ setIsCreateLinkOpen }) => {
 
   return (
     <>
-      <CollectionModal
-        heading="Edit Collection"
-        description="You can edit your collection and add cards to it and share it publicly."
-        isOpen={isCollectionModalOpen}
-        onRequestClose={() => setIsCollectionModalOpen(false)}
-        defaultTitle={collection.data.title}
-        submitContent="Save"
-        successMessage="Your collection was saved successfully."
-        id={collection.data.id}
-      />
+      {!isPublic && (
+        <CollectionModal
+          heading="Edit Collection"
+          description="You can edit your collection and add cards to it and share it publicly."
+          isOpen={isCollectionModalOpen}
+          onRequestClose={() => setIsCollectionModalOpen(false)}
+          defaultTitle={collection.data.title}
+          submitContent="Save"
+          successMessage="Your collection was saved successfully."
+          id={collection.data.id}
+        />
+      )}
       <Head title={collection.data.title} />
+      {isPublic && isSearchOpen && (
+        <Search defaultInput={searchKey} onRequestClose={closeSearch} />
+      )}
+      {isPublic && <Header isPublic={isPublic} openSearch={openSearch} />}
       <Hero
         css={`
           margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;
@@ -90,22 +106,25 @@ const Collection = ({ setIsCreateLinkOpen }) => {
                 {collection.data.totalCards !== 1 && 's'}
               </Body2>
             </div>
-            <Button
-              css={`
-                margin-left: auto;
-                margin-right: ${({ theme }) => theme.space[4]}px;
-              `}
-              iconProps={{ type: 'edit' }}
-              onClick={() => {
-                setIsCollectionModalOpen(true);
-              }}
-            >
-              Edit
-            </Button>
+            {!isPublic && (
+              <Button
+                css={`
+                  margin-left: auto;
+                  margin-right: ${({ theme }) => theme.space[4]}px;
+                `}
+                iconProps={{ type: 'edit' }}
+                onClick={() => {
+                  setIsCollectionModalOpen(true);
+                }}
+              >
+                Edit
+              </Button>
+            )}
           </div>
         </div>
       </Hero>
       <Cards
+        isPublic={isPublic}
         setIsCreateLinkOpen={setIsCreateLinkOpen}
         collectionId={collection.data.id}
       />
@@ -114,5 +133,6 @@ const Collection = ({ setIsCreateLinkOpen }) => {
 };
 
 Collection.propTypes = CollectionProps;
+Collection.defaultProps = defaultProps;
 
 export default Collection;

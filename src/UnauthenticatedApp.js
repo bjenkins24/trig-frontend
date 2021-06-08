@@ -5,10 +5,14 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Impersonation from './pages/Impersonation';
+import Collection from './pages/Collection';
 
 const UnauthenticatedApp = () => {
   return (
     <Switch>
+      <Route path="/collection/:token">
+        <Collection isPublic />
+      </Route>
       <Route path="/register">
         <Register />
       </Route>

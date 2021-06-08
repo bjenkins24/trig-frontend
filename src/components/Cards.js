@@ -9,13 +9,20 @@ import useCards, { CardQueryContext } from '../utils/useCards';
 const CardProps = {
   setIsCreateLinkOpen: PropTypes.func.isRequired,
   collectionId: PropTypes.number,
+  isPublic: PropTypes.bool,
 };
 
 const defaultProps = {
   collectionId: null,
+  isPublic: false,
 };
 
-const Cards = ({ setIsCreateLinkOpen, collectionId, ...restProps }) => {
+const Cards = ({
+  setIsCreateLinkOpen,
+  collectionId,
+  isPublic,
+  ...restProps
+}) => {
   const { queryString, filterProps, cardViewProps } = useFilters();
   let finalQueryString = queryString;
   if (collectionId) {
@@ -48,6 +55,7 @@ const Cards = ({ setIsCreateLinkOpen, collectionId, ...restProps }) => {
       >
         <CardQueryContext.Provider value={cardQueryKey}>
           <CardView
+            isPublic={isPublic}
             setIsCreateLinkOpen={setIsCreateLinkOpen}
             cards={cards}
             totalResults={totalResults}

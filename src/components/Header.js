@@ -23,12 +23,25 @@ const HeaderProps = {
       text: PropTypes.string,
       onClick: PropTypes.func,
     })
-  ).isRequired,
+  ),
   openSearch: PropTypes.func.isRequired,
-  setIsExtensionOpen: PropTypes.func.isRequired,
+  setIsExtensionOpen: PropTypes.func,
+  isPublic: PropTypes.bool,
 };
 
-const Header = ({ links, openSearch, setIsExtensionOpen, ...restProps }) => {
+const defaultProps = {
+  isPublic: false,
+  links: [],
+  setIsExtensionOpen: () => null,
+};
+
+const Header = ({
+  isPublic,
+  links,
+  openSearch,
+  setIsExtensionOpen,
+  ...restProps
+}) => {
   const { logout } = useUser();
   const [isConnectedServicesOpen, setIsConnectedServicesOpen] = useState(false);
   const history = useHistory();
@@ -90,9 +103,15 @@ const Header = ({ links, openSearch, setIsExtensionOpen, ...restProps }) => {
                   theme.space[5] + theme.space[4]}px;
               `}
             >
-              <Link to="/">
-                <Logo title="Trig" />
-              </Link>
+              {isPublic ? (
+                <a href="https://trytrig.com">
+                  <Logo title="Trig" />
+                </a>
+              ) : (
+                <Link to="/">
+                  <Logo title="Trig" />
+                </Link>
+              )}
             </div>
             <Button
               onClick={openSearch}
@@ -104,61 +123,67 @@ const Header = ({ links, openSearch, setIsExtensionOpen, ...restProps }) => {
             >
               Type anywhere to search
             </Button>
-            <div
-              css={`
-                position: relative;
-                top: 1px;
-              `}
-            >
-              <TabsNavigation tabs={links} defaultTab={getDefaultTab()} />
-            </div>
-            <div
-              css={`
-                display: flex;
-                margin-left: auto;
-                align-items: center;
-              `}
-            >
-              <PopoverNavigation
-                variant="light"
-                placement="bottom-end"
+            {links && (
+              <div
                 css={`
-                  margin-top: ${({ theme }) => theme.space[2]};
+                  position: relative;
+                  top: 1px;
                 `}
-                navigationList={[
-                  {
-                    item: 'Account Settings',
-                    onClick: () => history.push('/account'),
-                  },
-                  {
-                    item: 'Get Chrome Extension',
-                    onClick: () => setIsExtensionOpen(true),
-                  },
-                  {
-                    item: 'Logout',
-                    onClick: () => {
-                      toast({
-                        message: 'You have been successfully logged out.',
-                      });
-                      logout();
-                    },
-                  },
-                ]}
               >
-                <Avatar
-                  title="Profile"
+                <TabsNavigation tabs={links} defaultTab={getDefaultTab()} />
+              </div>
+            )}
+            {!isPublic && (
+              <div
+                css={`
+                  display: flex;
+                  margin-left: auto;
+                  align-items: center;
+                `}
+              >
+                <PopoverNavigation
+                  variant="light"
+                  placement="bottom-end"
                   css={`
-                    color: ${({ theme }) => theme.colors.pc};
-                    cursor: pointer;
+                    margin-top: ${({ theme }) => theme.space[2]};
                   `}
-                />
-              </PopoverNavigation>
-            </div>
-            <ServiceModal
-              defaultTab={1}
-              isOpen={isConnectedServicesOpen}
-              onRequestClose={() => setIsConnectedServicesOpen(false)}
-            />
+                  navigationList={[
+                    {
+                      item: 'Account Settings',
+                      onClick: () => history.push('/account'),
+                    },
+                    {
+                      item: 'Get Chrome Extension',
+                      onClick: () => setIsExtensionOpen(true),
+                    },
+                    {
+                      item: 'Logout',
+                      onClick: () => {
+                        toast({
+                          message: 'You have been successfully logged out.',
+                        });
+                        logout();
+                      },
+                    },
+                  ]}
+                >
+                  <Avatar
+                    title="Profile"
+                    css={`
+                      color: ${({ theme }) => theme.colors.pc};
+                      cursor: pointer;
+                    `}
+                  />
+                </PopoverNavigation>
+              </div>
+            )}
+            {!isPublic && (
+              <ServiceModal
+                defaultTab={1}
+                isOpen={isConnectedServicesOpen}
+                onRequestClose={() => setIsConnectedServicesOpen(false)}
+              />
+            )}
           </>
         ) : (
           <div
@@ -210,5 +235,6 @@ const Header = ({ links, openSearch, setIsExtensionOpen, ...restProps }) => {
 };
 
 Header.propTypes = HeaderProps;
+Header.defaultProps = defaultProps;
 
 export default Header;

@@ -7,7 +7,13 @@ const createCard = fields => {
 };
 
 const updateCard = fields => {
-  return client('card', {
+  if (typeof fields.id === 'undefined') {
+    // eslint-disable-next-line no-console
+    return console.error(
+      'You must specify and id field if you are updating a card'
+    );
+  }
+  return client(`card/${fields.id}`, {
     method: 'PATCH',
     body: { ...fields },
   });

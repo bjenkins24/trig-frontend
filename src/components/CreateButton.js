@@ -4,17 +4,11 @@ import {
   Fab,
   Icon,
   ListItemContent,
-  Body1Component,
-  StringFieldWithButtonForm,
-  ModalHeader,
-  toast,
+  Popover,
   Heading4,
 } from '@trig-app/core-components';
-import { string } from 'yup';
-import { useMutation, useQueryClient } from 'react-query';
-import Modal from './Modal';
-import ServiceModal from './ServiceModal';
-import { createCard } from '../utils/cardClient';
+import CollectionModal from './CollectionModal';
+import CardModal from './CardModal';
 
 const CreateItemProps = {
   iconType: PropTypes.string.isRequired,
@@ -83,7 +77,7 @@ const PopoverContentProps = {
   isOpen: PropTypes.bool.isRequired,
   closePopover: PropTypes.func.isRequired,
   setIsCreateOpen: PropTypes.func.isRequired,
-  setIsConnectAppOpen: PropTypes.func.isRequired,
+  setIsCreateCollectionOpen: PropTypes.func.isRequired,
   setIsCreateLinkOpen: PropTypes.func.isRequired,
 };
 
@@ -91,7 +85,7 @@ const PopoverContent = ({
   isOpen,
   closePopover,
   setIsCreateOpen,
-  setIsConnectAppOpen,
+  setIsCreateCollectionOpen,
   setIsCreateLinkOpen,
 }) => {
   useEffect(() => {
@@ -111,27 +105,8 @@ const PopoverContent = ({
       `}
     >
       <CreateItem
-        title="Connect a Service"
+        title="Create a Card"
         iconType="cards"
-        iconBackgroundColor="a2"
-        description="Create cards with data from other services"
-        onClick={() => {
-          close();
-          setIsConnectAppOpen(true);
-        }}
-        onKeyPress={e => {
-          if (e.key === 'Enter') {
-            close();
-          }
-        }}
-        css={`
-          border-top-right-radius: ${({ theme }) => theme.br};
-          border-top-left-radius: ${({ theme }) => theme.br};
-        `}
-      />
-      <CreateItem
-        title="Create a Link Card"
-        iconType="link"
         iconBackgroundColor="a1"
         description={
           /* eslint-disable react/jsx-wrap-multilines */
@@ -182,6 +157,25 @@ const PopoverContent = ({
           }
         }}
         css={`
+          border-top-right-radius: ${({ theme }) => theme.br};
+          border-top-left-radius: ${({ theme }) => theme.br};
+        `}
+      />
+      <CreateItem
+        title="Create a Collection"
+        iconType="collection"
+        iconBackgroundColor="a2"
+        description="A shareable collection of cards"
+        onClick={() => {
+          close();
+          setIsCreateCollectionOpen(true);
+        }}
+        onKeyPress={e => {
+          if (e.key === 'Enter') {
+            close();
+          }
+        }}
+        css={`
           border-bottom: 0;
           border-bottom-left-radius: ${({ theme }) => theme.br};
           border-bottom-right-radius: ${({ theme }) => theme.br};
@@ -199,114 +193,57 @@ const CreateButtonTypes = {
 };
 
 const CreateButton = ({ isCreateLinkOpen, setIsCreateLinkOpen }) => {
-  const [isConnectAppOpen, setIsConnectAppOpen] = useState(false);
-  const queryClient = useQueryClient();
-  const {
-    mutate: createCardMutate,
-    isLoading: isCreateCardLoading,
-  } = useMutation(createCard);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreateCollectionOpen, setIsCreateCollectionOpen] = useState(false);
 
   return (
     <>
-      <div
-        css={`
-          position: fixed;
-          bottom: ${({ theme }) => theme.space[4]}px;
-          right: ${({ theme }) => theme.space[4]}px;
-          padding-top: ${({ theme }) => theme.space[3]}px;
-          z-index: 3;
-        `}
+      <Popover
+        placement="top-end"
+        variant="light"
+        renderPopover={({ isOpen, closePopover }) => (
+          <PopoverContent
+            isOpen={isOpen}
+            closePopover={closePopover}
+            setIsCreateOpen={setIsCreateOpen}
+            setIsCreateCollectionOpen={setIsCreateCollectionOpen}
+            setIsCreateLinkOpen={setIsCreateLinkOpen}
+          />
+        )}
       >
-        <Fab onClick={() => setIsCreateLinkOpen(true)}>
-          <Icon type="plus" color="sc" size={2.8} />
-        </Fab>
-      </div>
-      <Modal
-        onRequestClose={() => {
-          setIsCreateLinkOpen(false);
-        }}
-        width={70}
-        isOpen={isCreateLinkOpen}
-        header="Create Link Cards"
-        renderHeader={() => (
-          <>
-            <ModalHeader>Create a Card</ModalHeader>
-            <Body1Component
-              as="p"
+        <div
+          css={`
+            position: fixed;
+            bottom: ${({ theme }) => theme.space[4]}px;
+            right: ${({ theme }) => theme.space[4]}px;
+            padding-top: ${({ theme }) => theme.space[3]}px;
+            z-index: 3;
+          `}
+        >
+          <Fab>
+            <Icon
+              type="plus"
+              color="sc"
+              size={2.8}
               css={`
-                margin-bottom: ${({ theme }) => theme.space[4]}px;
-              `}
-            >
-              Enter a URL for an online resource below. If it&apos;s a site that
-              requires login, consider using our{' '}
-              <a
-                href={process.env.CHROME_EXTENSION_URL}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Chrome Extension
-              </a>{' '}
-              instead.
-            </Body1Component>
-            <StringFieldWithButtonForm
-              autoFocus
-              placeholder="Enter a url..."
-              buttonContent="Add"
-              buttonProps={{ loading: isCreateCardLoading }}
-              disabled={isCreateCardLoading}
-              validate={string()
-                .required('This field is required.')
-                .matches(
-                  /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/,
-                  "It looks like you didn't enter a valid url. Please try again."
-                )}
-              onSubmit={async ({ value, resetForm }) => {
-                resetForm();
-                await createCardMutate(
-                  { url: value },
-                  {
-                    onError: error => {
-                      if (typeof error.error !== 'undefined') {
-                        if (error.error === 'exists') {
-                          return toast({
-                            message:
-                              'You already have a card created for the submitted link. You cannot have duplicate cards. The card was not created.',
-                            type: 'error',
-                          });
-                        }
-                      }
-                      return toast({
-                        message:
-                          'There was a problem submitting the url. Please try again.',
-                        type: 'error',
-                      });
-                    },
-                    onSuccess: () => {
-                      const queries = queryClient.getQueryCache().getAll();
-                      queries.forEach(query => {
-                        const { queryKey } = query;
-                        if (!queryKey || !queryKey.includes('cards')) return;
-                        setTimeout(() => {
-                          queryClient.invalidateQueries(queryKey);
-                        }, 1000);
-                      });
-                      return toast({
-                        message: 'The card was added successfully.',
-                      });
-                    },
-                  }
-                );
-              }}
-              css={`
-                width: 100%;
+                transition: transform 200ms;
+                transform: ${isCreateOpen ? 'rotate(45deg)' : 'none'};
               `}
             />
-          </>
-        )}
+          </Fab>
+        </div>
+      </Popover>
+      <CardModal
+        isCreateLinkOpen={isCreateLinkOpen}
+        setIsCreateLinkOpen={setIsCreateLinkOpen}
       />
-      <ServiceModal
-        isOpen={isConnectAppOpen}
-        onRequestClose={() => setIsConnectAppOpen(false)}
+      <CollectionModal
+        successMessage="Your new collection was created successfully"
+        heading="Create a New Collection"
+        description="Once you create a collection you can add cards to it and share it publicly."
+        isOpen={isCreateCollectionOpen}
+        onRequestClose={() => setIsCreateCollectionOpen(false)}
+        submitContent="Create"
       />
     </>
   );

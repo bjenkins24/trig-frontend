@@ -275,8 +275,9 @@ const CardBase = ({ data }) => {
       }}
       showTotalFavorites={false}
       dateTime={new Date(data.created_at)}
-      isFavorited={data.is_favorited}
-      totalFavorites={data.total_favorites}
+      showActions={!data.is_public}
+      isFavorited={data?.is_favorited}
+      totalFavorites={data?.total_favorites}
       onClickFavorite={async () => {
         await mutateFavorite({ is_favorited: !data.is_favorited, id: data.id });
       }}
@@ -314,6 +315,7 @@ const CardViewProps = {
   totalResults: PropTypes.number,
   isLoading: PropTypes.bool,
   isFetchingNextPage: PropTypes.bool,
+  isPublic: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -321,6 +323,7 @@ const defaultProps = {
   isLoading: false,
   totalResults: 0,
   isFetchingNextPage: false,
+  isPublic: false,
 };
 
 const CardView = ({
@@ -332,9 +335,11 @@ const CardView = ({
   isFetchingNextPage,
   isLoading,
   totalResults,
+  isPublic,
   ...restProps
 }) => {
   const { user } = useUser();
+  const updatedCards = cards.map(card => ({ ...card, is_public: isPublic }));
 
   const memoizedCallback = useCallback(async () => {
     if (!isFetchingNextPage) {
@@ -374,18 +379,20 @@ const CardView = ({
           margin-bottom: ${({ theme }) => theme.space[4]}px;
         `}
       >
-        <SelectField
-          css={`
-            margin-left: auto;
-          `}
-          value={cardCohort}
-          onChange={value => setCardCohort(value)}
-          options={[
-            { value: 'all', label: 'All Cards' },
-            { value: 'recently-viewed', label: 'Recently Viewed' },
-            { value: 'favorites', label: 'Favorites' },
-          ]}
-        />
+        {!isPublic && (
+          <SelectField
+            css={`
+              margin-left: auto;
+            `}
+            value={cardCohort}
+            onChange={value => setCardCohort(value)}
+            options={[
+              { value: 'all', label: 'All Cards' },
+              { value: 'recently-viewed', label: 'Recently Viewed' },
+              { value: 'favorites', label: 'Favorites' },
+            ]}
+          />
+        )}
       </div>
       <div
         css={`
@@ -394,13 +401,14 @@ const CardView = ({
           }
         `}
       >
-        {cards.length === 0 && user.total_cards !== 0 && (
-          <EmptyState
-            heading="No results"
-            content="Looks like no cards were found for the filters you used"
-          />
-        )}
-        {cards.length === 0 && user.total_cards === 0 && (
+        {(cards.length === 0 && isPublic) ||
+          (user && user.total_cards !== 0 && cards.length === 0 && (
+            <EmptyState
+              heading="No results"
+              content="Looks like no cards were found for the filters you used"
+            />
+          ))}
+        {!isPublic && cards.length === 0 && user?.total_cards === 0 && (
           <EmptyState
             heading="You Have No Cards!"
             content="Get started by adding a card to Trig and see your content automatically organized."
@@ -413,7 +421,7 @@ const CardView = ({
         {!isLoading && cards && (
           <MasonryScroller
             // Provides the data for our grid items
-            items={cards}
+            items={updatedCards}
             itemHeightEstimate={400}
             itemkey={data => data.id}
             positioner={positioner}

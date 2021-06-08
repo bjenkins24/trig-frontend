@@ -41,15 +41,6 @@ const VIEWS = {
   PEOPLE: 'people',
 };
 
-const SearchProps = {
-  onRequestClose: PropTypes.func.isRequired,
-  defaultInput: PropTypes.string,
-};
-
-const defaultProps = {
-  defaultInput: '',
-};
-
 /* eslint-disable react/prop-types */
 const CardResult = React.memo(({ card, cardQueryKey }) => {
   const { user } = useUser();
@@ -100,12 +91,27 @@ const CardResult = React.memo(({ card, cardQueryKey }) => {
 });
 /* esline-enable react/prop-types */
 
-const Search = ({ onRequestClose, defaultInput }) => {
+const SearchProps = {
+  onRequestClose: PropTypes.func.isRequired,
+  defaultInput: PropTypes.string,
+  collectionId: PropTypes.number,
+};
+
+const defaultProps = {
+  defaultInput: '',
+  collectionId: null,
+};
+
+const Search = ({ onRequestClose, defaultInput, collectionId }) => {
   const [searchInput, setSearchInput] = useState(defaultInput);
   const [currentView, setCurrentView] = useState(VIEWS.CARDS);
   const inputRef = useRef(null);
   const { filterProps, queryString } = useFilters();
-  const cardQueryKey = `h=1&q=${searchInput}&${queryString}`;
+  let collectionQuery = '';
+  if (collectionId) {
+    collectionQuery = `&col=${collectionId}`;
+  }
+  const cardQueryKey = `h=1&q=${searchInput}&${queryString}${collectionQuery}`;
   const { cards, totalResults, fetchCards, isLoading, filters } = useCards({
     queryString: cardQueryKey,
     queryConfig: { enabled: false },

@@ -33,8 +33,17 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
   const { isSearchOpen, openSearch, closeSearch, searchKey } = useSearch();
 
-  const { data: collection, isLoading } = useQuery(`collection/${token}`, () =>
-    getCollection({ token })
+  const { data: collection, isLoading } = useQuery(
+    `collection/${token}`,
+    () => getCollection({ token }),
+    {
+      onError: error => {
+        if (error.error === 'forbidden') {
+          window.location = '/';
+        }
+      },
+      retry: 0,
+    }
   );
 
   if (isLoading) {
@@ -50,6 +59,9 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
           isOpen={isCollectionModalOpen}
           onRequestClose={() => setIsCollectionModalOpen(false)}
           defaultTitle={collection.data.title}
+          defaultSharing={
+            collection.data.permissions.length > 0 ? 'public' : 'private'
+          }
           submitContent="Save"
           successMessage="Your collection was saved successfully."
           id={collection.data.id}
@@ -57,7 +69,11 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
       )}
       <Head title={collection.data.title} />
       {isPublic && isSearchOpen && (
-        <Search defaultInput={searchKey} onRequestClose={closeSearch} />
+        <Search
+          defaultInput={searchKey}
+          onRequestClose={closeSearch}
+          collectionId={collection.data.id}
+        />
       )}
       {isPublic && <Header isPublic={isPublic} openSearch={openSearch} />}
       <Hero

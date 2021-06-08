@@ -275,7 +275,7 @@ const CardBase = ({ data }) => {
       }}
       showTotalFavorites={false}
       dateTime={new Date(data.created_at)}
-      showActions={false}
+      showActions={!data.is_public}
       isFavorited={data?.is_favorited}
       totalFavorites={data?.total_favorites}
       onClickFavorite={async () => {
@@ -339,6 +339,7 @@ const CardView = ({
   ...restProps
 }) => {
   const { user } = useUser();
+  const updatedCards = cards.map(card => ({ ...card, is_public: isPublic }));
 
   const memoizedCallback = useCallback(async () => {
     if (!isFetchingNextPage) {
@@ -401,7 +402,7 @@ const CardView = ({
         `}
       >
         {(cards.length === 0 && isPublic) ||
-          (user && user.total_cards !== 0 && (
+          (user && user.total_cards !== 0 && cards.length === 0 && (
             <EmptyState
               heading="No results"
               content="Looks like no cards were found for the filters you used"
@@ -420,7 +421,7 @@ const CardView = ({
         {!isLoading && cards && (
           <MasonryScroller
             // Provides the data for our grid items
-            items={cards}
+            items={updatedCards}
             itemHeightEstimate={400}
             itemkey={data => data.id}
             positioner={positioner}

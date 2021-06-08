@@ -103,9 +103,15 @@ const Header = ({
                   theme.space[5] + theme.space[4]}px;
               `}
             >
-              <Link to="/">
-                <Logo title="Trig" />
-              </Link>
+              {isPublic ? (
+                <a href="https://trytrig.com">
+                  <Logo title="Trig" />
+                </a>
+              ) : (
+                <Link to="/">
+                  <Logo title="Trig" />
+                </Link>
+              )}
             </div>
             <Button
               onClick={openSearch}

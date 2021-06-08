@@ -45,14 +45,15 @@ const Home = ({ setIsCreateLinkOpen }) => {
   return (
     <div>
       <Head title="Dashboard" />
-      <Hero
-        css={`
-          padding-left: 0;
-          padding-right: 0;
-          margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;
-        `}
-      >
-        {typeof collections !== 'undefined' && (
+
+      {typeof collections !== 'undefined' && collections.data.length > 0 && (
+        <Hero
+          css={`
+            padding-left: 0;
+            padding-right: 0;
+            margin-bottom: ${({ theme }) => theme.space[5] + theme.space[1]}px;
+          `}
+        >
           <Carousel
             slidesPerPage={getSlidesPerPage({ width })}
             defaultSlidesToScroll={getSlidesPerPage({ width })}
@@ -84,8 +85,8 @@ const Home = ({ setIsCreateLinkOpen }) => {
               );
             })}
           </Carousel>
-        )}
-      </Hero>
+        </Hero>
+      )}
 
       <Cards setIsCreateLinkOpen={setIsCreateLinkOpen} />
     </div>

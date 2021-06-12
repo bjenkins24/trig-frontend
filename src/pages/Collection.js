@@ -150,6 +150,7 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
             <p
               css={`
                 margin-bottom: 0;
+                max-width: 700px;
               `}
             >
               <Body1 color="pc">{collection.data.description}</Body1>

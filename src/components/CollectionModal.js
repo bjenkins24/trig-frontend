@@ -7,6 +7,7 @@ import {
   StringField,
   SelectField,
   Fieldset,
+  TextField,
   toast,
 } from '@trig-app/core-components';
 import Modal from './Modal';
@@ -39,26 +40,6 @@ const CollectionButton = ({ connected, ...restProps }) => {
 
 CollectionButton.propTypes = CollectionButtonProps;
 CollectionButton.defaultProps = CollectionButtonDefaultProps;
-
-const CollectionModalProps = {
-  isOpen: PropTypes.bool.isRequired,
-  onRequestClose: PropTypes.func.isRequired,
-  defaultTitle: PropTypes.string,
-  defaultSharing: PropTypes.oneOf(['private', 'public']),
-  heading: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  submitContent: PropTypes.string.isRequired,
-  id: PropTypes.number,
-  successMessage: PropTypes.string.isRequired,
-};
-
-const CollectionModalDefaultProps = {
-  defaultTitle: '',
-  defaultSharing: 'private',
-  description: '',
-  id: null,
-};
-
 const getSharing = sharing => {
   if (sharing === 'private') {
     return { label: 'Private', value: 'private' };
@@ -69,26 +50,51 @@ const getSharing = sharing => {
   return {};
 };
 
+const CollectionModalProps = {
+  isOpen: PropTypes.bool.isRequired,
+  onRequestClose: PropTypes.func.isRequired,
+  defaultTitle: PropTypes.string,
+  defaultSharing: PropTypes.oneOf(['private', 'public']),
+  defaultDescription: PropTypes.string,
+  heading: PropTypes.string.isRequired,
+  content: PropTypes.string,
+  submitContent: PropTypes.string.isRequired,
+  id: PropTypes.number,
+  successMessage: PropTypes.string.isRequired,
+};
+
+const CollectionModalDefaultProps = {
+  defaultTitle: '',
+  defaultSharing: 'private',
+  defaultDescription: '',
+  content: '',
+  id: null,
+};
+
 const CollectionModal = ({
   id,
   isOpen,
   heading,
-  description,
+  content,
   onRequestClose,
   defaultTitle,
   defaultSharing,
+  defaultDescription,
   submitContent,
   successMessage,
 }) => {
+  console.log('defaultDescription', defaultDescription);
   const history = useHistory();
   const defaultSharingType = getSharing(defaultSharing);
   const [errorTitle, setErrorTitle] = useState('');
   const [sharing, setSharing] = useState(defaultSharingType);
   const [title, setTitle] = useState(defaultTitle);
+  const [description, setDescription] = useState(defaultDescription);
   const close = () => {
     onRequestClose();
     setTitle(defaultTitle);
     setSharing(defaultSharingType);
+    setDescription(defaultDescription);
   };
   const {
     collectionMutate,
@@ -96,7 +102,7 @@ const CollectionModal = ({
     collectionIsLoading,
   } = useCollections({
     onSuccess: () => {
-      onRequestClose();
+      close();
       return toast({
         message: successMessage,
       });
@@ -117,10 +123,11 @@ const CollectionModal = ({
       collectionMutate({
         id,
         title,
+        description,
         permissions: [{ type: 'public', capability: 'reader' }],
       });
     } else {
-      collectionMutate({ title, id });
+      collectionMutate({ title, description, id });
     }
     return false;
   };
@@ -138,15 +145,17 @@ const CollectionModal = ({
       }}
       header={heading}
     >
-      <Body1Component
-        as="p"
-        css={`
-          margin-top: 0;
-          margin-bottom: ${({ theme }) => theme.space[4]}px;
-        `}
-      >
-        {description}
-      </Body1Component>
+      {content && (
+        <Body1Component
+          as="p"
+          css={`
+            margin-top: 0;
+            margin-bottom: ${({ theme }) => theme.space[4]}px;
+          `}
+        >
+          {content}
+        </Body1Component>
+      )}
       <div
         css={`
           width: 100%;
@@ -175,6 +184,17 @@ const CollectionModal = ({
             error={errorTitle}
             value={title}
             placeholder="Enter a title..."
+            css={`
+              width: 100%;
+            `}
+          />
+          <TextField
+            label="Collection Description"
+            onChange={event => {
+              setDescription(event.target.value);
+            }}
+            value={description}
+            placeholder="Enter a description..."
             css={`
               width: 100%;
             `}

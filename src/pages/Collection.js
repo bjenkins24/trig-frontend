@@ -6,6 +6,7 @@ import {
   Heading1,
   Icon,
   Body2,
+  Body1,
   Button,
   Loading,
 } from '@trig-app/core-components';
@@ -55,10 +56,11 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
       {!isPublic && (
         <CollectionModal
           heading="Edit Collection"
-          description="You can edit your collection and add cards to it and share it publicly."
+          content="You can edit your collection and add cards to it and share it publicly."
           isOpen={isCollectionModalOpen}
           onRequestClose={() => setIsCollectionModalOpen(false)}
           defaultTitle={collection.data.title}
+          defaultDescription={collection.data.description}
           defaultSharing={
             collection.data.permissions.length > 0 ? 'public' : 'private'
           }
@@ -138,6 +140,22 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
             )}
           </div>
         </div>
+        {collection.data.description && (
+          <div
+            css={`
+              margin: 0 auto;
+              max-width: 1200px;
+            `}
+          >
+            <p
+              css={`
+                margin-bottom: 0;
+              `}
+            >
+              <Body1 color="pc">{collection.data.description}</Body1>
+            </p>
+          </div>
+        )}
       </Hero>
       <Cards
         isPublic={isPublic}

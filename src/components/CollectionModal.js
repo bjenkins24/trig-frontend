@@ -83,7 +83,6 @@ const CollectionModal = ({
   submitContent,
   successMessage,
 }) => {
-  console.log('defaultDescription', defaultDescription);
   const history = useHistory();
   const defaultSharingType = getSharing(defaultSharing);
   const [errorTitle, setErrorTitle] = useState('');

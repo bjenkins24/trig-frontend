@@ -162,6 +162,7 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
         isPublic={isPublic}
         setIsCreateLinkOpen={setIsCreateLinkOpen}
         collectionId={collection.data.id}
+        hiddenTags={collection.data.hidden_tags}
       />
     </>
   );

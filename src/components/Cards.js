@@ -10,17 +10,20 @@ const CardProps = {
   setIsCreateLinkOpen: PropTypes.func.isRequired,
   collectionId: PropTypes.number,
   isPublic: PropTypes.bool,
+  hiddenTags: PropTypes.arrayOf(PropTypes.string),
 };
 
 const defaultProps = {
   collectionId: null,
   isPublic: false,
+  hiddenTags: [],
 };
 
 const Cards = ({
   setIsCreateLinkOpen,
   collectionId,
   isPublic,
+  hiddenTags,
   ...restProps
 }) => {
   const { queryString, filterProps, cardViewProps } = useFilters();
@@ -45,6 +48,10 @@ const Cards = ({
     // queryConfig: { refetchInterval: 5000 },
   });
 
+  const tags = filters.tags.filter(tag => {
+    return !hiddenTags.includes(tag.name);
+  });
+
   return (
     <>
       <Content
@@ -67,7 +74,7 @@ const Cards = ({
             `}
             {...cardViewProps}
           />
-          <Filters tags={filters.tags} types={filters.types} {...filterProps} />
+          <Filters tags={tags} types={filters.types} {...filterProps} />
         </CardQueryContext.Provider>
       </Content>
     </>

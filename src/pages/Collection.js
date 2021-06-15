@@ -120,8 +120,8 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
                 `}
               />
               <Body2 color="pc">
-                {collection.data.totalCards} card
-                {collection.data.totalCards !== 1 && 's'}
+                {collection.data.total_cards} card
+                {collection.data.total_cards !== 1 && 's'}
               </Body2>
             </div>
             {!isPublic && (

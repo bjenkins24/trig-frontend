@@ -72,7 +72,7 @@ const Home = ({ setIsCreateLinkOpen }) => {
                       history.push(`/collection/${data.token}`);
                     }}
                     href={`/collection/${data.token}`}
-                    totalCards={data.totalCards}
+                    totalCards={data.total_cards}
                     title={data.title}
                     permission={
                       typeof data.permissions !== 'undefined' &&

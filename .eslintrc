@@ -12,8 +12,5 @@
         "react/prop-types": 0
       }
     }
-  ],
-  "globals": {
-    "analytics": "readonly"
-  }
+  ]
 }

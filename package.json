@@ -29,6 +29,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
+    "@analytics/segment": "^1.1.0",
     "@babel/core": "^7.12.10",
     "@babel/plugin-transform-runtime": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
@@ -40,6 +41,7 @@
     "@trig-app/constants": "^0.1.4",
     "@trig-app/core-components": "^1.0.11",
     "@trig-app/themes": "^0.1.6",
+    "analytics": "^0.7.5",
     "babel-loader": "^8.1.0",
     "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^3.6.0",

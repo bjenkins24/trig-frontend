@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
@@ -18,6 +18,7 @@ import { getCollection } from '../utils/collectionClient';
 import CollectionModal from '../components/CollectionModal';
 import Search from './Search';
 import useSearch from '../utils/useSearch';
+import { track } from '../utils/track';
 
 const CollectionProps = {
   setIsCreateLinkOpen: PropTypes.func,
@@ -47,6 +48,13 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
     }
   );
 
+  useEffect(() => {
+    track('User Views Collection', {
+      isAuthenticated: !isPublic,
+      token,
+    });
+  }, []);
+
   if (isLoading) {
     return <Loading />;
   }
@@ -75,6 +83,7 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
           defaultInput={searchKey}
           onRequestClose={closeSearch}
           collectionId={collection.data.id}
+          isPublic={isPublic}
         />
       )}
       {isPublic && <Header isPublic={isPublic} openSearch={openSearch} />}

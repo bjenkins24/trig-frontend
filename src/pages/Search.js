@@ -21,6 +21,7 @@ import {
 import useFilters from '../utils/useFilters';
 import useCards from '../utils/useCards';
 import EmptyState from '../components/EmptyState';
+import { track } from '../utils/track';
 
 const Separator = styled.div`
   height: 3px;
@@ -95,6 +96,7 @@ const SearchProps = {
   onRequestClose: PropTypes.func.isRequired,
   defaultInput: PropTypes.string,
   collectionId: PropTypes.number,
+  isPublic: PropTypes.bool.isRequired,
 };
 
 const defaultProps = {
@@ -102,7 +104,7 @@ const defaultProps = {
   collectionId: null,
 };
 
-const Search = ({ onRequestClose, defaultInput, collectionId }) => {
+const Search = ({ onRequestClose, defaultInput, collectionId, isPublic }) => {
   const [searchInput, setSearchInput] = useState(defaultInput);
   const [currentView, setCurrentView] = useState(VIEWS.CARDS);
   const inputRef = useRef(null);
@@ -118,6 +120,12 @@ const Search = ({ onRequestClose, defaultInput, collectionId }) => {
   });
 
   const debouncedFetch = useCallback(debounce(fetchCards, 150), []);
+
+  useEffect(() => {
+    track('User Opened Search', {
+      isAuthenticated: isPublic,
+    });
+  }, []);
 
   useEffect(() => {
     if (!searchInput) return;
@@ -333,6 +341,7 @@ const Search = ({ onRequestClose, defaultInput, collectionId }) => {
                     </ul>
                   </div>
                   <Filters
+                    isPublic={isPublic}
                     tags={filters.tags}
                     types={filters.types}
                     {...filterProps}

@@ -12,6 +12,7 @@ import AccountSettings from './pages/AccountSettings';
 import useSearch from './utils/useSearch';
 import useUser from './utils/useUser';
 import Extension from './components/Extension';
+import { identify } from './utils/track';
 
 const AuthenticatedApp = () => {
   const history = useHistory();
@@ -23,6 +24,10 @@ const AuthenticatedApp = () => {
     typeof onboardingClosed === 'undefined' || onboardingClosed !== true;
   const [isExtensionOpen, setIsExtensionOpen] = useState(shouldOpenOnboarding);
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    identify(user);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -41,7 +46,11 @@ const AuthenticatedApp = () => {
   return (
     <div>
       {isSearchOpen && (
-        <Search defaultInput={searchKey} onRequestClose={closeSearch} />
+        <Search
+          isPublic={false}
+          defaultInput={searchKey}
+          onRequestClose={closeSearch}
+        />
       )}
       <Extension setIsOpen={setIsExtensionOpen} isOpen={isExtensionOpen} />
       <CreateButton

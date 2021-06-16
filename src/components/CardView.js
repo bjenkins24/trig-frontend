@@ -20,8 +20,12 @@ import useUser from '../utils/useUser';
 import { CardQueryContext } from '../utils/useCards';
 import EmptyState from './EmptyState';
 import { DEFAULT_TO_SCREENSHOTS } from '../constants/defaultToScreenshots';
+import { track } from '../utils/track';
 
-export const saveView = async ({ id, userId }) => {
+export const saveView = async ({ id, userId, isPublic }) => {
+  track('User Views Card', {
+    isAuthenticated: !isPublic,
+  });
   await updateCard({ id, viewed_by: userId });
 };
 
@@ -270,7 +274,11 @@ const CardBase = ({ data }) => {
       key={data.id}
       onClick={async () => {
         if (get(data, 'id', false)) {
-          await saveView({ id: data.id, userId: user.id });
+          await saveView({
+            id: data.id,
+            userId: user.id,
+            isPublic: data.is_public,
+          });
         }
       }}
       showTotalFavorites={false}

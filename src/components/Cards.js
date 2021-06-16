@@ -74,7 +74,12 @@ const Cards = ({
             `}
             {...cardViewProps}
           />
-          <Filters tags={tags} types={filters.types} {...filterProps} />
+          <Filters
+            isPublic={isPublic}
+            tags={tags}
+            types={filters.types}
+            {...filterProps}
+          />
         </CardQueryContext.Provider>
       </Content>
     </>

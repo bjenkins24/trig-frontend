@@ -8,6 +8,7 @@ import {
   Icon,
   SelectField,
 } from '@trig-app/core-components';
+import { track } from '../utils/track';
 
 const makeLabel = ({ name, count }) => {
   return `${name} (${count})`;
@@ -19,6 +20,7 @@ export const maxWithoutSearchFilters = 9;
 const filterCategoryProps = {
   categoryName: PropTypes.string.isRequired,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  isPublic: PropTypes.bool.isRequired,
   selectedItems: PropTypes.arrayOf(PropTypes.string).isRequired,
   setSelectedItems: PropTypes.func.isRequired,
   icon: PropTypes.string.isRequired,
@@ -29,6 +31,7 @@ export const FilterCategory = ({
   items,
   icon,
   selectedItems,
+  isPublic,
   setSelectedItems,
 }) => {
   const totalItems = items.length;
@@ -90,6 +93,9 @@ export const FilterCategory = ({
           }}
           label={makeLabel(item)}
           onChange={() => {
+            track(`User Filtered By ${categoryName}`, {
+              isAuthenticated: !isPublic,
+            });
             if (selectedItems.includes(item.name)) {
               setSelectedItems(selectedItems.filter(i => i !== item.name));
             } else {
@@ -113,6 +119,9 @@ export const FilterCategory = ({
             margin-bottom: ${({ theme }) => theme.space[3]}px;
           `}
           onChange={value => {
+            track(`User Filtered By ${categoryName} with Search`, {
+              isAuthenticated: !isPublic,
+            });
             setSelectedItems([...selectedItems, value.value]);
           }}
           options={searchItems}
@@ -136,6 +145,7 @@ const FiltersProps = {
   setSelectedTypes: PropTypes.func.isRequired,
   tags: PropTypes.array,
   types: PropTypes.array,
+  isPublic: PropTypes.bool.isRequired,
 };
 
 const defaultProps = {
@@ -156,6 +166,7 @@ const Filters = ({
   setSelectedTypes,
   tags,
   types,
+  isPublic,
   ...restProps
 }) => {
   return (
@@ -205,14 +216,23 @@ const Filters = ({
         <DateRangeField
           startDate={startDate}
           endDate={endDate}
-          onSelectStart={date => setStartDate(date)}
-          onSelectEnd={date => setEndDate(date)}
+          onSelectStart={date => {
+            track('User Filtered By Start Date', {
+              isAuthenticated: !isPublic,
+            });
+            setStartDate(date);
+          }}
+          onSelectEnd={date => {
+            track('User Filtered By End Date', { isAuthenticated: !isPublic });
+            setEndDate(date);
+          }}
           clearStart={() => setStartDate(null)}
           clearEnd={() => setEndDate(null)}
         />
       </div>
       <div>
         <FilterCategory
+          isPublic={isPublic}
           categoryName="Tags"
           items={tags}
           icon="tags"
@@ -220,6 +240,7 @@ const Filters = ({
           selectedItems={selectedTags}
         />
         <FilterCategory
+          isPublic={isPublic}
           categoryName="Types"
           items={types}
           icon="cards"

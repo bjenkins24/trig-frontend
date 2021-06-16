@@ -123,7 +123,7 @@ const Search = ({ onRequestClose, defaultInput, collectionId, isPublic }) => {
 
   useEffect(() => {
     track('User Opened Search', {
-      isAuthenticated: isPublic,
+      isAuthenticated: !isPublic,
     });
   }, []);
 

@@ -9,6 +9,7 @@ import {
   Body1,
   Button,
   Loading,
+  ButtonCount,
 } from '@trig-app/core-components';
 import Head from '../components/Head';
 import Hero from '../components/Hero';
@@ -19,6 +20,7 @@ import CollectionModal from '../components/CollectionModal';
 import Search from './Search';
 import useSearch from '../utils/useSearch';
 import { track } from '../utils/track';
+import AuthModal from '../components/AuthModal';
 
 const CollectionProps = {
   setIsCreateLinkOpen: PropTypes.func,
@@ -34,6 +36,8 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
   const { token } = useParams();
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
   const { isSearchOpen, openSearch, closeSearch, searchKey } = useSearch();
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const { data: collection, isLoading } = useQuery(
     `collection/${token}`,
@@ -61,6 +65,20 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
 
   return (
     <>
+      {isPublic && (
+        <AuthModal
+          isRegisterOpen={isRegisterModalOpen}
+          setIsRegisterOpen={setIsRegisterModalOpen}
+          isLoginOpen={isLoginModalOpen}
+          setIsLoginOpen={setIsLoginModalOpen}
+          onRegisterSuccess={() => {
+            alert('registered');
+          }}
+          onLoginSuccess={() => {
+            alert('Logged in');
+          }}
+        />
+      )}
       {!isPublic && (
         <CollectionModal
           heading="Edit Collection"
@@ -148,6 +166,20 @@ const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
               </Button>
             )}
           </div>
+          <ButtonCount
+            countTotal={0}
+            buttonProps={{
+              onClick: () => {
+                if (isPublic) {
+                  setIsRegisterModalOpen(true);
+                } else {
+                  alert('sup');
+                }
+              },
+            }}
+          >
+            Follow
+          </ButtonCount>
         </div>
         {collection.data.description && (
           <div

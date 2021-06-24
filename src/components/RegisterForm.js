@@ -39,10 +39,10 @@ const defaultProps = {
   onSuccess: () => null,
 };
 
-const RegisterForm = ({ onSuccess, signInLink }) => {
+const RegisterForm = ({ onSuccess, signInLink, ...restProps }) => {
   const { register } = useUser();
   return (
-    <>
+    <div {...restProps}>
       <SignIn>Already have an account? {signInLink}</SignIn>
       <FormContainer>
         <Form
@@ -125,7 +125,7 @@ const RegisterForm = ({ onSuccess, signInLink }) => {
           }}
         </Form>
       </FormContainer>
-    </>
+    </div>
   );
 };
 

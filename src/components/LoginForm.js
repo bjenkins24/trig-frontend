@@ -56,11 +56,11 @@ const defaultProps = {
   onSuccess: () => null,
 };
 
-const LoginForm = ({ onSuccess, createAccountLink }) => {
+const LoginForm = ({ onSuccess, createAccountLink, ...restProps }) => {
   const { login } = useUser();
 
   return (
-    <>
+    <div {...restProps}>
       <CreateAccount>Need a Trig account? {createAccountLink}</CreateAccount>
       <FormContainer>
         <Form
@@ -115,7 +115,7 @@ const LoginForm = ({ onSuccess, createAccountLink }) => {
           <Lock /> Forgot your password?
         </ForgotPassword>
       </FormContainer>
-    </>
+    </div>
   );
 };
 

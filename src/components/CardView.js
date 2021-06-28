@@ -15,18 +15,18 @@ import {
   useResizeObserver,
   useInfiniteLoader,
 } from 'masonic';
-import { updateCard, deleteCard } from '../utils/cardClient';
+import { updateCard, deleteCard, saveCardView } from '../utils/cardClient';
 import useUser from '../utils/useUser';
 import { CardQueryContext } from '../utils/useCards';
 import EmptyState from './EmptyState';
 import { DEFAULT_TO_SCREENSHOTS } from '../constants/defaultToScreenshots';
 import { track } from '../utils/track';
 
-export const saveView = async ({ id, userId, isPublic }) => {
+export const saveView = async ({ token, isPublic }) => {
   track('User Views Card', {
     isAuthenticated: !isPublic,
   });
-  await updateCard({ id, viewed_by: userId });
+  await saveCardView(token);
 };
 
 const removeTags = ({ previousPage, cardId }) => {
@@ -274,11 +274,7 @@ const CardBase = ({ data }) => {
       key={data.id}
       onClick={async () => {
         if (get(data, 'id', false)) {
-          await saveView({
-            id: data.id,
-            userId: user.id,
-            isPublic: data.is_public,
-          });
+          await saveView({ token: data.token, isPublic: data.is_public });
         }
       }}
       showTotalFavorites={false}

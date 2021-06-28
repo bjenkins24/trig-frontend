@@ -11,7 +11,6 @@ import {
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import Filters from '../components/Filters';
-import useUser from '../utils/useUser';
 import {
   makeMoreList,
   saveView,
@@ -43,8 +42,7 @@ const VIEWS = {
 };
 
 /* eslint-disable react/prop-types */
-const CardResult = React.memo(({ card, cardQueryKey }) => {
-  const { user } = useUser();
+const CardResult = React.memo(({ card, cardQueryKey, isPublic }) => {
   const mutateFavorite = useFavorite(cardQueryKey);
   const mutateDelete = useDelete(cardQueryKey);
 
@@ -57,7 +55,7 @@ const CardResult = React.memo(({ card, cardQueryKey }) => {
     >
       <CardItem
         onClick={async () => {
-          await saveView({ id: card.id, useId: user.id });
+          await saveView({ token: card.token, isPublic });
         }}
         href={card.url}
         openInNewTab
@@ -332,6 +330,7 @@ const Search = ({ onRequestClose, defaultInput, collectionId, isPublic }) => {
                         cards.map(card => {
                           return (
                             <CardResult
+                              isPublic={isPublic}
                               key={card.id}
                               card={card}
                               cardQueryKey={`cards?${cardQueryKey}`}

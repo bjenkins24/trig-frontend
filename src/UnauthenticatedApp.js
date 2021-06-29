@@ -13,6 +13,12 @@ const UnauthenticatedApp = () => {
       <Route path="/collection/:token">
         <Collection isPublic />
       </Route>
+      <Route path="/product-market-fit">
+        <Collection
+          isPublic
+          defaultToken="8631d71f410e8b0785b144daebf26795881afad77c930793"
+        />
+      </Route>
       <Route path="/register">
         <Register />
       </Route>

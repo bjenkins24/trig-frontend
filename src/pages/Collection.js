@@ -25,15 +25,20 @@ import AuthModal from '../components/AuthModal';
 const CollectionProps = {
   setIsCreateLinkOpen: PropTypes.func,
   isPublic: PropTypes.bool,
+  defaultToken: PropTypes.string,
 };
 
 const defaultProps = {
   setIsCreateLinkOpen: () => null,
   isPublic: false,
+  defaultToken: '',
 };
 
-const Collection = ({ setIsCreateLinkOpen, isPublic }) => {
-  const { token } = useParams();
+const Collection = ({ setIsCreateLinkOpen, isPublic, defaultToken }) => {
+  let { token } = useParams();
+  if (!token) {
+    token = defaultToken;
+  }
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
   const { isSearchOpen, openSearch, closeSearch, searchKey } = useSearch();
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);

@@ -19,6 +19,17 @@ const updateCard = fields => {
   });
 };
 
+const saveCardView = token => {
+  if (typeof token === 'undefined') {
+    // eslint-disable-next-line no-console
+    return console.error('You must specify a card token');
+  }
+  return client(`card-view`, {
+    method: 'POST',
+    body: { token },
+  });
+};
+
 const deleteCard = ({ id }) => {
   return client(`card/${id}`, {
     method: 'DELETE',
@@ -29,4 +40,4 @@ const getCards = ({ queryKey, pageParam = 0 }) => {
   return client(`${queryKey}&p=${pageParam}`);
 };
 
-export { createCard, updateCard, getCards, deleteCard };
+export { createCard, updateCard, getCards, deleteCard, saveCardView };

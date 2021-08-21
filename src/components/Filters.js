@@ -83,31 +83,33 @@ export const FilterCategory = ({
           {categoryName}
         </div>
       </Body1>
-      {slicedItems.map(item => (
-        <Checkbox
-          key={makeLabel(item)}
-          width="100%"
-          labelProps={{
-            color: 'p',
-            style: { fontSize: '14px', marginTop: '2px' },
-          }}
-          label={makeLabel(item)}
-          onChange={() => {
-            track(`User Filtered By ${categoryName}`, {
-              isAuthenticated: !isPublic,
-            });
-            if (selectedItems.includes(item.name)) {
-              setSelectedItems(selectedItems.filter(i => i !== item.name));
-            } else {
-              setSelectedItems([...selectedItems, item.name]);
-            }
-          }}
-          checked={selectedItems.includes(item.name)}
-          css={`
-            margin-bottom: ${({ theme }) => theme.space[2]}px;
-          `}
-        />
-      ))}
+      {slicedItems.map(item => {
+        return (
+          <Checkbox
+            key={makeLabel(item)}
+            width="100%"
+            labelProps={{
+              color: 'p',
+              style: { fontSize: '14px', marginTop: '2px' },
+            }}
+            label={makeLabel(item)}
+            onChange={() => {
+              track(`User Filtered By ${categoryName}`, {
+                isAuthenticated: !isPublic,
+              });
+              if (selectedItems.includes(item.name)) {
+                setSelectedItems(selectedItems.filter(i => i !== item.name));
+              } else {
+                setSelectedItems([...selectedItems, item.name]);
+              }
+            }}
+            checked={selectedItems.includes(item.name)}
+            css={`
+              margin-bottom: ${({ theme }) => theme.space[2]}px;
+            `}
+          />
+        );
+      })}
       {searchItems.length > 0 && (
         <SelectField
           placeholder="Search..."
@@ -180,7 +182,8 @@ const Filters = ({
     >
       <Heading2
         css={`
-          margin-bottom: ${({ theme }) => theme.space[4]};
+          margin-top: ${({ theme }) => theme.space[1]}px;
+          margin-bottom: ${({ theme }) => theme.space[4]}px;
         `}
       >
         Filter By

@@ -60,35 +60,27 @@ const Cards = ({
         `}
         {...restProps}
       >
-        <div
-          css={`
-            display: flex;
-            margin: 0 auto;
-          `}
-        >
-          <CardQueryContext.Provider value={cardQueryKey}>
-            <CardView
-              isPublic={isPublic}
-              setIsCreateLinkOpen={setIsCreateLinkOpen}
-              cards={cards}
-              totalResults={totalResults}
-              fetchNextPage={fetchNextPage}
-              isFetchingNextPage={isFetchingNextPage}
-              isLoading={isLoading}
-              css={`
-                margin-right: ${({ theme }) => theme.space[5]}px;
-              `}
-              selectedTags={filterProps.selectedTags}
-              {...cardViewProps}
-            />
-            <Filters
-              isPublic={isPublic}
-              tags={tags}
-              types={filters.types}
-              {...filterProps}
-            />
-          </CardQueryContext.Provider>
-        </div>
+        <CardQueryContext.Provider value={cardQueryKey}>
+          <CardView
+            isPublic={isPublic}
+            setIsCreateLinkOpen={setIsCreateLinkOpen}
+            cards={cards}
+            totalResults={totalResults}
+            fetchNextPage={fetchNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            isLoading={isLoading}
+            css={`
+              margin-right: ${({ theme }) => theme.space[5]}px;
+            `}
+            {...cardViewProps}
+          />
+          <Filters
+            isPublic={isPublic}
+            tags={tags}
+            types={filters.types}
+            {...filterProps}
+          />
+        </CardQueryContext.Provider>
       </Content>
     </>
   );

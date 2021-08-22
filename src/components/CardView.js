@@ -6,12 +6,8 @@ import {
   Icon,
   SelectField,
   Card,
-  CardLarge,
   HorizontalGroup,
   toast,
-  Tag,
-  ButtonToggle,
-  Heading2,
 } from '@trig-app/core-components';
 import {
   MasonryScroller,
@@ -25,9 +21,6 @@ import { CardQueryContext } from '../utils/useCards';
 import EmptyState from './EmptyState';
 import { DEFAULT_TO_SCREENSHOTS } from '../constants/defaultToScreenshots';
 import { track } from '../utils/track';
-import useLocalStorage from '../utils/useLocalStorage';
-
-const thumbnailWidth = 294;
 
 export const saveView = async ({ token, isPublic }) => {
   track('User Views Card', {
@@ -272,13 +265,13 @@ const CardBase = ({ data }) => {
   const cardQueryKey = useContext(CardQueryContext);
   const mutateFavorite = useFavorite(cardQueryKey);
   const mutateDelete = useDelete(cardQueryKey);
+  const { user } = useUser();
 
   const image = getImage(data);
 
   return (
     <Card
       key={data.id}
-      width={thumbnailWidth}
       onClick={async () => {
         if (get(data, 'id', false)) {
           await saveView({ token: data.token, isPublic: data.is_public });
@@ -309,73 +302,9 @@ const CardBase = ({ data }) => {
   );
 };
 
-/* eslint-disable */
-const CardLargeBase = ({ data }) => {
-  const cardQueryKey = useContext(CardQueryContext);
-  const mutateFavorite = useFavorite(cardQueryKey);
-  const mutateDelete = useDelete(cardQueryKey);
-
-  return (
-    <div>
-      <CardLarge
-        key={data.id}
-        onClick={async () => {
-          if (get(data, 'id', false)) {
-            await saveView({ token: data.token, isPublic: data.is_public });
-          }
-        }}
-        showTotalFavorites={false}
-        canFavorite={!data.is_public}
-        isFavorited={data?.is_favorited}
-        totalFavorites={data?.total_favorites}
-        onClickFavorite={async () => {
-          await mutateFavorite({
-            is_favorited: !data.is_favorited,
-            id: data.id,
-          });
-        }}
-        title={data.title}
-        href={data.url}
-        type={data.type}
-        image={
-          data.screenshot_large.path
-            ? `${process.env.CDN_URL}${data.screenshot_large.path}`
-            : null
-        }
-        imageWidth={data.screenshot_large.width}
-        imageHeight={data.screenshot_large.height}
-        totalViews={data.total_views}
-        onClickTrash={() => mutateDelete({ id: data.id })}
-        maxHeight={400}
-      />
-      <HorizontalGroup
-        margin={0.4}
-        css={`
-          flex-wrap: wrap;
-          & > * {
-            margin-top: ${({ theme }) => theme.space[1]}px;
-          }
-        `}
-      >
-        {data.tags.map(tag => {
-          return (
-            <Tag key={tag} isSelected={data.selectedTags.includes(tag)}>
-              {tag}
-            </Tag>
-          );
-        })}
-      </HorizontalGroup>
-    </div>
-  );
-};
-
 // this has to be defined outside of the component or the UI flashes
 const CardRenderer = ({ data }) => {
   return <CardBase data={data} />;
-};
-
-const CardLargeRenderer = ({ data }) => {
-  return <CardLargeBase data={data} />;
 };
 
 const CardViewProps = {
@@ -387,7 +316,6 @@ const CardViewProps = {
   fetchNextPage: PropTypes.func.isRequired,
   setCardCohort: PropTypes.func.isRequired,
   setIsCreateLinkOpen: PropTypes.func.isRequired,
-  selectedTags: PropTypes.array,
   totalResults: PropTypes.number,
   isLoading: PropTypes.bool,
   isFetchingNextPage: PropTypes.bool,
@@ -400,7 +328,6 @@ const defaultProps = {
   totalResults: 0,
   isFetchingNextPage: false,
   isPublic: false,
-  selectedTags: [],
 };
 
 const CardView = ({
@@ -413,21 +340,10 @@ const CardView = ({
   isLoading,
   totalResults,
   isPublic,
-  selectedTags,
   ...restProps
 }) => {
   const { user } = useUser();
-  const thumbnailView = 'thumbnail-view';
-  const largeThumbnailView = 'large-thumbnail-view';
-  const [currentView, setCurrentView] = useLocalStorage(
-    'currentView',
-    largeThumbnailView
-  );
-  const updatedCards = cards.map(card => ({
-    ...card,
-    is_public: isPublic,
-    selectedTags,
-  }));
+  const updatedCards = cards.map(card => ({ ...card, is_public: isPublic }));
 
   const memoizedCallback = useCallback(async () => {
     if (!isFetchingNextPage) {
@@ -445,11 +361,7 @@ const CardView = ({
   });
 
   const positioner = usePositioner(
-    {
-      width: 1200,
-      columnWidth: currentView === largeThumbnailView ? 568 : thumbnailWidth,
-      columnGutter: currentView === largeThumbnailView ? 16 : 6,
-    },
+    { width: 780, columnWidth: 251, columnGutter: 6 },
     // This is our dependencies array. When these dependencies
     // change, the positioner cache will be cleared and the
     // masonry component will reset as a result.
@@ -461,7 +373,7 @@ const CardView = ({
   return (
     <div
       css={`
-        width: 1200px;
+        width: 776px;
       `}
       {...restProps}
     >
@@ -471,32 +383,11 @@ const CardView = ({
           margin-bottom: ${({ theme }) => theme.space[4]}px;
         `}
       >
-        <Heading2
-          css={`
-            margin: ${({ theme }) => theme.space[1]}px 0 0 0;
-          `}
-        >
-          Cards
-        </Heading2>
-        <ButtonToggle
-          defaultSelectedIndex={currentView === thumbnailView ? 1 : 0}
-          css={`
-            margin: 2px ${({ theme }) => theme.space[4]}px 0 auto;
-          `}
-        >
-          <Icon
-            type="row-view"
-            onClick={() => setCurrentView(largeThumbnailView)}
-            size={1.6}
-          />
-          <Icon
-            type="thumbnail-view"
-            onClick={() => setCurrentView(thumbnailView)}
-            size={1.6}
-          />
-        </ButtonToggle>
         {!isPublic && (
           <SelectField
+            css={`
+              margin-left: auto;
+            `}
             value={cardCohort}
             onChange={value => setCardCohort(value)}
             options={[
@@ -543,11 +434,7 @@ const CardView = ({
             // Pre-renders 5 windows worth of content
             overscanBy={5}
             // This is the grid item component
-            render={
-              currentView === largeThumbnailView
-                ? CardLargeRenderer
-                : CardRenderer
-            }
+            render={CardRenderer}
             onRender={maybeLoadMore}
           />
         )}

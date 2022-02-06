@@ -394,7 +394,11 @@ const CardLargeBase = ({ data }) => {
   }
 
   return (
-    <div>
+    <div
+      css={`
+        margin-bottom: ${({ theme }) => theme.space[2]}px;
+      `}
+    >
       <CardLarge
         key={data.id}
         onClick={async () => {

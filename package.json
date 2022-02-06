@@ -39,7 +39,7 @@
     "@sentry/react": "^5.30.0",
     "@sentry/tracing": "^6.3.0",
     "@trig-app/constants": "^0.1.4",
-    "@trig-app/core-components": "^1.0.18",
+    "@trig-app/core-components": "^1.0.25",
     "@trig-app/themes": "^0.1.6",
     "analytics": "^0.7.5",
     "babel-loader": "^8.1.0",

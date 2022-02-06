@@ -7,6 +7,7 @@ import {
   SelectField,
   Card,
   CardLarge,
+  CardTwitter,
   HorizontalGroup,
   toast,
   Tag,
@@ -314,6 +315,83 @@ const CardLargeBase = ({ data }) => {
   const cardQueryKey = useContext(CardQueryContext);
   const mutateFavorite = useFavorite(cardQueryKey);
   const mutateDelete = useDelete(cardQueryKey);
+
+  if (data.type === 'tweet' && data.tweet.name) {
+    const getLink = () => {
+      if (data.tweet.link.href) {
+        return {
+          href: data.tweet.link.url,
+          imageSrc: data.tweet.link.image_src,
+          title: data.tweet.link.title,
+          description: data.tweet.link.description,
+        };
+      }
+      return null;
+    };
+    const getReply = () => {
+      if (data.tweet.reply.content) {
+        return {
+          handle: data.tweet.reply.handle,
+          name: data.tweet.reply.name,
+          replyingTo: data.tweet.reply.replying_to,
+          content: data.tweet.reply.content,
+          avatar: data.tweet.reply.avatar,
+        };
+      }
+      return null;
+    };
+    return (
+      <div>
+        <CardTwitter
+          key={data.id}
+          onClick={async () => {
+            if (get(data, 'id', false)) {
+              await saveView({ token: data.token, isPublic: data.is_public });
+            }
+          }}
+          showTotalFavorites={false}
+          canFavorite={!data.is_public}
+          isFavorited={data?.is_favorited}
+          totalFavorites={data?.total_favorites}
+          onClickFavorite={async () => {
+            await mutateFavorite({
+              is_favorited: !data.is_favorited,
+              id: data.id,
+            });
+          }}
+          href={data.url}
+          type={data.type}
+          totalViews={data.total_views}
+          onClickTrash={() => mutateDelete({ id: data.id })}
+          avatar={data.tweet.avatar}
+          name={data.tweet.name}
+          handle={data.tweet.handle}
+          date={data.tweet.created_at}
+          content={data.title}
+          link={getLink()}
+          reply={getReply()}
+          images={data.tweet.images}
+        />
+        <HorizontalGroup
+          margin={0.4}
+          css={`
+            flex-wrap: wrap;
+            & > * {
+              margin-top: ${({ theme }) => theme.space[1]}px;
+            }
+          `}
+        >
+          {data.tags.map(tag => {
+            return (
+              <Tag key={tag} isSelected={data.selectedTags.includes(tag)}>
+                {tag}
+              </Tag>
+            );
+          })}
+        </HorizontalGroup>
+      </div>
+    );
+  }
 
   return (
     <div>

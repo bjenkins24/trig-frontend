@@ -316,7 +316,7 @@ const CardLargeBase = ({ data }) => {
   const mutateFavorite = useFavorite(cardQueryKey);
   const mutateDelete = useDelete(cardQueryKey);
 
-  if (data.type === 'tweet' && data.tweet.name) {
+  if (data.type === 'tweet' && data.tweet?.name) {
     const getLink = () => {
       if (data.tweet.link.href) {
         return {
